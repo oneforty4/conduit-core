@@ -1,0 +1,157 @@
+name: ci
+on:
+  push: { branches: [main] }
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      extended_checks:
+        description: Run the ten-minute real-timer qualification
+        type: boolean
+        default: false
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 24
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm format
+      - run: pnpm typecheck
+      - run: mkdir -p test-results
+      - run: pnpm test --reporter=default --reporter=junit --outputFile=test-results/vitest.xml
+        env:
+          CONDUIT_NETWORK_SCENARIO_ARTIFACT: ${{ github.workspace }}/test-results/network-scenarios.json
+      - run: pnpm check:three
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: vitest-results, path: test-results/ }
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: check
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @conduit-examples/sandbox exec playwright install --with-deps ${{ matrix.browser }}
+      - run: pnpm e2e
+        env:
+          CONDUIT_BROWSER: ${{ matrix.browser }}
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          {
+            name: 'playwright-report-${{ matrix.browser }}',
+            path: examples/sandbox/playwright-report/,
+          }
+
+  extended-timing:
+    if: github.event_name == 'workflow_dispatch' && inputs.extended_checks
+    runs-on: ubuntu-latest
+    needs: check
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: mkdir -p test-results
+      - run: pnpm exec vitest run packages/sim/test/fixedLoop.test.ts --reporter=default --reporter=junit --outputFile=test-results/timing.xml
+        env:
+          CONDUIT_SLOW: '1'
+          CONDUIT_SLOW_SECONDS: '600'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: extended-timing, path: test-results/ }
+
+  consume:
+    # Proves docs/consuming.md: a fresh workspace that globs packages/* from this checkout installs, typechecks an app
+    # importing every @conduit/game entry, and resolves exactly one `three`.
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Create throwaway game workspace
+        run: |
+          set -euo pipefail
+          APP="$RUNNER_TEMP/consume"
+          mkdir -p "$APP/vendor/conduit-core" "$APP/app/src"
+          rsync -a --exclude node_modules "$GITHUB_WORKSPACE/packages" "$GITHUB_WORKSPACE/scripts" "$APP/vendor/conduit-core/"
+          cp "$GITHUB_WORKSPACE/.npmrc" "$APP/.npmrc"
+          cat > "$APP/pnpm-workspace.yaml" <<'EOF'
+          packages:
+            - 'vendor/conduit-core/packages/*'
+            - 'app'
+
+          allowBuilds:
+            esbuild: true
+          EOF
+          cat > "$APP/package.json" <<'EOF'
+          { "name": "consume-check", "private": true, "type": "module", "packageManager": "pnpm@11.21.0" }
+          EOF
+          cat > "$APP/tsconfig.json" <<'EOF'
+          { "extends": "./vendor/conduit-core/packages/tooling/tsconfig.base.json", "include": [] }
+          EOF
+          cat > "$APP/app/package.json" <<'EOF'
+          {
+            "name": "consume-app", "private": true, "type": "module",
+            "scripts": { "typecheck": "tsc -p tsconfig.json" },
+            "dependencies": { "@conduit/game": "workspace:*", "three": "0.170.0" },
+            "devDependencies": { "@conduit/tooling": "workspace:*", "@types/node": "^22.10.0", "@types/three": "0.170.0", "typescript": "^5.6.0" }
+          }
+          EOF
+          cat > "$APP/app/tsconfig.json" <<'EOF'
+          {
+            "extends": "../tsconfig.json",
+            "compilerOptions": { "lib": ["ES2022", "DOM", "DOM.Iterable"], "types": ["node"] },
+            "include": ["src"]
+          }
+          EOF
+          cat > "$APP/app/src/main.ts" <<'EOF'
+          import { defineGame } from '@conduit/game';
+          import { createClient } from '@conduit/game/client';
+          import { createHost } from '@conduit/game/host';
+          import { createServer, createJournalReplayRun } from '@conduit/game/server';
+          export const entries = { defineGame, createClient, createHost, createServer, createJournalReplayRun };
+          EOF
+          echo "APP=$APP" >> "$GITHUB_ENV"
+      - name: Install
+        working-directory: ${{ env.APP }}
+        run: pnpm install
+      - name: Typecheck consumer
+        working-directory: ${{ env.APP }}
+        run: pnpm --filter consume-app typecheck
+      - name: Assert a single three
+        working-directory: ${{ env.APP }}
+        run: pnpm why -r three --json | node vendor/conduit-core/scripts/assert-single-three.mjs
+      - name: Assert no dist or build artefacts were needed
+        working-directory: ${{ env.APP }}
+        run: test -z "$(find vendor/conduit-core/packages -name dist -type d -print -quit)"

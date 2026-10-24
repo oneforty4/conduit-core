@@ -1,0 +1,45 @@
+{
+  "name": "@conduit/host",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "bin": {
+    "conduit-host": "./src/cli.ts"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./worker": {
+      "types": "./src/worker.ts",
+      "default": "./src/worker.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@conduit/auth": "workspace:*",
+    "@conduit/lobby": "workspace:*",
+    "@conduit/net-server": "workspace:*",
+    "@conduit/persist": "workspace:*",
+    "@conduit/protocol": "workspace:*",
+    "hono": "^4.6.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@conduit/game": "workspace:*",
+    "@conduit/lobby-client": "workspace:*",
+    "@conduit/net-client": "workspace:*",
+    "@conduit/sim": "workspace:*",
+    "@conduit/tooling": "workspace:*",
+    "@types/node": "^22.10.0",
+    "@types/ws": "^8.5.12",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^3.1.0"
+  }
+}

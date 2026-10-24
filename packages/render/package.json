@@ -1,0 +1,38 @@
+{
+  "name": "@conduit/render",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@conduit/assets": "workspace:*",
+    "@conduit/math": "workspace:*",
+    "@conduit/net-client": "workspace:*",
+    "@conduit/protocol": "workspace:*",
+    "@conduit/sim": "workspace:*",
+    "@conduit/world": "workspace:*"
+  },
+  "peerDependencies": {
+    "three": ">=0.160.0 <1.0.0",
+    "@types/three": ">=0.160.0 <1.0.0"
+  },
+  "devDependencies": {
+    "@conduit/tooling": "workspace:*",
+    "@types/node": "^22.10.0",
+    "@types/three": "0.170.0",
+    "jsdom": "^25.0.0",
+    "three": "0.170.0",
+    "typescript": "^5.6.0",
+    "vitest": "^3.1.0"
+  }
+}

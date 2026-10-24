@@ -1,0 +1,2939 @@
+{
+  "description": "Four entities in two regions through every replication case: creates on first sight, updates only for version > baseline, a component removed once, removed and re-added between snapshots, destroy by death, leaving and re-entering interest, interest shrinking and growing, a reused slot with a new generation, a component added to a known entity, two writes between snapshots, a region change inside interest, an empty delta.",
+  "components": [
+    "Model",
+    "Name",
+    "Owner",
+    "Region",
+    "Transform"
+  ],
+  "steps": [
+    {
+      "tick": 3,
+      "interest": [
+        "cell/0_0",
+        "cell/1_0"
+      ],
+      "delta": {
+        "header": {
+          "serverTick": 3,
+          "serverTimeMs": 150,
+          "baselineTick": 0,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 1
+        },
+        "regions": [
+          "cell/1_0",
+          "cell/0_0"
+        ],
+        "creates": [
+          {
+            "entity": 1,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 0
+                }
+              },
+              {
+                "id": 1,
+                "value": {
+                  "value": "A"
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 10.5,
+                    "y": 0,
+                    "z": 20.25
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 2,
+            "regionIdx": 1,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 0
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 3
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 100,
+                    "y": 0,
+                    "z": 100
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 3,
+            "regionIdx": 1,
+            "components": [
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 5,
+                    "y": 0,
+                    "z": 250.75
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 4,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 1,
+                "value": {
+                  "value": "D"
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 1
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 64,
+                    "y": 0,
+                    "z": 64
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0.247404,
+                    "z": 0,
+                    "w": 0.968912
+                  },
+                  "vel": {
+                    "x": 1.5,
+                    "y": 0,
+                    "z": -2.25
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "updates": [],
+        "destroys": []
+      },
+      "full": {
+        "header": {
+          "serverTick": 3,
+          "serverTimeMs": 150,
+          "baselineTick": 0,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 1
+        },
+        "regions": [
+          "cell/1_0",
+          "cell/0_0"
+        ],
+        "creates": [
+          {
+            "entity": 1,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 0
+                }
+              },
+              {
+                "id": 1,
+                "value": {
+                  "value": "A"
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 10.5,
+                    "y": 0,
+                    "z": 20.25
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 2,
+            "regionIdx": 1,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 0
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 3
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 100,
+                    "y": 0,
+                    "z": 100
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 3,
+            "regionIdx": 1,
+            "components": [
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 5,
+                    "y": 0,
+                    "z": 250.75
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 4,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 1,
+                "value": {
+                  "value": "D"
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 1
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 64,
+                    "y": 0,
+                    "z": 64
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0.247404,
+                    "z": 0,
+                    "w": 0.968912
+                  },
+                  "vel": {
+                    "x": 1.5,
+                    "y": 0,
+                    "z": -2.25
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "updates": [],
+        "destroys": []
+      }
+    },
+    {
+      "tick": 6,
+      "interest": [
+        "cell/0_0",
+        "cell/1_0"
+      ],
+      "delta": {
+        "header": {
+          "serverTick": 6,
+          "serverTimeMs": 300,
+          "baselineTick": 3,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 0
+        },
+        "regions": [],
+        "creates": [],
+        "updates": [
+          {
+            "entity": 1,
+            "components": [
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 11.5,
+                    "y": 0,
+                    "z": 20.25
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0.124675,
+                    "z": 0,
+                    "w": 0.992198
+                  },
+                  "vel": {
+                    "x": 20,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ],
+            "removed": []
+          }
+        ],
+        "destroys": []
+      },
+      "full": {
+        "header": {
+          "serverTick": 6,
+          "serverTimeMs": 300,
+          "baselineTick": 0,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 1
+        },
+        "regions": [
+          "cell/1_0",
+          "cell/0_0"
+        ],
+        "creates": [
+          {
+            "entity": 1,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 0
+                }
+              },
+              {
+                "id": 1,
+                "value": {
+                  "value": "A"
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 11.5,
+                    "y": 0,
+                    "z": 20.25
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0.124675,
+                    "z": 0,
+                    "w": 0.992198
+                  },
+                  "vel": {
+                    "x": 20,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 2,
+            "regionIdx": 1,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 0
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 3
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 100,
+                    "y": 0,
+                    "z": 100
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 3,
+            "regionIdx": 1,
+            "components": [
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 5,
+                    "y": 0,
+                    "z": 250.75
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 4,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 1,
+                "value": {
+                  "value": "D"
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 1
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 64,
+                    "y": 0,
+                    "z": 64
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0.247404,
+                    "z": 0,
+                    "w": 0.968912
+                  },
+                  "vel": {
+                    "x": 1.5,
+                    "y": 0,
+                    "z": -2.25
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "updates": [],
+        "destroys": []
+      }
+    },
+    {
+      "tick": 9,
+      "interest": [
+        "cell/0_0",
+        "cell/1_0"
+      ],
+      "delta": {
+        "header": {
+          "serverTick": 9,
+          "serverTimeMs": 450,
+          "baselineTick": 6,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 0
+        },
+        "regions": [],
+        "creates": [],
+        "updates": [
+          {
+            "entity": 1,
+            "components": [],
+            "removed": [
+              1
+            ]
+          }
+        ],
+        "destroys": []
+      },
+      "full": {
+        "header": {
+          "serverTick": 9,
+          "serverTimeMs": 450,
+          "baselineTick": 0,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 1
+        },
+        "regions": [
+          "cell/1_0",
+          "cell/0_0"
+        ],
+        "creates": [
+          {
+            "entity": 1,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 0
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 11.5,
+                    "y": 0,
+                    "z": 20.25
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0.124675,
+                    "z": 0,
+                    "w": 0.992198
+                  },
+                  "vel": {
+                    "x": 20,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 2,
+            "regionIdx": 1,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 0
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 3
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 100,
+                    "y": 0,
+                    "z": 100
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 3,
+            "regionIdx": 1,
+            "components": [
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 5,
+                    "y": 0,
+                    "z": 250.75
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 4,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 1,
+                "value": {
+                  "value": "D"
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 1
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 64,
+                    "y": 0,
+                    "z": 64
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0.247404,
+                    "z": 0,
+                    "w": 0.968912
+                  },
+                  "vel": {
+                    "x": 1.5,
+                    "y": 0,
+                    "z": -2.25
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "updates": [],
+        "destroys": []
+      }
+    },
+    {
+      "tick": 12,
+      "interest": [
+        "cell/0_0",
+        "cell/1_0"
+      ],
+      "delta": {
+        "header": {
+          "serverTick": 12,
+          "serverTimeMs": 600,
+          "baselineTick": 9,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 0
+        },
+        "regions": [],
+        "creates": [],
+        "updates": [
+          {
+            "entity": 1,
+            "components": [
+              {
+                "id": 1,
+                "value": {
+                  "value": "A3"
+                }
+              }
+            ],
+            "removed": []
+          },
+          {
+            "entity": 2,
+            "components": [],
+            "removed": [
+              0
+            ]
+          }
+        ],
+        "destroys": []
+      },
+      "full": {
+        "header": {
+          "serverTick": 12,
+          "serverTimeMs": 600,
+          "baselineTick": 0,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 1
+        },
+        "regions": [
+          "cell/1_0",
+          "cell/0_0"
+        ],
+        "creates": [
+          {
+            "entity": 1,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 0
+                }
+              },
+              {
+                "id": 1,
+                "value": {
+                  "value": "A3"
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 11.5,
+                    "y": 0,
+                    "z": 20.25
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0.124675,
+                    "z": 0,
+                    "w": 0.992198
+                  },
+                  "vel": {
+                    "x": 20,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 2,
+            "regionIdx": 1,
+            "components": [
+              {
+                "id": 2,
+                "value": {
+                  "player": 3
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 100,
+                    "y": 0,
+                    "z": 100
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 3,
+            "regionIdx": 1,
+            "components": [
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 5,
+                    "y": 0,
+                    "z": 250.75
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 4,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 1,
+                "value": {
+                  "value": "D"
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 1
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 64,
+                    "y": 0,
+                    "z": 64
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0.247404,
+                    "z": 0,
+                    "w": 0.968912
+                  },
+                  "vel": {
+                    "x": 1.5,
+                    "y": 0,
+                    "z": -2.25
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "updates": [],
+        "destroys": []
+      }
+    },
+    {
+      "tick": 15,
+      "interest": [
+        "cell/0_0",
+        "cell/1_0"
+      ],
+      "delta": {
+        "header": {
+          "serverTick": 15,
+          "serverTimeMs": 750,
+          "baselineTick": 12,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 0
+        },
+        "regions": [],
+        "creates": [],
+        "updates": [],
+        "destroys": [
+          3
+        ]
+      },
+      "full": {
+        "header": {
+          "serverTick": 15,
+          "serverTimeMs": 750,
+          "baselineTick": 0,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 1
+        },
+        "regions": [
+          "cell/1_0",
+          "cell/0_0"
+        ],
+        "creates": [
+          {
+            "entity": 1,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 0
+                }
+              },
+              {
+                "id": 1,
+                "value": {
+                  "value": "A3"
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 11.5,
+                    "y": 0,
+                    "z": 20.25
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0.124675,
+                    "z": 0,
+                    "w": 0.992198
+                  },
+                  "vel": {
+                    "x": 20,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 2,
+            "regionIdx": 1,
+            "components": [
+              {
+                "id": 2,
+                "value": {
+                  "player": 3
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 100,
+                    "y": 0,
+                    "z": 100
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 4,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 1,
+                "value": {
+                  "value": "D"
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 1
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 64,
+                    "y": 0,
+                    "z": 64
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0.247404,
+                    "z": 0,
+                    "w": 0.968912
+                  },
+                  "vel": {
+                    "x": 1.5,
+                    "y": 0,
+                    "z": -2.25
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "updates": [],
+        "destroys": []
+      }
+    },
+    {
+      "tick": 18,
+      "interest": [
+        "cell/0_0",
+        "cell/1_0"
+      ],
+      "delta": {
+        "header": {
+          "serverTick": 18,
+          "serverTimeMs": 900,
+          "baselineTick": 15,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 0
+        },
+        "regions": [],
+        "creates": [],
+        "updates": [],
+        "destroys": [
+          4
+        ]
+      },
+      "full": {
+        "header": {
+          "serverTick": 18,
+          "serverTimeMs": 900,
+          "baselineTick": 0,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 1
+        },
+        "regions": [
+          "cell/1_0",
+          "cell/0_0"
+        ],
+        "creates": [
+          {
+            "entity": 1,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 0
+                }
+              },
+              {
+                "id": 1,
+                "value": {
+                  "value": "A3"
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 11.5,
+                    "y": 0,
+                    "z": 20.25
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0.124675,
+                    "z": 0,
+                    "w": 0.992198
+                  },
+                  "vel": {
+                    "x": 20,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 2,
+            "regionIdx": 1,
+            "components": [
+              {
+                "id": 2,
+                "value": {
+                  "player": 3
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 100,
+                    "y": 0,
+                    "z": 100
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "updates": [],
+        "destroys": []
+      }
+    },
+    {
+      "tick": 21,
+      "interest": [
+        "cell/0_0",
+        "cell/1_0"
+      ],
+      "delta": {
+        "header": {
+          "serverTick": 21,
+          "serverTimeMs": 1050,
+          "baselineTick": 18,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 0
+        },
+        "regions": [
+          "cell/1_0"
+        ],
+        "creates": [
+          {
+            "entity": 4,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 1,
+                "value": {
+                  "value": "D"
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 1
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 1,
+                    "y": 0,
+                    "z": 255
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 3
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "updates": [],
+        "destroys": []
+      },
+      "full": {
+        "header": {
+          "serverTick": 21,
+          "serverTimeMs": 1050,
+          "baselineTick": 0,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 1
+        },
+        "regions": [
+          "cell/1_0",
+          "cell/0_0"
+        ],
+        "creates": [
+          {
+            "entity": 1,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 0
+                }
+              },
+              {
+                "id": 1,
+                "value": {
+                  "value": "A3"
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 11.5,
+                    "y": 0,
+                    "z": 20.25
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0.124675,
+                    "z": 0,
+                    "w": 0.992198
+                  },
+                  "vel": {
+                    "x": 20,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 2,
+            "regionIdx": 1,
+            "components": [
+              {
+                "id": 2,
+                "value": {
+                  "player": 3
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 100,
+                    "y": 0,
+                    "z": 100
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 4,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 1,
+                "value": {
+                  "value": "D"
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 1
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 1,
+                    "y": 0,
+                    "z": 255
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 3
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "updates": [],
+        "destroys": []
+      }
+    },
+    {
+      "tick": 24,
+      "interest": [
+        "cell/0_0"
+      ],
+      "delta": {
+        "header": {
+          "serverTick": 24,
+          "serverTimeMs": 1200,
+          "baselineTick": 21,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 0
+        },
+        "regions": [],
+        "creates": [],
+        "updates": [],
+        "destroys": [
+          1,
+          4
+        ]
+      },
+      "full": {
+        "header": {
+          "serverTick": 24,
+          "serverTimeMs": 1200,
+          "baselineTick": 0,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 1
+        },
+        "regions": [
+          "cell/0_0"
+        ],
+        "creates": [
+          {
+            "entity": 2,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 2,
+                "value": {
+                  "player": 3
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 100,
+                    "y": 0,
+                    "z": 100
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "updates": [],
+        "destroys": []
+      }
+    },
+    {
+      "tick": 27,
+      "interest": [
+        "cell/0_0",
+        "cell/1_0"
+      ],
+      "delta": {
+        "header": {
+          "serverTick": 27,
+          "serverTimeMs": 1350,
+          "baselineTick": 24,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 0
+        },
+        "regions": [
+          "cell/1_0"
+        ],
+        "creates": [
+          {
+            "entity": 1,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 0
+                }
+              },
+              {
+                "id": 1,
+                "value": {
+                  "value": "A3"
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 30,
+                    "y": 0,
+                    "z": 22
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0.479426,
+                    "z": 0,
+                    "w": 0.877583
+                  },
+                  "vel": {
+                    "x": -4,
+                    "y": 0,
+                    "z": 0.5
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 4,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 1,
+                "value": {
+                  "value": "D"
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 1
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 1,
+                    "y": 0,
+                    "z": 255
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 3
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "updates": [],
+        "destroys": []
+      },
+      "full": {
+        "header": {
+          "serverTick": 27,
+          "serverTimeMs": 1350,
+          "baselineTick": 0,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 1
+        },
+        "regions": [
+          "cell/1_0",
+          "cell/0_0"
+        ],
+        "creates": [
+          {
+            "entity": 1,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 0
+                }
+              },
+              {
+                "id": 1,
+                "value": {
+                  "value": "A3"
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 30,
+                    "y": 0,
+                    "z": 22
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0.479426,
+                    "z": 0,
+                    "w": 0.877583
+                  },
+                  "vel": {
+                    "x": -4,
+                    "y": 0,
+                    "z": 0.5
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 2,
+            "regionIdx": 1,
+            "components": [
+              {
+                "id": 2,
+                "value": {
+                  "player": 3
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 100,
+                    "y": 0,
+                    "z": 100
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 4,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 1,
+                "value": {
+                  "value": "D"
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 1
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 1,
+                    "y": 0,
+                    "z": 255
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 3
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "updates": [],
+        "destroys": []
+      }
+    },
+    {
+      "tick": 30,
+      "interest": [
+        "cell/0_0",
+        "cell/1_0"
+      ],
+      "delta": {
+        "header": {
+          "serverTick": 30,
+          "serverTimeMs": 1500,
+          "baselineTick": 27,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 0
+        },
+        "regions": [
+          "cell/0_0"
+        ],
+        "creates": [
+          {
+            "entity": 1048578,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 2
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 100,
+                    "y": 0,
+                    "z": 101
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "updates": [],
+        "destroys": [
+          2
+        ]
+      },
+      "full": {
+        "header": {
+          "serverTick": 30,
+          "serverTimeMs": 1500,
+          "baselineTick": 0,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 1
+        },
+        "regions": [
+          "cell/1_0",
+          "cell/0_0"
+        ],
+        "creates": [
+          {
+            "entity": 1,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 0
+                }
+              },
+              {
+                "id": 1,
+                "value": {
+                  "value": "A3"
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 30,
+                    "y": 0,
+                    "z": 22
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0.479426,
+                    "z": 0,
+                    "w": 0.877583
+                  },
+                  "vel": {
+                    "x": -4,
+                    "y": 0,
+                    "z": 0.5
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 4,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 1,
+                "value": {
+                  "value": "D"
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 1
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 1,
+                    "y": 0,
+                    "z": 255
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 3
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 1048578,
+            "regionIdx": 1,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 2
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 100,
+                    "y": 0,
+                    "z": 101
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "updates": [],
+        "destroys": []
+      }
+    },
+    {
+      "tick": 33,
+      "interest": [
+        "cell/0_0",
+        "cell/1_0"
+      ],
+      "delta": {
+        "header": {
+          "serverTick": 33,
+          "serverTimeMs": 1650,
+          "baselineTick": 30,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 0
+        },
+        "regions": [],
+        "creates": [],
+        "updates": [
+          {
+            "entity": 1,
+            "components": [
+              {
+                "id": 2,
+                "value": {
+                  "player": 0
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 32,
+                    "y": 0,
+                    "z": 22.5
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ],
+            "removed": []
+          }
+        ],
+        "destroys": []
+      },
+      "full": {
+        "header": {
+          "serverTick": 33,
+          "serverTimeMs": 1650,
+          "baselineTick": 0,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 1
+        },
+        "regions": [
+          "cell/1_0",
+          "cell/0_0"
+        ],
+        "creates": [
+          {
+            "entity": 1,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 0
+                }
+              },
+              {
+                "id": 1,
+                "value": {
+                  "value": "A3"
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 0
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 32,
+                    "y": 0,
+                    "z": 22.5
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 4,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 1,
+                "value": {
+                  "value": "D"
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 1
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 1,
+                    "y": 0,
+                    "z": 255
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 3
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 1048578,
+            "regionIdx": 1,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 2
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 100,
+                    "y": 0,
+                    "z": 101
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "updates": [],
+        "destroys": []
+      }
+    },
+    {
+      "tick": 36,
+      "interest": [
+        "cell/0_0",
+        "cell/1_0"
+      ],
+      "delta": {
+        "header": {
+          "serverTick": 36,
+          "serverTimeMs": 1800,
+          "baselineTick": 33,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 0
+        },
+        "regions": [],
+        "creates": [],
+        "updates": [
+          {
+            "entity": 1,
+            "components": [
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 288,
+                    "y": 0,
+                    "z": 22.5
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ],
+            "removed": []
+          }
+        ],
+        "destroys": []
+      },
+      "full": {
+        "header": {
+          "serverTick": 36,
+          "serverTimeMs": 1800,
+          "baselineTick": 0,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 1
+        },
+        "regions": [
+          "cell/0_0",
+          "cell/1_0"
+        ],
+        "creates": [
+          {
+            "entity": 1,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 0
+                }
+              },
+              {
+                "id": 1,
+                "value": {
+                  "value": "A3"
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 0
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 288,
+                    "y": 0,
+                    "z": 22.5
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 4,
+            "regionIdx": 1,
+            "components": [
+              {
+                "id": 1,
+                "value": {
+                  "value": "D"
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 1
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 1,
+                    "y": 0,
+                    "z": 255
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 3
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 1048578,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 2
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 100,
+                    "y": 0,
+                    "z": 101
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "updates": [],
+        "destroys": []
+      }
+    },
+    {
+      "tick": 39,
+      "interest": [
+        "cell/0_0",
+        "cell/1_0"
+      ],
+      "delta": {
+        "header": {
+          "serverTick": 39,
+          "serverTimeMs": 1950,
+          "baselineTick": 36,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 0
+        },
+        "regions": [],
+        "creates": [],
+        "updates": [],
+        "destroys": []
+      },
+      "full": {
+        "header": {
+          "serverTick": 39,
+          "serverTimeMs": 1950,
+          "baselineTick": 0,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 1
+        },
+        "regions": [
+          "cell/0_0",
+          "cell/1_0"
+        ],
+        "creates": [
+          {
+            "entity": 1,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 0
+                }
+              },
+              {
+                "id": 1,
+                "value": {
+                  "value": "A3"
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 0
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 288,
+                    "y": 0,
+                    "z": 22.5
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 4,
+            "regionIdx": 1,
+            "components": [
+              {
+                "id": 1,
+                "value": {
+                  "value": "D"
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 1
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 1,
+                    "y": 0,
+                    "z": 255
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 3
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 1048578,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 2
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 100,
+                    "y": 0,
+                    "z": 101
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "updates": [],
+        "destroys": []
+      }
+    },
+    {
+      "tick": 42,
+      "interest": [
+        "cell/0_0",
+        "cell/1_0"
+      ],
+      "delta": {
+        "header": {
+          "serverTick": 42,
+          "serverTimeMs": 2100,
+          "baselineTick": 39,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 0
+        },
+        "regions": [
+          "cell/1_0"
+        ],
+        "creates": [
+          {
+            "entity": 5,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 1,
+                "value": {
+                  "value": "E"
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 128,
+                    "y": 0,
+                    "z": 128
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "updates": [],
+        "destroys": [
+          1
+        ]
+      },
+      "full": {
+        "header": {
+          "serverTick": 42,
+          "serverTimeMs": 2100,
+          "baselineTick": 0,
+          "lastInputSeq": 0,
+          "lastInputTick": 0,
+          "flags": 1
+        },
+        "regions": [
+          "cell/1_0",
+          "cell/0_0"
+        ],
+        "creates": [
+          {
+            "entity": 4,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 1,
+                "value": {
+                  "value": "D"
+                }
+              },
+              {
+                "id": 2,
+                "value": {
+                  "player": 1
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 1,
+                    "y": 0,
+                    "z": 255
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 3
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 5,
+            "regionIdx": 0,
+            "components": [
+              {
+                "id": 1,
+                "value": {
+                  "value": "E"
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/1_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 128,
+                    "y": 0,
+                    "z": 128
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "entity": 1048578,
+            "regionIdx": 1,
+            "components": [
+              {
+                "id": 0,
+                "value": {
+                  "asset": "crate",
+                  "variant": 2
+                }
+              },
+              {
+                "id": 3,
+                "value": {
+                  "id": "cell/0_0"
+                }
+              },
+              {
+                "id": 4,
+                "value": {
+                  "pos": {
+                    "x": 100,
+                    "y": 0,
+                    "z": 101
+                  },
+                  "rot": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0,
+                    "w": 1
+                  },
+                  "vel": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "updates": [],
+        "destroys": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,8792 @@
+{
+  "version": 1,
+  "kind": "grid",
+  "grid": {
+    "cellSize": 256,
+    "cols": 16,
+    "rows": 16,
+    "plane": "xz",
+    "kind": "cell",
+    "wantedDepth": 1,
+    "base": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "worldSeed": 12648430
+  },
+  "regions": [
+    {
+      "id": "cell/0_0",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/1_0",
+        "cell/0_1",
+        "cell/1_1"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 4569758
+    },
+    {
+      "id": "cell/1_0",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 256,
+          "y": 0,
+          "z": 0
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_0",
+        "cell/2_0",
+        "cell/0_1",
+        "cell/1_1",
+        "cell/2_1"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 85904137
+    },
+    {
+      "id": "cell/2_0",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 512,
+          "y": 0,
+          "z": 0
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/1_0",
+        "cell/3_0",
+        "cell/1_1",
+        "cell/2_1",
+        "cell/3_1"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2872342740
+    },
+    {
+      "id": "cell/3_0",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 768,
+          "y": 0,
+          "z": 0
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/2_0",
+        "cell/4_0",
+        "cell/2_1",
+        "cell/3_1",
+        "cell/4_1"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 816587647
+    },
+    {
+      "id": "cell/4_0",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1024,
+          "y": 0,
+          "z": 0
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/3_0",
+        "cell/5_0",
+        "cell/3_1",
+        "cell/4_1",
+        "cell/5_1"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 752999858
+    },
+    {
+      "id": "cell/5_0",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1280,
+          "y": 0,
+          "z": 0
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/4_0",
+        "cell/6_0",
+        "cell/4_1",
+        "cell/5_1",
+        "cell/6_1"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1371218045
+    },
+    {
+      "id": "cell/6_0",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1536,
+          "y": 0,
+          "z": 0
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/5_0",
+        "cell/7_0",
+        "cell/5_1",
+        "cell/6_1",
+        "cell/7_1"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3610430248
+    },
+    {
+      "id": "cell/7_0",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1792,
+          "y": 0,
+          "z": 0
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/6_0",
+        "cell/8_0",
+        "cell/6_1",
+        "cell/7_1",
+        "cell/8_1"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1523441043
+    },
+    {
+      "id": "cell/8_0",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2048,
+          "y": 0,
+          "z": 0
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/7_0",
+        "cell/9_0",
+        "cell/7_1",
+        "cell/8_1",
+        "cell/9_1"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2296923990
+    },
+    {
+      "id": "cell/9_0",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2304,
+          "y": 0,
+          "z": 0
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/8_0",
+        "cell/10_0",
+        "cell/8_1",
+        "cell/9_1",
+        "cell/10_1"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2935930529
+    },
+    {
+      "id": "cell/10_0",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2560,
+          "y": 0,
+          "z": 0
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/9_0",
+        "cell/11_0",
+        "cell/9_1",
+        "cell/10_1",
+        "cell/11_1"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 829060797
+    },
+    {
+      "id": "cell/11_0",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2816,
+          "y": 0,
+          "z": 0
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/10_0",
+        "cell/12_0",
+        "cell/10_1",
+        "cell/11_1",
+        "cell/12_1"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 210842610
+    },
+    {
+      "id": "cell/12_0",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3072,
+          "y": 0,
+          "z": 0
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/11_0",
+        "cell/13_0",
+        "cell/11_1",
+        "cell/12_1",
+        "cell/13_1"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1022860499
+    },
+    {
+      "id": "cell/13_0",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3328,
+          "y": 0,
+          "z": 0
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/12_0",
+        "cell/14_0",
+        "cell/12_1",
+        "cell/13_1",
+        "cell/14_1"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3068273000
+    },
+    {
+      "id": "cell/14_0",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3584,
+          "y": 0,
+          "z": 0
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/13_0",
+        "cell/15_0",
+        "cell/13_1",
+        "cell/14_1",
+        "cell/15_1"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3880290889
+    },
+    {
+      "id": "cell/15_0",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3840,
+          "y": 0,
+          "z": 0
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/14_0",
+        "cell/14_1",
+        "cell/15_1"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3798956510
+    },
+    {
+      "id": "cell/0_1",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 0,
+          "y": 0,
+          "z": 256
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_0",
+        "cell/1_0",
+        "cell/1_1",
+        "cell/0_2",
+        "cell/1_2"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 21347377
+    },
+    {
+      "id": "cell/1_1",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 256,
+          "y": 0,
+          "z": 256
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_0",
+        "cell/1_0",
+        "cell/2_0",
+        "cell/0_1",
+        "cell/2_1",
+        "cell/0_2",
+        "cell/1_2",
+        "cell/2_2"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 69126518
+    },
+    {
+      "id": "cell/2_1",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 512,
+          "y": 0,
+          "z": 256
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/1_0",
+        "cell/2_0",
+        "cell/3_0",
+        "cell/1_1",
+        "cell/3_1",
+        "cell/1_2",
+        "cell/2_2",
+        "cell/3_2"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2889120359
+    },
+    {
+      "id": "cell/3_1",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 768,
+          "y": 0,
+          "z": 256
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/2_0",
+        "cell/3_0",
+        "cell/4_0",
+        "cell/2_1",
+        "cell/4_1",
+        "cell/2_2",
+        "cell/3_2",
+        "cell/4_2"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 799810028
+    },
+    {
+      "id": "cell/4_1",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1024,
+          "y": 0,
+          "z": 256
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/3_0",
+        "cell/4_0",
+        "cell/5_0",
+        "cell/3_1",
+        "cell/5_1",
+        "cell/3_2",
+        "cell/4_2",
+        "cell/5_2"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 769777477
+    },
+    {
+      "id": "cell/5_1",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1280,
+          "y": 0,
+          "z": 256
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/4_0",
+        "cell/5_0",
+        "cell/6_0",
+        "cell/4_1",
+        "cell/6_1",
+        "cell/4_2",
+        "cell/5_2",
+        "cell/6_2"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1354440426
+    },
+    {
+      "id": "cell/6_1",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1536,
+          "y": 0,
+          "z": 256
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/5_0",
+        "cell/6_0",
+        "cell/7_0",
+        "cell/5_1",
+        "cell/7_1",
+        "cell/5_2",
+        "cell/6_2",
+        "cell/7_2"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3627207867
+    },
+    {
+      "id": "cell/7_1",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1792,
+          "y": 0,
+          "z": 256
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/6_0",
+        "cell/7_0",
+        "cell/8_0",
+        "cell/6_1",
+        "cell/8_1",
+        "cell/6_2",
+        "cell/7_2",
+        "cell/8_2"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1506663424
+    },
+    {
+      "id": "cell/8_1",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2048,
+          "y": 0,
+          "z": 256
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/7_0",
+        "cell/8_0",
+        "cell/9_0",
+        "cell/7_1",
+        "cell/9_1",
+        "cell/7_2",
+        "cell/8_2",
+        "cell/9_2"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2313701609
+    },
+    {
+      "id": "cell/9_1",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2304,
+          "y": 0,
+          "z": 256
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/8_0",
+        "cell/9_0",
+        "cell/10_0",
+        "cell/8_1",
+        "cell/10_1",
+        "cell/8_2",
+        "cell/9_2",
+        "cell/10_2"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2919152910
+    },
+    {
+      "id": "cell/10_1",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2560,
+          "y": 0,
+          "z": 256
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/9_0",
+        "cell/10_0",
+        "cell/11_0",
+        "cell/9_1",
+        "cell/11_1",
+        "cell/9_2",
+        "cell/10_2",
+        "cell/11_2"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 812283178
+    },
+    {
+      "id": "cell/11_1",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2816,
+          "y": 0,
+          "z": 256
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/10_0",
+        "cell/11_0",
+        "cell/12_0",
+        "cell/10_1",
+        "cell/12_1",
+        "cell/10_2",
+        "cell/11_2",
+        "cell/12_2"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 227620229
+    },
+    {
+      "id": "cell/12_1",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3072,
+          "y": 0,
+          "z": 256
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/11_0",
+        "cell/12_0",
+        "cell/13_0",
+        "cell/11_1",
+        "cell/13_1",
+        "cell/11_2",
+        "cell/12_2",
+        "cell/13_2"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1006082880
+    },
+    {
+      "id": "cell/13_1",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3328,
+          "y": 0,
+          "z": 256
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/12_0",
+        "cell/13_0",
+        "cell/14_0",
+        "cell/12_1",
+        "cell/14_1",
+        "cell/12_2",
+        "cell/13_2",
+        "cell/14_2"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3085050619
+    },
+    {
+      "id": "cell/14_1",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3584,
+          "y": 0,
+          "z": 256
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/13_0",
+        "cell/14_0",
+        "cell/15_0",
+        "cell/13_1",
+        "cell/15_1",
+        "cell/13_2",
+        "cell/14_2",
+        "cell/15_2"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3863513270
+    },
+    {
+      "id": "cell/15_1",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3840,
+          "y": 0,
+          "z": 256
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/14_0",
+        "cell/15_0",
+        "cell/14_1",
+        "cell/14_2",
+        "cell/15_2"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3815734129
+    },
+    {
+      "id": "cell/0_2",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 0,
+          "y": 0,
+          "z": 512
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_1",
+        "cell/1_1",
+        "cell/1_2",
+        "cell/0_3",
+        "cell/1_3"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 4265981816
+    },
+    {
+      "id": "cell/1_2",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 256,
+          "y": 0,
+          "z": 512
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_1",
+        "cell/1_1",
+        "cell/2_1",
+        "cell/0_2",
+        "cell/2_2",
+        "cell/0_3",
+        "cell/1_3",
+        "cell/2_3"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 52348899
+    },
+    {
+      "id": "cell/2_2",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 512,
+          "y": 0,
+          "z": 512
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/1_1",
+        "cell/2_1",
+        "cell/3_1",
+        "cell/1_2",
+        "cell/3_2",
+        "cell/1_3",
+        "cell/2_3",
+        "cell/3_3"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2905897978
+    },
+    {
+      "id": "cell/3_2",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 768,
+          "y": 0,
+          "z": 512
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/2_1",
+        "cell/3_1",
+        "cell/4_1",
+        "cell/2_2",
+        "cell/4_2",
+        "cell/2_3",
+        "cell/3_3",
+        "cell/4_3"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 850142885
+    },
+    {
+      "id": "cell/4_2",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1024,
+          "y": 0,
+          "z": 512
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/3_1",
+        "cell/4_1",
+        "cell/5_1",
+        "cell/3_2",
+        "cell/5_2",
+        "cell/3_3",
+        "cell/4_3",
+        "cell/5_3"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 719444620
+    },
+    {
+      "id": "cell/5_2",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1280,
+          "y": 0,
+          "z": 512
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/4_1",
+        "cell/5_1",
+        "cell/6_1",
+        "cell/4_2",
+        "cell/6_2",
+        "cell/4_3",
+        "cell/5_3",
+        "cell/6_3"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1337662807
+    },
+    {
+      "id": "cell/6_2",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1536,
+          "y": 0,
+          "z": 512
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/5_1",
+        "cell/6_1",
+        "cell/7_1",
+        "cell/5_2",
+        "cell/7_2",
+        "cell/5_3",
+        "cell/6_3",
+        "cell/7_3"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3643985486
+    },
+    {
+      "id": "cell/7_2",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1792,
+          "y": 0,
+          "z": 512
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/6_1",
+        "cell/7_1",
+        "cell/8_1",
+        "cell/6_2",
+        "cell/8_2",
+        "cell/6_3",
+        "cell/7_3",
+        "cell/8_3"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1556996281
+    },
+    {
+      "id": "cell/8_2",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2048,
+          "y": 0,
+          "z": 512
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/7_1",
+        "cell/8_1",
+        "cell/9_1",
+        "cell/7_2",
+        "cell/9_2",
+        "cell/7_3",
+        "cell/8_3",
+        "cell/9_3"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2263368752
+    },
+    {
+      "id": "cell/9_2",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2304,
+          "y": 0,
+          "z": 512
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/8_1",
+        "cell/9_1",
+        "cell/10_1",
+        "cell/8_2",
+        "cell/10_2",
+        "cell/8_3",
+        "cell/9_3",
+        "cell/10_3"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2902375291
+    },
+    {
+      "id": "cell/10_2",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2560,
+          "y": 0,
+          "z": 512
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/9_1",
+        "cell/10_1",
+        "cell/11_1",
+        "cell/9_2",
+        "cell/11_2",
+        "cell/9_3",
+        "cell/10_3",
+        "cell/11_3"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 795505559
+    },
+    {
+      "id": "cell/11_2",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2816,
+          "y": 0,
+          "z": 512
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/10_1",
+        "cell/11_1",
+        "cell/12_1",
+        "cell/10_2",
+        "cell/12_2",
+        "cell/10_3",
+        "cell/11_3",
+        "cell/12_3"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 177287372
+    },
+    {
+      "id": "cell/12_2",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3072,
+          "y": 0,
+          "z": 512
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/11_1",
+        "cell/12_1",
+        "cell/13_1",
+        "cell/11_2",
+        "cell/13_2",
+        "cell/11_3",
+        "cell/12_3",
+        "cell/13_3"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1056415737
+    },
+    {
+      "id": "cell/13_2",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3328,
+          "y": 0,
+          "z": 512
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/12_1",
+        "cell/13_1",
+        "cell/14_1",
+        "cell/12_2",
+        "cell/14_2",
+        "cell/12_3",
+        "cell/13_3",
+        "cell/14_3"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3101828238
+    },
+    {
+      "id": "cell/14_2",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3584,
+          "y": 0,
+          "z": 512
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/13_1",
+        "cell/14_1",
+        "cell/15_1",
+        "cell/13_2",
+        "cell/15_2",
+        "cell/13_3",
+        "cell/14_3",
+        "cell/15_3"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3846735651
+    },
+    {
+      "id": "cell/15_2",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3840,
+          "y": 0,
+          "z": 512
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/14_1",
+        "cell/15_1",
+        "cell/14_2",
+        "cell/14_3",
+        "cell/15_3"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3765401272
+    },
+    {
+      "id": "cell/0_3",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 0,
+          "y": 0,
+          "z": 768
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_2",
+        "cell/1_2",
+        "cell/1_3",
+        "cell/0_4",
+        "cell/1_4"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 4282759435
+    },
+    {
+      "id": "cell/1_3",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 256,
+          "y": 0,
+          "z": 768
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_2",
+        "cell/1_2",
+        "cell/2_2",
+        "cell/0_3",
+        "cell/2_3",
+        "cell/0_4",
+        "cell/1_4",
+        "cell/2_4"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 35571280
+    },
+    {
+      "id": "cell/2_3",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 512,
+          "y": 0,
+          "z": 768
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/1_2",
+        "cell/2_2",
+        "cell/3_2",
+        "cell/1_3",
+        "cell/3_3",
+        "cell/1_4",
+        "cell/2_4",
+        "cell/3_4"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2922675597
+    },
+    {
+      "id": "cell/3_3",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 768,
+          "y": 0,
+          "z": 768
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/2_2",
+        "cell/3_2",
+        "cell/4_2",
+        "cell/2_3",
+        "cell/4_3",
+        "cell/2_4",
+        "cell/3_4",
+        "cell/4_4"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 833365266
+    },
+    {
+      "id": "cell/4_3",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1024,
+          "y": 0,
+          "z": 768
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/3_2",
+        "cell/4_2",
+        "cell/5_2",
+        "cell/3_3",
+        "cell/5_3",
+        "cell/3_4",
+        "cell/4_4",
+        "cell/5_4"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 736222239
+    },
+    {
+      "id": "cell/5_3",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1280,
+          "y": 0,
+          "z": 768
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/4_2",
+        "cell/5_2",
+        "cell/6_2",
+        "cell/4_3",
+        "cell/6_3",
+        "cell/4_4",
+        "cell/5_4",
+        "cell/6_4"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1320885188
+    },
+    {
+      "id": "cell/6_3",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1536,
+          "y": 0,
+          "z": 768
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/5_2",
+        "cell/6_2",
+        "cell/7_2",
+        "cell/5_3",
+        "cell/7_3",
+        "cell/5_4",
+        "cell/6_4",
+        "cell/7_4"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3660763105
+    },
+    {
+      "id": "cell/7_3",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1792,
+          "y": 0,
+          "z": 768
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/6_2",
+        "cell/7_2",
+        "cell/8_2",
+        "cell/6_3",
+        "cell/8_3",
+        "cell/6_4",
+        "cell/7_4",
+        "cell/8_4"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1540218662
+    },
+    {
+      "id": "cell/8_3",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2048,
+          "y": 0,
+          "z": 768
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/7_2",
+        "cell/8_2",
+        "cell/9_2",
+        "cell/7_3",
+        "cell/9_3",
+        "cell/7_4",
+        "cell/8_4",
+        "cell/9_4"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2280146371
+    },
+    {
+      "id": "cell/9_3",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2304,
+          "y": 0,
+          "z": 768
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/8_2",
+        "cell/9_2",
+        "cell/10_2",
+        "cell/8_3",
+        "cell/10_3",
+        "cell/8_4",
+        "cell/9_4",
+        "cell/10_4"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2885597672
+    },
+    {
+      "id": "cell/10_3",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2560,
+          "y": 0,
+          "z": 768
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/9_2",
+        "cell/10_2",
+        "cell/11_2",
+        "cell/9_3",
+        "cell/11_3",
+        "cell/9_4",
+        "cell/10_4",
+        "cell/11_4"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 778727940
+    },
+    {
+      "id": "cell/11_3",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2816,
+          "y": 0,
+          "z": 768
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/10_2",
+        "cell/11_2",
+        "cell/12_2",
+        "cell/10_3",
+        "cell/12_3",
+        "cell/10_4",
+        "cell/11_4",
+        "cell/12_4"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 194064991
+    },
+    {
+      "id": "cell/12_3",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3072,
+          "y": 0,
+          "z": 768
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/11_2",
+        "cell/12_2",
+        "cell/13_2",
+        "cell/11_3",
+        "cell/13_3",
+        "cell/11_4",
+        "cell/12_4",
+        "cell/13_4"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1039638118
+    },
+    {
+      "id": "cell/13_3",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3328,
+          "y": 0,
+          "z": 768
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/12_2",
+        "cell/13_2",
+        "cell/14_2",
+        "cell/12_3",
+        "cell/14_3",
+        "cell/12_4",
+        "cell/13_4",
+        "cell/14_4"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3118605857
+    },
+    {
+      "id": "cell/14_3",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3584,
+          "y": 0,
+          "z": 768
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/13_2",
+        "cell/14_2",
+        "cell/15_2",
+        "cell/13_3",
+        "cell/15_3",
+        "cell/13_4",
+        "cell/14_4",
+        "cell/15_4"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3829958032
+    },
+    {
+      "id": "cell/15_3",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3840,
+          "y": 0,
+          "z": 768
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/14_2",
+        "cell/15_2",
+        "cell/14_3",
+        "cell/14_4",
+        "cell/15_4"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3782178891
+    },
+    {
+      "id": "cell/0_4",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 0,
+          "y": 0,
+          "z": 1024
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_3",
+        "cell/1_3",
+        "cell/1_4",
+        "cell/0_5",
+        "cell/1_5"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 71680234
+    },
+    {
+      "id": "cell/1_4",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 256,
+          "y": 0,
+          "z": 1024
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_3",
+        "cell/1_3",
+        "cell/2_3",
+        "cell/0_4",
+        "cell/2_4",
+        "cell/0_5",
+        "cell/1_5",
+        "cell/2_5"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 153014613
+    },
+    {
+      "id": "cell/2_4",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 512,
+          "y": 0,
+          "z": 1024
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/1_3",
+        "cell/2_3",
+        "cell/3_3",
+        "cell/1_4",
+        "cell/3_4",
+        "cell/1_5",
+        "cell/2_5",
+        "cell/3_5"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2805232264
+    },
+    {
+      "id": "cell/3_4",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 768,
+          "y": 0,
+          "z": 1024
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/2_3",
+        "cell/3_3",
+        "cell/4_3",
+        "cell/2_4",
+        "cell/4_4",
+        "cell/2_5",
+        "cell/3_5",
+        "cell/4_5"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 749477171
+    },
+    {
+      "id": "cell/4_4",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1024,
+          "y": 0,
+          "z": 1024
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/3_3",
+        "cell/4_3",
+        "cell/5_3",
+        "cell/3_4",
+        "cell/5_4",
+        "cell/3_5",
+        "cell/4_5",
+        "cell/5_5"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 685889382
+    },
+    {
+      "id": "cell/5_4",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1280,
+          "y": 0,
+          "z": 1024
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/4_3",
+        "cell/5_3",
+        "cell/6_3",
+        "cell/4_4",
+        "cell/6_4",
+        "cell/4_5",
+        "cell/5_5",
+        "cell/6_5"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1304107569
+    },
+    {
+      "id": "cell/6_4",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1536,
+          "y": 0,
+          "z": 1024
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/5_3",
+        "cell/6_3",
+        "cell/7_3",
+        "cell/5_4",
+        "cell/7_4",
+        "cell/5_5",
+        "cell/6_5",
+        "cell/7_5"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3677540724
+    },
+    {
+      "id": "cell/7_4",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1792,
+          "y": 0,
+          "z": 1024
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/6_3",
+        "cell/7_3",
+        "cell/8_3",
+        "cell/6_4",
+        "cell/8_4",
+        "cell/6_5",
+        "cell/7_5",
+        "cell/8_5"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1590551519
+    },
+    {
+      "id": "cell/8_4",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2048,
+          "y": 0,
+          "z": 1024
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/7_3",
+        "cell/8_3",
+        "cell/9_3",
+        "cell/7_4",
+        "cell/9_4",
+        "cell/7_5",
+        "cell/8_5",
+        "cell/9_5"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2364034466
+    },
+    {
+      "id": "cell/9_4",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2304,
+          "y": 0,
+          "z": 1024
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/8_3",
+        "cell/9_3",
+        "cell/10_3",
+        "cell/8_4",
+        "cell/10_4",
+        "cell/8_5",
+        "cell/9_5",
+        "cell/10_5"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3003041005
+    },
+    {
+      "id": "cell/10_4",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2560,
+          "y": 0,
+          "z": 1024
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/9_3",
+        "cell/10_3",
+        "cell/11_3",
+        "cell/9_4",
+        "cell/11_4",
+        "cell/9_5",
+        "cell/10_5",
+        "cell/11_5"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 761950321
+    },
+    {
+      "id": "cell/11_4",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2816,
+          "y": 0,
+          "z": 1024
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/10_3",
+        "cell/11_3",
+        "cell/12_3",
+        "cell/10_4",
+        "cell/12_4",
+        "cell/10_5",
+        "cell/11_5",
+        "cell/12_5"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 143732134
+    },
+    {
+      "id": "cell/12_4",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3072,
+          "y": 0,
+          "z": 1024
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/11_3",
+        "cell/12_3",
+        "cell/13_3",
+        "cell/11_4",
+        "cell/13_4",
+        "cell/11_5",
+        "cell/12_5",
+        "cell/13_5"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1089970975
+    },
+    {
+      "id": "cell/13_4",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3328,
+          "y": 0,
+          "z": 1024
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/12_3",
+        "cell/13_3",
+        "cell/14_3",
+        "cell/12_4",
+        "cell/14_4",
+        "cell/12_5",
+        "cell/13_5",
+        "cell/14_5"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3135383476
+    },
+    {
+      "id": "cell/14_4",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3584,
+          "y": 0,
+          "z": 1024
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/13_3",
+        "cell/14_3",
+        "cell/15_3",
+        "cell/13_4",
+        "cell/15_4",
+        "cell/13_5",
+        "cell/14_5",
+        "cell/15_5"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3947401365
+    },
+    {
+      "id": "cell/15_4",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3840,
+          "y": 0,
+          "z": 1024
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/14_3",
+        "cell/15_3",
+        "cell/14_4",
+        "cell/14_5",
+        "cell/15_5"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3866066986
+    },
+    {
+      "id": "cell/0_5",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 0,
+          "y": 0,
+          "z": 1280
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_4",
+        "cell/1_4",
+        "cell/1_5",
+        "cell/0_6",
+        "cell/1_6"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 88457853
+    },
+    {
+      "id": "cell/1_5",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 256,
+          "y": 0,
+          "z": 1280
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_4",
+        "cell/1_4",
+        "cell/2_4",
+        "cell/0_5",
+        "cell/2_5",
+        "cell/0_6",
+        "cell/1_6",
+        "cell/2_6"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 136236994
+    },
+    {
+      "id": "cell/2_5",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 512,
+          "y": 0,
+          "z": 1280
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/1_4",
+        "cell/2_4",
+        "cell/3_4",
+        "cell/1_5",
+        "cell/3_5",
+        "cell/1_6",
+        "cell/2_6",
+        "cell/3_6"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2822009883
+    },
+    {
+      "id": "cell/3_5",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 768,
+          "y": 0,
+          "z": 1280
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/2_4",
+        "cell/3_4",
+        "cell/4_4",
+        "cell/2_5",
+        "cell/4_5",
+        "cell/2_6",
+        "cell/3_6",
+        "cell/4_6"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 732699552
+    },
+    {
+      "id": "cell/4_5",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1024,
+          "y": 0,
+          "z": 1280
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/3_4",
+        "cell/4_4",
+        "cell/5_4",
+        "cell/3_5",
+        "cell/5_5",
+        "cell/3_6",
+        "cell/4_6",
+        "cell/5_6"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 702667001
+    },
+    {
+      "id": "cell/5_5",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1280,
+          "y": 0,
+          "z": 1280
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/4_4",
+        "cell/5_4",
+        "cell/6_4",
+        "cell/4_5",
+        "cell/6_5",
+        "cell/4_6",
+        "cell/5_6",
+        "cell/6_6"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1287329950
+    },
+    {
+      "id": "cell/6_5",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1536,
+          "y": 0,
+          "z": 1280
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/5_4",
+        "cell/6_4",
+        "cell/7_4",
+        "cell/5_5",
+        "cell/7_5",
+        "cell/5_6",
+        "cell/6_6",
+        "cell/7_6"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3694318343
+    },
+    {
+      "id": "cell/7_5",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1792,
+          "y": 0,
+          "z": 1280
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/6_4",
+        "cell/7_4",
+        "cell/8_4",
+        "cell/6_5",
+        "cell/8_5",
+        "cell/6_6",
+        "cell/7_6",
+        "cell/8_6"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1573773900
+    },
+    {
+      "id": "cell/8_5",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2048,
+          "y": 0,
+          "z": 1280
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/7_4",
+        "cell/8_4",
+        "cell/9_4",
+        "cell/7_5",
+        "cell/9_5",
+        "cell/7_6",
+        "cell/8_6",
+        "cell/9_6"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2380812085
+    },
+    {
+      "id": "cell/9_5",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2304,
+          "y": 0,
+          "z": 1280
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/8_4",
+        "cell/9_4",
+        "cell/10_4",
+        "cell/8_5",
+        "cell/10_5",
+        "cell/8_6",
+        "cell/9_6",
+        "cell/10_6"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2986263386
+    },
+    {
+      "id": "cell/10_5",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2560,
+          "y": 0,
+          "z": 1280
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/9_4",
+        "cell/10_4",
+        "cell/11_4",
+        "cell/9_5",
+        "cell/11_5",
+        "cell/9_6",
+        "cell/10_6",
+        "cell/11_6"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 745172702
+    },
+    {
+      "id": "cell/11_5",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2816,
+          "y": 0,
+          "z": 1280
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/10_4",
+        "cell/11_4",
+        "cell/12_4",
+        "cell/10_5",
+        "cell/12_5",
+        "cell/10_6",
+        "cell/11_6",
+        "cell/12_6"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 160509753
+    },
+    {
+      "id": "cell/12_5",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3072,
+          "y": 0,
+          "z": 1280
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/11_4",
+        "cell/12_4",
+        "cell/13_4",
+        "cell/11_5",
+        "cell/13_5",
+        "cell/11_6",
+        "cell/12_6",
+        "cell/13_6"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1073193356
+    },
+    {
+      "id": "cell/13_5",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3328,
+          "y": 0,
+          "z": 1280
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/12_4",
+        "cell/13_4",
+        "cell/14_4",
+        "cell/12_5",
+        "cell/14_5",
+        "cell/12_6",
+        "cell/13_6",
+        "cell/14_6"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3152161095
+    },
+    {
+      "id": "cell/14_5",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3584,
+          "y": 0,
+          "z": 1280
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/13_4",
+        "cell/14_4",
+        "cell/15_4",
+        "cell/13_5",
+        "cell/15_5",
+        "cell/13_6",
+        "cell/14_6",
+        "cell/15_6"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3930623746
+    },
+    {
+      "id": "cell/15_5",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3840,
+          "y": 0,
+          "z": 1280
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/14_4",
+        "cell/15_4",
+        "cell/14_5",
+        "cell/14_6",
+        "cell/15_6"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3882844605
+    },
+    {
+      "id": "cell/0_6",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 0,
+          "y": 0,
+          "z": 1536
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_5",
+        "cell/1_5",
+        "cell/1_6",
+        "cell/0_7",
+        "cell/1_7"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 38124996
+    },
+    {
+      "id": "cell/1_6",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 256,
+          "y": 0,
+          "z": 1536
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_5",
+        "cell/1_5",
+        "cell/2_5",
+        "cell/0_6",
+        "cell/2_6",
+        "cell/0_7",
+        "cell/1_7",
+        "cell/2_7"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 119459375
+    },
+    {
+      "id": "cell/2_6",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 512,
+          "y": 0,
+          "z": 1536
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/1_5",
+        "cell/2_5",
+        "cell/3_5",
+        "cell/1_6",
+        "cell/3_6",
+        "cell/1_7",
+        "cell/2_7",
+        "cell/3_7"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2838787502
+    },
+    {
+      "id": "cell/3_6",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 768,
+          "y": 0,
+          "z": 1536
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/2_5",
+        "cell/3_5",
+        "cell/4_5",
+        "cell/2_6",
+        "cell/4_6",
+        "cell/2_7",
+        "cell/3_7",
+        "cell/4_7"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 783032409
+    },
+    {
+      "id": "cell/4_6",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1024,
+          "y": 0,
+          "z": 1536
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/3_5",
+        "cell/4_5",
+        "cell/5_5",
+        "cell/3_6",
+        "cell/5_6",
+        "cell/3_7",
+        "cell/4_7",
+        "cell/5_7"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 652334144
+    },
+    {
+      "id": "cell/5_6",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1280,
+          "y": 0,
+          "z": 1536
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/4_5",
+        "cell/5_5",
+        "cell/6_5",
+        "cell/4_6",
+        "cell/6_6",
+        "cell/4_7",
+        "cell/5_7",
+        "cell/6_7"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1270552331
+    },
+    {
+      "id": "cell/6_6",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1536,
+          "y": 0,
+          "z": 1536
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/5_5",
+        "cell/6_5",
+        "cell/7_5",
+        "cell/5_6",
+        "cell/7_6",
+        "cell/5_7",
+        "cell/6_7",
+        "cell/7_7"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3711095962
+    },
+    {
+      "id": "cell/7_6",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1792,
+          "y": 0,
+          "z": 1536
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/6_5",
+        "cell/7_5",
+        "cell/8_5",
+        "cell/6_6",
+        "cell/8_6",
+        "cell/6_7",
+        "cell/7_7",
+        "cell/8_7"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1624106757
+    },
+    {
+      "id": "cell/8_6",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2048,
+          "y": 0,
+          "z": 1536
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/7_5",
+        "cell/8_5",
+        "cell/9_5",
+        "cell/7_6",
+        "cell/9_6",
+        "cell/7_7",
+        "cell/8_7",
+        "cell/9_7"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2330479228
+    },
+    {
+      "id": "cell/9_6",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2304,
+          "y": 0,
+          "z": 1536
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/8_5",
+        "cell/9_5",
+        "cell/10_5",
+        "cell/8_6",
+        "cell/10_6",
+        "cell/8_7",
+        "cell/9_7",
+        "cell/10_7"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2969485767
+    },
+    {
+      "id": "cell/10_6",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2560,
+          "y": 0,
+          "z": 1536
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/9_5",
+        "cell/10_5",
+        "cell/11_5",
+        "cell/9_6",
+        "cell/11_6",
+        "cell/9_7",
+        "cell/10_7",
+        "cell/11_7"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 728395083
+    },
+    {
+      "id": "cell/11_6",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2816,
+          "y": 0,
+          "z": 1536
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/10_5",
+        "cell/11_5",
+        "cell/12_5",
+        "cell/10_6",
+        "cell/12_6",
+        "cell/10_7",
+        "cell/11_7",
+        "cell/12_7"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 110176896
+    },
+    {
+      "id": "cell/12_6",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3072,
+          "y": 0,
+          "z": 1536
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/11_5",
+        "cell/12_5",
+        "cell/13_5",
+        "cell/11_6",
+        "cell/13_6",
+        "cell/11_7",
+        "cell/12_7",
+        "cell/13_7"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1123526213
+    },
+    {
+      "id": "cell/13_6",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3328,
+          "y": 0,
+          "z": 1536
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/12_5",
+        "cell/13_5",
+        "cell/14_5",
+        "cell/12_6",
+        "cell/14_6",
+        "cell/12_7",
+        "cell/13_7",
+        "cell/14_7"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3168938714
+    },
+    {
+      "id": "cell/14_6",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3584,
+          "y": 0,
+          "z": 1536
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/13_5",
+        "cell/14_5",
+        "cell/15_5",
+        "cell/13_6",
+        "cell/15_6",
+        "cell/13_7",
+        "cell/14_7",
+        "cell/15_7"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3913846127
+    },
+    {
+      "id": "cell/15_6",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3840,
+          "y": 0,
+          "z": 1536
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/14_5",
+        "cell/15_5",
+        "cell/14_6",
+        "cell/14_7",
+        "cell/15_7"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3832511748
+    },
+    {
+      "id": "cell/0_7",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 0,
+          "y": 0,
+          "z": 1792
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_6",
+        "cell/1_6",
+        "cell/1_7",
+        "cell/0_8",
+        "cell/1_8"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 54902615
+    },
+    {
+      "id": "cell/1_7",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 256,
+          "y": 0,
+          "z": 1792
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_6",
+        "cell/1_6",
+        "cell/2_6",
+        "cell/0_7",
+        "cell/2_7",
+        "cell/0_8",
+        "cell/1_8",
+        "cell/2_8"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 102681756
+    },
+    {
+      "id": "cell/2_7",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 512,
+          "y": 0,
+          "z": 1792
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/1_6",
+        "cell/2_6",
+        "cell/3_6",
+        "cell/1_7",
+        "cell/3_7",
+        "cell/1_8",
+        "cell/2_8",
+        "cell/3_8"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2855565121
+    },
+    {
+      "id": "cell/3_7",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 768,
+          "y": 0,
+          "z": 1792
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/2_6",
+        "cell/3_6",
+        "cell/4_6",
+        "cell/2_7",
+        "cell/4_7",
+        "cell/2_8",
+        "cell/3_8",
+        "cell/4_8"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 766254790
+    },
+    {
+      "id": "cell/4_7",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1024,
+          "y": 0,
+          "z": 1792
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/3_6",
+        "cell/4_6",
+        "cell/5_6",
+        "cell/3_7",
+        "cell/5_7",
+        "cell/3_8",
+        "cell/4_8",
+        "cell/5_8"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 669111763
+    },
+    {
+      "id": "cell/5_7",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1280,
+          "y": 0,
+          "z": 1792
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/4_6",
+        "cell/5_6",
+        "cell/6_6",
+        "cell/4_7",
+        "cell/6_7",
+        "cell/4_8",
+        "cell/5_8",
+        "cell/6_8"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1253774712
+    },
+    {
+      "id": "cell/6_7",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1536,
+          "y": 0,
+          "z": 1792
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/5_6",
+        "cell/6_6",
+        "cell/7_6",
+        "cell/5_7",
+        "cell/7_7",
+        "cell/5_8",
+        "cell/6_8",
+        "cell/7_8"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3727873581
+    },
+    {
+      "id": "cell/7_7",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1792,
+          "y": 0,
+          "z": 1792
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/6_6",
+        "cell/7_6",
+        "cell/8_6",
+        "cell/6_7",
+        "cell/8_7",
+        "cell/6_8",
+        "cell/7_8",
+        "cell/8_8"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1607329138
+    },
+    {
+      "id": "cell/8_7",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2048,
+          "y": 0,
+          "z": 1792
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/7_6",
+        "cell/8_6",
+        "cell/9_6",
+        "cell/7_7",
+        "cell/9_7",
+        "cell/7_8",
+        "cell/8_8",
+        "cell/9_8"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2347256847
+    },
+    {
+      "id": "cell/9_7",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2304,
+          "y": 0,
+          "z": 1792
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/8_6",
+        "cell/9_6",
+        "cell/10_6",
+        "cell/8_7",
+        "cell/10_7",
+        "cell/8_8",
+        "cell/9_8",
+        "cell/10_8"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2952708148
+    },
+    {
+      "id": "cell/10_7",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2560,
+          "y": 0,
+          "z": 1792
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/9_6",
+        "cell/10_6",
+        "cell/11_6",
+        "cell/9_7",
+        "cell/11_7",
+        "cell/9_8",
+        "cell/10_8",
+        "cell/11_8"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 711617464
+    },
+    {
+      "id": "cell/11_7",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2816,
+          "y": 0,
+          "z": 1792
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/10_6",
+        "cell/11_6",
+        "cell/12_6",
+        "cell/10_7",
+        "cell/12_7",
+        "cell/10_8",
+        "cell/11_8",
+        "cell/12_8"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 126954515
+    },
+    {
+      "id": "cell/12_7",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3072,
+          "y": 0,
+          "z": 1792
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/11_6",
+        "cell/12_6",
+        "cell/13_6",
+        "cell/11_7",
+        "cell/13_7",
+        "cell/11_8",
+        "cell/12_8",
+        "cell/13_8"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1106748594
+    },
+    {
+      "id": "cell/13_7",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3328,
+          "y": 0,
+          "z": 1792
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/12_6",
+        "cell/13_6",
+        "cell/14_6",
+        "cell/12_7",
+        "cell/14_7",
+        "cell/12_8",
+        "cell/13_8",
+        "cell/14_8"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3185716333
+    },
+    {
+      "id": "cell/14_7",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3584,
+          "y": 0,
+          "z": 1792
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/13_6",
+        "cell/14_6",
+        "cell/15_6",
+        "cell/13_7",
+        "cell/15_7",
+        "cell/13_8",
+        "cell/14_8",
+        "cell/15_8"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3897068508
+    },
+    {
+      "id": "cell/15_7",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3840,
+          "y": 0,
+          "z": 1792
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/14_6",
+        "cell/15_6",
+        "cell/14_7",
+        "cell/14_8",
+        "cell/15_8"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3849289367
+    },
+    {
+      "id": "cell/0_8",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 0,
+          "y": 0,
+          "z": 2048
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_7",
+        "cell/1_7",
+        "cell/1_8",
+        "cell/0_9",
+        "cell/1_9"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 4165316102
+    },
+    {
+      "id": "cell/1_8",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 256,
+          "y": 0,
+          "z": 2048
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_7",
+        "cell/1_7",
+        "cell/2_7",
+        "cell/0_8",
+        "cell/2_8",
+        "cell/0_9",
+        "cell/1_9",
+        "cell/2_9"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 220125089
+    },
+    {
+      "id": "cell/2_8",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 512,
+          "y": 0,
+          "z": 2048
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/1_7",
+        "cell/2_7",
+        "cell/3_7",
+        "cell/1_8",
+        "cell/3_8",
+        "cell/1_9",
+        "cell/2_9",
+        "cell/3_9"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2738121788
+    },
+    {
+      "id": "cell/3_8",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 768,
+          "y": 0,
+          "z": 2048
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/2_7",
+        "cell/3_7",
+        "cell/4_7",
+        "cell/2_8",
+        "cell/4_8",
+        "cell/2_9",
+        "cell/3_9",
+        "cell/4_9"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 950808599
+    },
+    {
+      "id": "cell/4_8",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1024,
+          "y": 0,
+          "z": 2048
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/3_7",
+        "cell/4_7",
+        "cell/5_7",
+        "cell/3_8",
+        "cell/5_8",
+        "cell/3_9",
+        "cell/4_9",
+        "cell/5_9"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 887220810
+    },
+    {
+      "id": "cell/5_8",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1280,
+          "y": 0,
+          "z": 2048
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/4_7",
+        "cell/5_7",
+        "cell/6_7",
+        "cell/4_8",
+        "cell/6_8",
+        "cell/4_9",
+        "cell/5_9",
+        "cell/6_9"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1236997093
+    },
+    {
+      "id": "cell/6_8",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1536,
+          "y": 0,
+          "z": 2048
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/5_7",
+        "cell/6_7",
+        "cell/7_7",
+        "cell/5_8",
+        "cell/7_8",
+        "cell/5_9",
+        "cell/6_9",
+        "cell/7_9"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3476209296
+    },
+    {
+      "id": "cell/7_8",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1792,
+          "y": 0,
+          "z": 2048
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/6_7",
+        "cell/7_7",
+        "cell/8_7",
+        "cell/6_8",
+        "cell/8_8",
+        "cell/6_9",
+        "cell/7_9",
+        "cell/8_9"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1657661995
+    },
+    {
+      "id": "cell/8_8",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2048,
+          "y": 0,
+          "z": 2048
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/7_7",
+        "cell/8_7",
+        "cell/9_7",
+        "cell/7_8",
+        "cell/9_8",
+        "cell/7_9",
+        "cell/8_9",
+        "cell/9_9"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2431144942
+    },
+    {
+      "id": "cell/9_8",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2304,
+          "y": 0,
+          "z": 2048
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/8_7",
+        "cell/9_7",
+        "cell/10_7",
+        "cell/8_8",
+        "cell/10_8",
+        "cell/8_9",
+        "cell/9_9",
+        "cell/10_9"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2801709577
+    },
+    {
+      "id": "cell/10_8",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2560,
+          "y": 0,
+          "z": 2048
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/9_7",
+        "cell/10_7",
+        "cell/11_7",
+        "cell/9_8",
+        "cell/11_8",
+        "cell/9_9",
+        "cell/10_9",
+        "cell/11_9"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 694839845
+    },
+    {
+      "id": "cell/11_8",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2816,
+          "y": 0,
+          "z": 2048
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/10_7",
+        "cell/11_7",
+        "cell/12_7",
+        "cell/10_8",
+        "cell/12_8",
+        "cell/10_9",
+        "cell/11_9",
+        "cell/12_9"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 345063562
+    },
+    {
+      "id": "cell/12_8",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3072,
+          "y": 0,
+          "z": 2048
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/11_7",
+        "cell/12_7",
+        "cell/13_7",
+        "cell/11_8",
+        "cell/13_8",
+        "cell/11_9",
+        "cell/12_9",
+        "cell/13_9"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1157081451
+    },
+    {
+      "id": "cell/13_8",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3328,
+          "y": 0,
+          "z": 2048
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/12_7",
+        "cell/13_7",
+        "cell/14_7",
+        "cell/12_8",
+        "cell/14_8",
+        "cell/12_9",
+        "cell/13_9",
+        "cell/14_9"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2934052048
+    },
+    {
+      "id": "cell/14_8",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3584,
+          "y": 0,
+          "z": 2048
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/13_7",
+        "cell/14_7",
+        "cell/15_7",
+        "cell/13_8",
+        "cell/15_8",
+        "cell/13_9",
+        "cell/14_9",
+        "cell/15_9"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 4014511841
+    },
+    {
+      "id": "cell/15_8",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3840,
+          "y": 0,
+          "z": 2048
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/14_7",
+        "cell/15_7",
+        "cell/14_8",
+        "cell/14_9",
+        "cell/15_9"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3664735558
+    },
+    {
+      "id": "cell/0_9",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 0,
+          "y": 0,
+          "z": 2304
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_8",
+        "cell/1_8",
+        "cell/1_9",
+        "cell/0_10",
+        "cell/1_10"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 4182093721
+    },
+    {
+      "id": "cell/1_9",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 256,
+          "y": 0,
+          "z": 2304
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_8",
+        "cell/1_8",
+        "cell/2_8",
+        "cell/0_9",
+        "cell/2_9",
+        "cell/0_10",
+        "cell/1_10",
+        "cell/2_10"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 203347470
+    },
+    {
+      "id": "cell/2_9",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 512,
+          "y": 0,
+          "z": 2304
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/1_8",
+        "cell/2_8",
+        "cell/3_8",
+        "cell/1_9",
+        "cell/3_9",
+        "cell/1_10",
+        "cell/2_10",
+        "cell/3_10"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2754899407
+    },
+    {
+      "id": "cell/3_9",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 768,
+          "y": 0,
+          "z": 2304
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/2_8",
+        "cell/3_8",
+        "cell/4_8",
+        "cell/2_9",
+        "cell/4_9",
+        "cell/2_10",
+        "cell/3_10",
+        "cell/4_10"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 934030980
+    },
+    {
+      "id": "cell/4_9",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1024,
+          "y": 0,
+          "z": 2304
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/3_8",
+        "cell/4_8",
+        "cell/5_8",
+        "cell/3_9",
+        "cell/5_9",
+        "cell/3_10",
+        "cell/4_10",
+        "cell/5_10"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 903998429
+    },
+    {
+      "id": "cell/5_9",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1280,
+          "y": 0,
+          "z": 2304
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/4_8",
+        "cell/5_8",
+        "cell/6_8",
+        "cell/4_9",
+        "cell/6_9",
+        "cell/4_10",
+        "cell/5_10",
+        "cell/6_10"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1220219474
+    },
+    {
+      "id": "cell/6_9",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1536,
+          "y": 0,
+          "z": 2304
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/5_8",
+        "cell/6_8",
+        "cell/7_8",
+        "cell/5_9",
+        "cell/7_9",
+        "cell/5_10",
+        "cell/6_10",
+        "cell/7_10"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3492986915
+    },
+    {
+      "id": "cell/7_9",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1792,
+          "y": 0,
+          "z": 2304
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/6_8",
+        "cell/7_8",
+        "cell/8_8",
+        "cell/6_9",
+        "cell/8_9",
+        "cell/6_10",
+        "cell/7_10",
+        "cell/8_10"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1640884376
+    },
+    {
+      "id": "cell/8_9",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2048,
+          "y": 0,
+          "z": 2304
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/7_8",
+        "cell/8_8",
+        "cell/9_8",
+        "cell/7_9",
+        "cell/9_9",
+        "cell/7_10",
+        "cell/8_10",
+        "cell/9_10"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2447922561
+    },
+    {
+      "id": "cell/9_9",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2304,
+          "y": 0,
+          "z": 2304
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/8_8",
+        "cell/9_8",
+        "cell/10_8",
+        "cell/8_9",
+        "cell/10_9",
+        "cell/8_10",
+        "cell/9_10",
+        "cell/10_10"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2784931958
+    },
+    {
+      "id": "cell/10_9",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2560,
+          "y": 0,
+          "z": 2304
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/9_8",
+        "cell/10_8",
+        "cell/11_8",
+        "cell/9_9",
+        "cell/11_9",
+        "cell/9_10",
+        "cell/10_10",
+        "cell/11_10"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 678062226
+    },
+    {
+      "id": "cell/11_9",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2816,
+          "y": 0,
+          "z": 2304
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/10_8",
+        "cell/11_8",
+        "cell/12_8",
+        "cell/10_9",
+        "cell/12_9",
+        "cell/10_10",
+        "cell/11_10",
+        "cell/12_10"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 361841181
+    },
+    {
+      "id": "cell/12_9",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3072,
+          "y": 0,
+          "z": 2304
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/11_8",
+        "cell/12_8",
+        "cell/13_8",
+        "cell/11_9",
+        "cell/13_9",
+        "cell/11_10",
+        "cell/12_10",
+        "cell/13_10"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1140303832
+    },
+    {
+      "id": "cell/13_9",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3328,
+          "y": 0,
+          "z": 2304
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/12_8",
+        "cell/13_8",
+        "cell/14_8",
+        "cell/12_9",
+        "cell/14_9",
+        "cell/12_10",
+        "cell/13_10",
+        "cell/14_10"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2950829667
+    },
+    {
+      "id": "cell/14_9",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3584,
+          "y": 0,
+          "z": 2304
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/13_8",
+        "cell/14_8",
+        "cell/15_8",
+        "cell/13_9",
+        "cell/15_9",
+        "cell/13_10",
+        "cell/14_10",
+        "cell/15_10"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3997734222
+    },
+    {
+      "id": "cell/15_9",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3840,
+          "y": 0,
+          "z": 2304
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/14_8",
+        "cell/15_8",
+        "cell/14_9",
+        "cell/14_10",
+        "cell/15_10"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3681513177
+    },
+    {
+      "id": "cell/0_10",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 0,
+          "y": 0,
+          "z": 2560
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_9",
+        "cell/1_9",
+        "cell/1_10",
+        "cell/0_11",
+        "cell/1_11"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 29816211
+    },
+    {
+      "id": "cell/1_10",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 256,
+          "y": 0,
+          "z": 2560
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_9",
+        "cell/1_9",
+        "cell/2_9",
+        "cell/0_10",
+        "cell/2_10",
+        "cell/0_11",
+        "cell/1_11",
+        "cell/2_11"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3262568754
+    },
+    {
+      "id": "cell/2_10",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 512,
+          "y": 0,
+          "z": 2560
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/1_9",
+        "cell/2_9",
+        "cell/3_9",
+        "cell/1_10",
+        "cell/3_10",
+        "cell/1_11",
+        "cell/2_11",
+        "cell/3_11"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1838978805
+    },
+    {
+      "id": "cell/3_10",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 768,
+          "y": 0,
+          "z": 2560
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/2_9",
+        "cell/3_9",
+        "cell/4_9",
+        "cell/2_10",
+        "cell/4_10",
+        "cell/2_11",
+        "cell/3_11",
+        "cell/4_11"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3891875156
+    },
+    {
+      "id": "cell/4_10",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1024,
+          "y": 0,
+          "z": 2560
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/3_9",
+        "cell/4_9",
+        "cell/5_9",
+        "cell/3_10",
+        "cell/5_10",
+        "cell/3_11",
+        "cell/4_11",
+        "cell/5_11"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2945631535
+    },
+    {
+      "id": "cell/5_10",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1280,
+          "y": 0,
+          "z": 2560
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/4_9",
+        "cell/5_9",
+        "cell/6_9",
+        "cell/4_10",
+        "cell/6_10",
+        "cell/4_11",
+        "cell/5_11",
+        "cell/6_11"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 4036071726
+    },
+    {
+      "id": "cell/6_10",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1536,
+          "y": 0,
+          "z": 2560
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/5_9",
+        "cell/6_9",
+        "cell/7_9",
+        "cell/5_10",
+        "cell/7_10",
+        "cell/5_11",
+        "cell/6_11",
+        "cell/7_11"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3807903441
+    },
+    {
+      "id": "cell/7_10",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1792,
+          "y": 0,
+          "z": 2560
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/6_9",
+        "cell/7_9",
+        "cell/8_9",
+        "cell/6_10",
+        "cell/8_10",
+        "cell/6_11",
+        "cell/7_11",
+        "cell/8_11"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2400296848
+    },
+    {
+      "id": "cell/8_10",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2048,
+          "y": 0,
+          "z": 2560
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/7_9",
+        "cell/8_9",
+        "cell/9_9",
+        "cell/7_10",
+        "cell/9_10",
+        "cell/7_11",
+        "cell/8_11",
+        "cell/9_11"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 4054494619
+    },
+    {
+      "id": "cell/9_10",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2304,
+          "y": 0,
+          "z": 2560
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/8_9",
+        "cell/9_9",
+        "cell/10_9",
+        "cell/8_10",
+        "cell/10_10",
+        "cell/8_11",
+        "cell/9_11",
+        "cell/10_11"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 637790362
+    },
+    {
+      "id": "cell/10_10",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2560,
+          "y": 0,
+          "z": 2560
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/9_9",
+        "cell/10_9",
+        "cell/11_9",
+        "cell/9_10",
+        "cell/11_10",
+        "cell/9_11",
+        "cell/10_11",
+        "cell/11_11"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1368807406
+    },
+    {
+      "id": "cell/11_10",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2816,
+          "y": 0,
+          "z": 2560
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/10_9",
+        "cell/11_9",
+        "cell/12_9",
+        "cell/10_10",
+        "cell/12_10",
+        "cell/10_11",
+        "cell/11_11",
+        "cell/12_11"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 278367215
+    },
+    {
+      "id": "cell/12_10",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3072,
+          "y": 0,
+          "z": 2560
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/11_9",
+        "cell/12_9",
+        "cell/13_9",
+        "cell/11_10",
+        "cell/13_10",
+        "cell/11_11",
+        "cell/12_11",
+        "cell/13_11"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3603542352
+    },
+    {
+      "id": "cell/13_10",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3328,
+          "y": 0,
+          "z": 2560
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/12_9",
+        "cell/13_9",
+        "cell/14_9",
+        "cell/12_10",
+        "cell/14_10",
+        "cell/12_11",
+        "cell/13_11",
+        "cell/14_11"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1140639121
+    },
+    {
+      "id": "cell/14_10",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3584,
+          "y": 0,
+          "z": 2560
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/13_9",
+        "cell/14_9",
+        "cell/15_9",
+        "cell/13_10",
+        "cell/15_10",
+        "cell/13_11",
+        "cell/14_11",
+        "cell/15_11"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 170846962
+    },
+    {
+      "id": "cell/15_10",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3840,
+          "y": 0,
+          "z": 2560
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/14_9",
+        "cell/15_9",
+        "cell/14_10",
+        "cell/14_11",
+        "cell/15_11"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1233061715
+    },
+    {
+      "id": "cell/0_11",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 0,
+          "y": 0,
+          "z": 2816
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_10",
+        "cell/1_10",
+        "cell/1_11",
+        "cell/0_12",
+        "cell/1_12"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 13038592
+    },
+    {
+      "id": "cell/1_11",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 256,
+          "y": 0,
+          "z": 2816
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_10",
+        "cell/1_10",
+        "cell/2_10",
+        "cell/0_11",
+        "cell/2_11",
+        "cell/0_12",
+        "cell/1_12",
+        "cell/2_12"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3279346373
+    },
+    {
+      "id": "cell/2_11",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 512,
+          "y": 0,
+          "z": 2816
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/1_10",
+        "cell/2_10",
+        "cell/3_10",
+        "cell/1_11",
+        "cell/3_11",
+        "cell/1_12",
+        "cell/2_12",
+        "cell/3_12"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1822201186
+    },
+    {
+      "id": "cell/3_11",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 768,
+          "y": 0,
+          "z": 2816
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/2_10",
+        "cell/3_10",
+        "cell/4_10",
+        "cell/2_11",
+        "cell/4_11",
+        "cell/2_12",
+        "cell/3_12",
+        "cell/4_12"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3908652775
+    },
+    {
+      "id": "cell/4_11",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1024,
+          "y": 0,
+          "z": 2816
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/3_10",
+        "cell/4_10",
+        "cell/5_10",
+        "cell/3_11",
+        "cell/5_11",
+        "cell/3_12",
+        "cell/4_12",
+        "cell/5_12"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2928853916
+    },
+    {
+      "id": "cell/5_11",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1280,
+          "y": 0,
+          "z": 2816
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/4_10",
+        "cell/5_10",
+        "cell/6_10",
+        "cell/4_11",
+        "cell/6_11",
+        "cell/4_12",
+        "cell/5_12",
+        "cell/6_12"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 4052849345
+    },
+    {
+      "id": "cell/6_11",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1536,
+          "y": 0,
+          "z": 2816
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/5_10",
+        "cell/6_10",
+        "cell/7_10",
+        "cell/5_11",
+        "cell/7_11",
+        "cell/5_12",
+        "cell/6_12",
+        "cell/7_12"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3791125822
+    },
+    {
+      "id": "cell/7_11",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1792,
+          "y": 0,
+          "z": 2816
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/6_10",
+        "cell/7_10",
+        "cell/8_10",
+        "cell/6_11",
+        "cell/8_11",
+        "cell/6_12",
+        "cell/7_12",
+        "cell/8_12"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2417074467
+    },
+    {
+      "id": "cell/8_11",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2048,
+          "y": 0,
+          "z": 2816
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/7_10",
+        "cell/8_10",
+        "cell/9_10",
+        "cell/7_11",
+        "cell/9_11",
+        "cell/7_12",
+        "cell/8_12",
+        "cell/9_12"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 4037717000
+    },
+    {
+      "id": "cell/9_11",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2304,
+          "y": 0,
+          "z": 2816
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/8_10",
+        "cell/9_10",
+        "cell/10_10",
+        "cell/8_11",
+        "cell/10_11",
+        "cell/8_12",
+        "cell/9_12",
+        "cell/10_12"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 654567981
+    },
+    {
+      "id": "cell/10_11",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2560,
+          "y": 0,
+          "z": 2816
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/9_10",
+        "cell/10_10",
+        "cell/11_10",
+        "cell/9_11",
+        "cell/11_11",
+        "cell/9_12",
+        "cell/10_12",
+        "cell/11_12"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1385585025
+    },
+    {
+      "id": "cell/11_11",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2816,
+          "y": 0,
+          "z": 2816
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/10_10",
+        "cell/11_10",
+        "cell/12_10",
+        "cell/10_11",
+        "cell/12_11",
+        "cell/10_12",
+        "cell/11_12",
+        "cell/12_12"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 261589596
+    },
+    {
+      "id": "cell/12_11",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3072,
+          "y": 0,
+          "z": 2816
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/11_10",
+        "cell/12_10",
+        "cell/13_10",
+        "cell/11_11",
+        "cell/13_11",
+        "cell/11_12",
+        "cell/12_12",
+        "cell/13_12"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3620319971
+    },
+    {
+      "id": "cell/13_11",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3328,
+          "y": 0,
+          "z": 2816
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/12_10",
+        "cell/13_10",
+        "cell/14_10",
+        "cell/12_11",
+        "cell/14_11",
+        "cell/12_12",
+        "cell/13_12",
+        "cell/14_12"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1123861502
+    },
+    {
+      "id": "cell/14_11",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3584,
+          "y": 0,
+          "z": 2816
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/13_10",
+        "cell/14_10",
+        "cell/15_10",
+        "cell/13_11",
+        "cell/15_11",
+        "cell/13_12",
+        "cell/14_12",
+        "cell/15_12"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 187624581
+    },
+    {
+      "id": "cell/15_11",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3840,
+          "y": 0,
+          "z": 2816
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/14_10",
+        "cell/15_10",
+        "cell/14_11",
+        "cell/14_12",
+        "cell/15_12"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1216284096
+    },
+    {
+      "id": "cell/0_12",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 0,
+          "y": 0,
+          "z": 3072
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_11",
+        "cell/1_11",
+        "cell/1_12",
+        "cell/0_13",
+        "cell/1_13"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 63371449
+    },
+    {
+      "id": "cell/1_12",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 256,
+          "y": 0,
+          "z": 3072
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_11",
+        "cell/1_11",
+        "cell/2_11",
+        "cell/0_12",
+        "cell/2_12",
+        "cell/0_13",
+        "cell/1_13",
+        "cell/2_13"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3229013516
+    },
+    {
+      "id": "cell/2_12",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 512,
+          "y": 0,
+          "z": 3072
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/1_11",
+        "cell/2_11",
+        "cell/3_11",
+        "cell/1_12",
+        "cell/3_12",
+        "cell/1_13",
+        "cell/2_13",
+        "cell/3_13"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1805423567
+    },
+    {
+      "id": "cell/3_12",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 768,
+          "y": 0,
+          "z": 3072
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/2_11",
+        "cell/3_11",
+        "cell/4_11",
+        "cell/2_12",
+        "cell/4_12",
+        "cell/2_13",
+        "cell/3_13",
+        "cell/4_13"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3925430394
+    },
+    {
+      "id": "cell/4_12",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1024,
+          "y": 0,
+          "z": 3072
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/3_11",
+        "cell/4_11",
+        "cell/5_11",
+        "cell/3_12",
+        "cell/5_12",
+        "cell/3_13",
+        "cell/4_13",
+        "cell/5_13"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2979186773
+    },
+    {
+      "id": "cell/5_12",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1280,
+          "y": 0,
+          "z": 3072
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/4_11",
+        "cell/5_11",
+        "cell/6_11",
+        "cell/4_12",
+        "cell/6_12",
+        "cell/4_13",
+        "cell/5_13",
+        "cell/6_13"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 4002516488
+    },
+    {
+      "id": "cell/6_12",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1536,
+          "y": 0,
+          "z": 3072
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/5_11",
+        "cell/6_11",
+        "cell/7_11",
+        "cell/5_12",
+        "cell/7_12",
+        "cell/5_13",
+        "cell/6_13",
+        "cell/7_13"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3774348203
+    },
+    {
+      "id": "cell/7_12",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1792,
+          "y": 0,
+          "z": 3072
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/6_11",
+        "cell/7_11",
+        "cell/8_11",
+        "cell/6_12",
+        "cell/8_12",
+        "cell/6_13",
+        "cell/7_13",
+        "cell/8_13"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2433852086
+    },
+    {
+      "id": "cell/8_12",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2048,
+          "y": 0,
+          "z": 3072
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/7_11",
+        "cell/8_11",
+        "cell/9_11",
+        "cell/7_12",
+        "cell/9_12",
+        "cell/7_13",
+        "cell/8_13",
+        "cell/9_13"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 4088049857
+    },
+    {
+      "id": "cell/9_12",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2304,
+          "y": 0,
+          "z": 3072
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/8_11",
+        "cell/9_11",
+        "cell/10_11",
+        "cell/8_12",
+        "cell/10_12",
+        "cell/8_13",
+        "cell/9_13",
+        "cell/10_13"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 604235124
+    },
+    {
+      "id": "cell/10_12",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2560,
+          "y": 0,
+          "z": 3072
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/9_11",
+        "cell/10_11",
+        "cell/11_11",
+        "cell/9_12",
+        "cell/11_12",
+        "cell/9_13",
+        "cell/10_13",
+        "cell/11_13"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1335252168
+    },
+    {
+      "id": "cell/11_12",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2816,
+          "y": 0,
+          "z": 3072
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/10_11",
+        "cell/11_11",
+        "cell/12_11",
+        "cell/10_12",
+        "cell/12_12",
+        "cell/10_13",
+        "cell/11_13",
+        "cell/12_13"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 311922453
+    },
+    {
+      "id": "cell/12_12",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3072,
+          "y": 0,
+          "z": 3072
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/11_11",
+        "cell/12_11",
+        "cell/13_11",
+        "cell/11_12",
+        "cell/13_12",
+        "cell/11_13",
+        "cell/12_13",
+        "cell/13_13"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3637097590
+    },
+    {
+      "id": "cell/13_12",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3328,
+          "y": 0,
+          "z": 3072
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/12_11",
+        "cell/13_11",
+        "cell/14_11",
+        "cell/12_12",
+        "cell/14_12",
+        "cell/12_13",
+        "cell/13_13",
+        "cell/14_13"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1107083883
+    },
+    {
+      "id": "cell/14_12",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3584,
+          "y": 0,
+          "z": 3072
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/13_11",
+        "cell/14_11",
+        "cell/15_11",
+        "cell/13_12",
+        "cell/15_12",
+        "cell/13_13",
+        "cell/14_13",
+        "cell/15_13"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 137291724
+    },
+    {
+      "id": "cell/15_12",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3840,
+          "y": 0,
+          "z": 3072
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/14_11",
+        "cell/15_11",
+        "cell/14_12",
+        "cell/14_13",
+        "cell/15_13"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1266616953
+    },
+    {
+      "id": "cell/0_13",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 0,
+          "y": 0,
+          "z": 3328
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_12",
+        "cell/1_12",
+        "cell/1_13",
+        "cell/0_14",
+        "cell/1_14"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 46593830
+    },
+    {
+      "id": "cell/1_13",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 256,
+          "y": 0,
+          "z": 3328
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_12",
+        "cell/1_12",
+        "cell/2_12",
+        "cell/0_13",
+        "cell/2_13",
+        "cell/0_14",
+        "cell/1_14",
+        "cell/2_14"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3245791135
+    },
+    {
+      "id": "cell/2_13",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 512,
+          "y": 0,
+          "z": 3328
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/1_12",
+        "cell/2_12",
+        "cell/3_12",
+        "cell/1_13",
+        "cell/3_13",
+        "cell/1_14",
+        "cell/2_14",
+        "cell/3_14"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1788645948
+    },
+    {
+      "id": "cell/3_13",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 768,
+          "y": 0,
+          "z": 3328
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/2_12",
+        "cell/3_12",
+        "cell/4_12",
+        "cell/2_13",
+        "cell/4_13",
+        "cell/2_14",
+        "cell/3_14",
+        "cell/4_14"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3942208013
+    },
+    {
+      "id": "cell/4_13",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1024,
+          "y": 0,
+          "z": 3328
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/3_12",
+        "cell/4_12",
+        "cell/5_12",
+        "cell/3_13",
+        "cell/5_13",
+        "cell/3_14",
+        "cell/4_14",
+        "cell/5_14"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2962409154
+    },
+    {
+      "id": "cell/5_13",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1280,
+          "y": 0,
+          "z": 3328
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/4_12",
+        "cell/5_12",
+        "cell/6_12",
+        "cell/4_13",
+        "cell/6_13",
+        "cell/4_14",
+        "cell/5_14",
+        "cell/6_14"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 4019294107
+    },
+    {
+      "id": "cell/6_13",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1536,
+          "y": 0,
+          "z": 3328
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/5_12",
+        "cell/6_12",
+        "cell/7_12",
+        "cell/5_13",
+        "cell/7_13",
+        "cell/5_14",
+        "cell/6_14",
+        "cell/7_14"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3757570584
+    },
+    {
+      "id": "cell/7_13",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1792,
+          "y": 0,
+          "z": 3328
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/6_12",
+        "cell/7_12",
+        "cell/8_12",
+        "cell/6_13",
+        "cell/8_13",
+        "cell/6_14",
+        "cell/7_14",
+        "cell/8_14"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2450629705
+    },
+    {
+      "id": "cell/8_13",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2048,
+          "y": 0,
+          "z": 3328
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/7_12",
+        "cell/8_12",
+        "cell/9_12",
+        "cell/7_13",
+        "cell/9_13",
+        "cell/7_14",
+        "cell/8_14",
+        "cell/9_14"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 4071272238
+    },
+    {
+      "id": "cell/9_13",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2304,
+          "y": 0,
+          "z": 3328
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/8_12",
+        "cell/9_12",
+        "cell/10_12",
+        "cell/8_13",
+        "cell/10_13",
+        "cell/8_14",
+        "cell/9_14",
+        "cell/10_14"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 621012743
+    },
+    {
+      "id": "cell/10_13",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2560,
+          "y": 0,
+          "z": 3328
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/9_12",
+        "cell/10_12",
+        "cell/11_12",
+        "cell/9_13",
+        "cell/11_13",
+        "cell/9_14",
+        "cell/10_14",
+        "cell/11_14"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1352029787
+    },
+    {
+      "id": "cell/11_13",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2816,
+          "y": 0,
+          "z": 3328
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/10_12",
+        "cell/11_12",
+        "cell/12_12",
+        "cell/10_13",
+        "cell/12_13",
+        "cell/10_14",
+        "cell/11_14",
+        "cell/12_14"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 295144834
+    },
+    {
+      "id": "cell/12_13",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3072,
+          "y": 0,
+          "z": 3328
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/11_12",
+        "cell/12_12",
+        "cell/13_12",
+        "cell/11_13",
+        "cell/13_13",
+        "cell/11_14",
+        "cell/12_14",
+        "cell/13_14"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3653875209
+    },
+    {
+      "id": "cell/13_13",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3328,
+          "y": 0,
+          "z": 3328
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/12_12",
+        "cell/13_12",
+        "cell/14_12",
+        "cell/12_13",
+        "cell/14_13",
+        "cell/12_14",
+        "cell/13_14",
+        "cell/14_14"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1090306264
+    },
+    {
+      "id": "cell/14_13",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3584,
+          "y": 0,
+          "z": 3328
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/13_12",
+        "cell/14_12",
+        "cell/15_12",
+        "cell/13_13",
+        "cell/15_13",
+        "cell/13_14",
+        "cell/14_14",
+        "cell/15_14"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 154069343
+    },
+    {
+      "id": "cell/15_13",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3840,
+          "y": 0,
+          "z": 3328
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/14_12",
+        "cell/15_12",
+        "cell/14_13",
+        "cell/14_14",
+        "cell/15_14"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1249839334
+    },
+    {
+      "id": "cell/0_14",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 0,
+          "y": 0,
+          "z": 3584
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_13",
+        "cell/1_13",
+        "cell/1_14",
+        "cell/0_15",
+        "cell/1_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 96926687
+    },
+    {
+      "id": "cell/1_14",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 256,
+          "y": 0,
+          "z": 3584
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_13",
+        "cell/1_13",
+        "cell/2_13",
+        "cell/0_14",
+        "cell/2_14",
+        "cell/0_15",
+        "cell/1_15",
+        "cell/2_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3195458278
+    },
+    {
+      "id": "cell/2_14",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 512,
+          "y": 0,
+          "z": 3584
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/1_13",
+        "cell/2_13",
+        "cell/3_13",
+        "cell/1_14",
+        "cell/3_14",
+        "cell/1_15",
+        "cell/2_15",
+        "cell/3_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1771868329
+    },
+    {
+      "id": "cell/3_14",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 768,
+          "y": 0,
+          "z": 3584
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/2_13",
+        "cell/3_13",
+        "cell/4_13",
+        "cell/2_14",
+        "cell/4_14",
+        "cell/2_15",
+        "cell/3_15",
+        "cell/4_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3824764680
+    },
+    {
+      "id": "cell/4_14",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1024,
+          "y": 0,
+          "z": 3584
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/3_13",
+        "cell/4_13",
+        "cell/5_13",
+        "cell/3_14",
+        "cell/5_14",
+        "cell/3_15",
+        "cell/4_15",
+        "cell/5_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2878521059
+    },
+    {
+      "id": "cell/5_14",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1280,
+          "y": 0,
+          "z": 3584
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/4_13",
+        "cell/5_13",
+        "cell/6_13",
+        "cell/4_14",
+        "cell/6_14",
+        "cell/4_15",
+        "cell/5_15",
+        "cell/6_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 4103182202
+    },
+    {
+      "id": "cell/6_14",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1536,
+          "y": 0,
+          "z": 3584
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/5_13",
+        "cell/6_13",
+        "cell/7_13",
+        "cell/5_14",
+        "cell/7_14",
+        "cell/5_15",
+        "cell/6_15",
+        "cell/7_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3875013917
+    },
+    {
+      "id": "cell/7_14",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1792,
+          "y": 0,
+          "z": 3584
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/6_13",
+        "cell/7_13",
+        "cell/8_13",
+        "cell/6_14",
+        "cell/8_14",
+        "cell/6_15",
+        "cell/7_15",
+        "cell/8_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2467407324
+    },
+    {
+      "id": "cell/8_14",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2048,
+          "y": 0,
+          "z": 3584
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/7_13",
+        "cell/8_13",
+        "cell/9_13",
+        "cell/7_14",
+        "cell/9_14",
+        "cell/7_15",
+        "cell/8_15",
+        "cell/9_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 4121605095
+    },
+    {
+      "id": "cell/9_14",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2304,
+          "y": 0,
+          "z": 3584
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/8_13",
+        "cell/9_13",
+        "cell/10_13",
+        "cell/8_14",
+        "cell/10_14",
+        "cell/8_15",
+        "cell/9_15",
+        "cell/10_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 570679886
+    },
+    {
+      "id": "cell/10_14",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2560,
+          "y": 0,
+          "z": 3584
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/9_13",
+        "cell/10_13",
+        "cell/11_13",
+        "cell/9_14",
+        "cell/11_14",
+        "cell/9_15",
+        "cell/10_15",
+        "cell/11_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1435917882
+    },
+    {
+      "id": "cell/11_14",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2816,
+          "y": 0,
+          "z": 3584
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/10_13",
+        "cell/11_13",
+        "cell/12_13",
+        "cell/10_14",
+        "cell/12_14",
+        "cell/10_15",
+        "cell/11_15",
+        "cell/12_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 211256739
+    },
+    {
+      "id": "cell/12_14",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3072,
+          "y": 0,
+          "z": 3584
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/11_13",
+        "cell/12_13",
+        "cell/13_13",
+        "cell/11_14",
+        "cell/13_14",
+        "cell/11_15",
+        "cell/12_15",
+        "cell/13_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3670652828
+    },
+    {
+      "id": "cell/13_14",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3328,
+          "y": 0,
+          "z": 3584
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/12_13",
+        "cell/13_13",
+        "cell/14_13",
+        "cell/12_14",
+        "cell/14_14",
+        "cell/12_15",
+        "cell/13_15",
+        "cell/14_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1207749597
+    },
+    {
+      "id": "cell/14_14",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3584,
+          "y": 0,
+          "z": 3584
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/13_13",
+        "cell/14_13",
+        "cell/15_13",
+        "cell/13_14",
+        "cell/15_14",
+        "cell/13_15",
+        "cell/14_15",
+        "cell/15_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 103736486
+    },
+    {
+      "id": "cell/15_14",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3840,
+          "y": 0,
+          "z": 3584
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/14_13",
+        "cell/15_13",
+        "cell/14_14",
+        "cell/14_15",
+        "cell/15_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1300172191
+    },
+    {
+      "id": "cell/0_15",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 0,
+          "y": 0,
+          "z": 3840
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_14",
+        "cell/1_14",
+        "cell/1_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 80149068
+    },
+    {
+      "id": "cell/1_15",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 256,
+          "y": 0,
+          "z": 3840
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/0_14",
+        "cell/1_14",
+        "cell/2_14",
+        "cell/0_15",
+        "cell/2_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3212235897
+    },
+    {
+      "id": "cell/2_15",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 512,
+          "y": 0,
+          "z": 3840
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/1_14",
+        "cell/2_14",
+        "cell/3_14",
+        "cell/1_15",
+        "cell/3_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1755090710
+    },
+    {
+      "id": "cell/3_15",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 768,
+          "y": 0,
+          "z": 3840
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/2_14",
+        "cell/3_14",
+        "cell/4_14",
+        "cell/2_15",
+        "cell/4_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3841542299
+    },
+    {
+      "id": "cell/4_15",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1024,
+          "y": 0,
+          "z": 3840
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/3_14",
+        "cell/4_14",
+        "cell/5_14",
+        "cell/3_15",
+        "cell/5_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2861743440
+    },
+    {
+      "id": "cell/5_15",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1280,
+          "y": 0,
+          "z": 3840
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/4_14",
+        "cell/5_14",
+        "cell/6_14",
+        "cell/4_15",
+        "cell/6_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 4119959821
+    },
+    {
+      "id": "cell/6_15",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1536,
+          "y": 0,
+          "z": 3840
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/5_14",
+        "cell/6_14",
+        "cell/7_14",
+        "cell/5_15",
+        "cell/7_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3858236298
+    },
+    {
+      "id": "cell/7_15",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 1792,
+          "y": 0,
+          "z": 3840
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/6_14",
+        "cell/7_14",
+        "cell/8_14",
+        "cell/6_15",
+        "cell/8_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 2484184943
+    },
+    {
+      "id": "cell/8_15",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2048,
+          "y": 0,
+          "z": 3840
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/7_14",
+        "cell/8_14",
+        "cell/9_14",
+        "cell/7_15",
+        "cell/9_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 4104827476
+    },
+    {
+      "id": "cell/9_15",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2304,
+          "y": 0,
+          "z": 3840
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/8_14",
+        "cell/9_14",
+        "cell/10_14",
+        "cell/8_15",
+        "cell/10_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 587457505
+    },
+    {
+      "id": "cell/10_15",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2560,
+          "y": 0,
+          "z": 3840
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/9_14",
+        "cell/10_14",
+        "cell/11_14",
+        "cell/9_15",
+        "cell/11_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1452695501
+    },
+    {
+      "id": "cell/11_15",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 2816,
+          "y": 0,
+          "z": 3840
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/10_14",
+        "cell/11_14",
+        "cell/12_14",
+        "cell/10_15",
+        "cell/12_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 194479120
+    },
+    {
+      "id": "cell/12_15",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3072,
+          "y": 0,
+          "z": 3840
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/11_14",
+        "cell/12_14",
+        "cell/13_14",
+        "cell/11_15",
+        "cell/13_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 3687430447
+    },
+    {
+      "id": "cell/13_15",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3328,
+          "y": 0,
+          "z": 3840
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/12_14",
+        "cell/13_14",
+        "cell/14_14",
+        "cell/12_15",
+        "cell/14_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1190971978
+    },
+    {
+      "id": "cell/14_15",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3584,
+          "y": 0,
+          "z": 3840
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/13_14",
+        "cell/14_14",
+        "cell/15_14",
+        "cell/13_15",
+        "cell/15_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 120514105
+    },
+    {
+      "id": "cell/15_15",
+      "kind": "cell",
+      "bounds": {
+        "kind": "aabb2",
+        "origin": {
+          "x": 3840,
+          "y": 0,
+          "z": 3840
+        },
+        "min": {
+          "x": 0,
+          "y": 0
+        },
+        "max": {
+          "x": 256,
+          "y": 256
+        },
+        "plane": "xz"
+      },
+      "neighbors": [
+        "cell/14_14",
+        "cell/15_14",
+        "cell/14_15"
+      ],
+      "assets": [
+        "crate"
+      ],
+      "seed": 1283394572
+    }
+  ]
+}

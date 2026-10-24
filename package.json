@@ -1,0 +1,30 @@
+{
+  "name": "conduit-core",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.21.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "typecheck": "pnpm -r --workspace-concurrency=4 run typecheck",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --check .",
+    "format:write": "prettier --write .",
+    "test": "vitest run",
+    "dev": "pnpm --filter @conduit-examples/sandbox dev",
+    "dev:host": "pnpm --filter @conduit-examples/sandbox dev:host",
+    "e2e": "pnpm --filter @conduit-examples/sandbox e2e",
+    "assets": "pnpm --filter @conduit-examples/sandbox assets",
+    "check:three": "pnpm why -r three --json | node scripts/assert-single-three.mjs"
+  },
+  "devDependencies": {
+    "@conduit/tooling": "workspace:*",
+    "@eslint/js": "^9.15.0",
+    "eslint": "^9.15.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.15.0",
+    "vitest": "^3.1.0"
+  }
+}

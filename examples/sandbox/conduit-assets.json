@@ -1,0 +1,4 @@
+{
+  "baseUrl": "/assets/",
+  "groups": { "core": ["vehicle", "crate"] }
+}

@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": { "types": ["node"], "allowJs": true },
+  "include": ["src", "test", "vitest.preset.ts", "vite.preset.ts"]
+}

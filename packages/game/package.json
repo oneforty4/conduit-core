@@ -1,0 +1,52 @@
+{
+  "name": "@conduit/game",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./server": {
+      "types": "./src/server.ts",
+      "default": "./src/server.ts"
+    },
+    "./client": {
+      "types": "./src/client.ts",
+      "default": "./src/client.ts"
+    },
+    "./host": {
+      "types": "./src/host.ts",
+      "default": "./src/host.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@conduit/assets": "workspace:*",
+    "@conduit/auth": "workspace:*",
+    "@conduit/host": "workspace:*",
+    "@conduit/lobby-client": "workspace:*",
+    "@conduit/math": "workspace:*",
+    "@conduit/net-client": "workspace:*",
+    "@conduit/net-server": "workspace:*",
+    "@conduit/persist": "workspace:*",
+    "@conduit/protocol": "workspace:*",
+    "@conduit/render": "workspace:*",
+    "@conduit/sim": "workspace:*",
+    "@conduit/world": "workspace:*"
+  },
+  "devDependencies": {
+    "@conduit/tooling": "workspace:*",
+    "@types/node": "^22.10.0",
+    "@types/ws": "^8.5.12",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.6.0",
+    "vitest": "^3.1.0",
+    "ws": "^8.18.0"
+  }
+}

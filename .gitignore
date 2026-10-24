@@ -1,0 +1,19 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.DS_Store
+.env
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+playwright-report/
+test-results/
+examples/sandbox/public/assets/
+
+# Local planning notes and generated implementation/review evidence.
+/PLAN.md
+/IMPROVEMENTS.MD
+/IMPROVEMENTS-PLAN.MD
+/IMPLEMENTATION-LEDGER.MD
+/artifacts/

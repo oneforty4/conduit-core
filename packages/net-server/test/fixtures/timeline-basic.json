@@ -1,0 +1,221 @@
+{
+  "description": "Four entities in two regions through every replication case: creates on first sight, updates only for version > baseline, a component removed once, removed and re-added between snapshots, destroy by death, leaving and re-entering interest, interest shrinking and growing, a reused slot with a new generation, a component added to a known entity, two writes between snapshots, a region change inside interest, an empty delta.",
+  "snapshotEvery": 3,
+  "interest": ["cell/0_0", "cell/1_0"],
+  "ticks": [
+    {
+      "tick": 1,
+      "ops": [
+        {
+          "op": "spawn",
+          "entity": 1,
+          "components": {
+            "Region": { "id": "cell/1_0" },
+            "Transform": {
+              "pos": { "x": 10.5, "y": 0, "z": 20.25 },
+              "rot": { "x": 0, "y": 0, "z": 0, "w": 1 },
+              "vel": { "x": 0, "y": 0, "z": 0 }
+            },
+            "Model": { "asset": "crate", "variant": 0 },
+            "Name": { "value": "A" }
+          }
+        },
+        {
+          "op": "spawn",
+          "entity": 2,
+          "components": {
+            "Region": { "id": "cell/0_0" },
+            "Transform": {
+              "pos": { "x": 100, "y": 0, "z": 100 },
+              "rot": { "x": 0, "y": 0, "z": 0, "w": 1 },
+              "vel": { "x": 0, "y": 0, "z": 0 }
+            },
+            "Model": { "asset": "crate", "variant": 0 },
+            "Owner": { "player": 3 }
+          }
+        },
+        {
+          "op": "spawn",
+          "entity": 3,
+          "components": {
+            "Region": { "id": "cell/0_0" },
+            "Transform": {
+              "pos": { "x": 5, "y": 0, "z": 250.75 },
+              "rot": { "x": 0, "y": 0, "z": 0, "w": 1 },
+              "vel": { "x": 0, "y": 0, "z": 0 }
+            }
+          }
+        },
+        {
+          "op": "spawn",
+          "entity": 4,
+          "components": {
+            "Region": { "id": "cell/1_0" },
+            "Transform": {
+              "pos": { "x": 64, "y": 0, "z": 64 },
+              "rot": { "x": 0, "y": 0.247404, "z": 0, "w": 0.968912 },
+              "vel": { "x": 1.5, "y": 0, "z": -2.25 }
+            },
+            "Owner": { "player": 1 },
+            "Name": { "value": "D" }
+          }
+        }
+      ]
+    },
+    {
+      "tick": 4,
+      "ops": [
+        {
+          "op": "set",
+          "entity": 1,
+          "component": "Transform",
+          "value": {
+            "pos": { "x": 11.5, "y": 0, "z": 20.25 },
+            "rot": { "x": 0, "y": 0.124675, "z": 0, "w": 0.992198 },
+            "vel": { "x": 20, "y": 0, "z": 0 }
+          }
+        }
+      ]
+    },
+    { "tick": 7, "ops": [{ "op": "remove", "entity": 1, "component": "Name" }] },
+    {
+      "tick": 10,
+      "ops": [
+        { "op": "set", "entity": 1, "component": "Name", "value": { "value": "A2" } },
+        { "op": "remove", "entity": 2, "component": "Model" }
+      ]
+    },
+    {
+      "tick": 11,
+      "ops": [
+        { "op": "remove", "entity": 1, "component": "Name" },
+        { "op": "set", "entity": 1, "component": "Name", "value": { "value": "A3" } }
+      ]
+    },
+    { "tick": 13, "ops": [{ "op": "destroy", "entity": 3 }] },
+    {
+      "tick": 16,
+      "ops": [{ "op": "set", "entity": 4, "component": "Region", "value": { "id": "cell/5_5" } }]
+    },
+    {
+      "tick": 19,
+      "ops": [
+        { "op": "set", "entity": 4, "component": "Region", "value": { "id": "cell/1_0" } },
+        {
+          "op": "set",
+          "entity": 4,
+          "component": "Transform",
+          "value": {
+            "pos": { "x": 1, "y": 0, "z": 255 },
+            "rot": { "x": 0, "y": 0, "z": 0, "w": 1 },
+            "vel": { "x": 0, "y": 0, "z": 3 }
+          }
+        }
+      ]
+    },
+    { "tick": 22, "interest": ["cell/0_0"] },
+    {
+      "tick": 25,
+      "interest": ["cell/0_0", "cell/1_0"],
+      "ops": [
+        {
+          "op": "set",
+          "entity": 1,
+          "component": "Transform",
+          "value": {
+            "pos": { "x": 30, "y": 0, "z": 22 },
+            "rot": { "x": 0, "y": 0.479426, "z": 0, "w": 0.877583 },
+            "vel": { "x": -4, "y": 0, "z": 0.5 }
+          }
+        }
+      ]
+    },
+    { "tick": 28, "ops": [{ "op": "destroy", "entity": 2 }] },
+    {
+      "tick": 29,
+      "ops": [
+        {
+          "op": "spawn",
+          "entity": 1048578,
+          "components": {
+            "Region": { "id": "cell/0_0" },
+            "Transform": {
+              "pos": { "x": 100, "y": 0, "z": 101 },
+              "rot": { "x": 0, "y": 0, "z": 0, "w": 1 },
+              "vel": { "x": 0, "y": 0, "z": 0 }
+            },
+            "Model": { "asset": "crate", "variant": 2 }
+          }
+        }
+      ]
+    },
+    {
+      "tick": 31,
+      "ops": [
+        {
+          "op": "set",
+          "entity": 1,
+          "component": "Transform",
+          "value": {
+            "pos": { "x": 31, "y": 0, "z": 22 },
+            "rot": { "x": 0, "y": 0, "z": 0, "w": 1 },
+            "vel": { "x": 0, "y": 0, "z": 0 }
+          }
+        }
+      ]
+    },
+    {
+      "tick": 32,
+      "ops": [
+        {
+          "op": "set",
+          "entity": 1,
+          "component": "Transform",
+          "value": {
+            "pos": { "x": 32, "y": 0, "z": 22.5 },
+            "rot": { "x": 0, "y": 0, "z": 0, "w": 1 },
+            "vel": { "x": 0, "y": 0, "z": 0 }
+          }
+        },
+        { "op": "set", "entity": 1, "component": "Owner", "value": { "player": 0 } }
+      ]
+    },
+    {
+      "tick": 34,
+      "ops": [
+        { "op": "set", "entity": 1, "component": "Region", "value": { "id": "cell/0_0" } },
+        {
+          "op": "set",
+          "entity": 1,
+          "component": "Transform",
+          "value": {
+            "pos": { "x": 288, "y": 0, "z": 22.5 },
+            "rot": { "x": 0, "y": 0, "z": 0, "w": 1 },
+            "vel": { "x": 0, "y": 0, "z": 0 }
+          }
+        }
+      ]
+    },
+    { "tick": 39 },
+    {
+      "tick": 40,
+      "ops": [
+        { "op": "destroy", "entity": 1 },
+        {
+          "op": "spawn",
+          "entity": 5,
+          "components": {
+            "Region": { "id": "cell/1_0" },
+            "Transform": {
+              "pos": { "x": 128, "y": 0, "z": 128 },
+              "rot": { "x": 0, "y": 0, "z": 0, "w": 1 },
+              "vel": { "x": 0, "y": 0, "z": 0 }
+            },
+            "Name": { "value": "E" }
+          }
+        }
+      ]
+    },
+    { "tick": 42 }
+  ]
+}

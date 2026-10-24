@@ -1,0 +1,34 @@
+{
+  "name": "@conduit/net-server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@conduit/auth": "workspace:*",
+    "@conduit/math": "workspace:*",
+    "@conduit/persist": "workspace:*",
+    "@conduit/protocol": "workspace:*",
+    "@conduit/sim": "workspace:*",
+    "@conduit/world": "workspace:*",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@conduit/net-client": "workspace:*",
+    "@conduit/tooling": "workspace:*",
+    "@types/node": "^22.10.0",
+    "@types/ws": "^8.5.12",
+    "typescript": "^5.6.0",
+    "vitest": "^3.1.0"
+  }
+}
