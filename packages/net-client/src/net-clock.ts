@@ -1,7 +1,5 @@
 import {
   CLOCK_WINDOW,
-  FRAME_ALPHA,
-  FRAME_RESET_MS,
   JITTER_ALPHA,
   JITTER_MAX_MS,
   JITTER_MIN_MS,
@@ -10,6 +8,7 @@ import {
   SLEW_RATE,
   SNAP_THRESHOLD_MS,
 } from './constants.ts';
+import { FrameTimes } from './frame-times.ts';
 
 export interface NetClockOptions {
   now: () => number;
@@ -63,9 +62,10 @@ export class NetClock {
   private jitter = 0;
   private lastSnapshotRecvMs: number | null = null;
   private renderMs: number | null = null;
-  /** Smoothed frame interval the render clock advances by; null before the second `update`. */
-  private frameMs: number | null = null;
-  private lastUpdateMs = 0;
+  /** When each frame `update` is given is shown. */
+  private readonly frames = new FrameTimes();
+  /** When the frame of the last `update` was shown. */
+  private lastShownMs = 0;
   private maxServerTick = 0;
   private snapCount = 0;
 
@@ -212,33 +212,36 @@ export class NetClock {
     this.lastSnapshotRecvMs = recvMs;
   }
 
+  /** The display's refresh period, ms, as the frames fit it (`FrameTimes`); undefined while none fits. */
+  get refreshMs(): number | undefined {
+    return this.frames.refreshMs;
+  }
+
   /**
-   * Advances the render clock to `nowMs`: jumps to the target on the first call; otherwise advances
-   * by the smoothed frame interval and compares with the target at the same instant, snapping when
-   * more than `SNAP_THRESHOLD_MS` off and else correcting by at most `SLEW_RATE × dt` (never past
-   * the target) outside the `SLEW_DEADBAND_MS` deadband. No-op until synced.
+   * Advances the render clock to the frame stamped `nowMs`: jumps to the target on the first call;
+   * otherwise advances by the time since the frame before as the display shows them (`FrameTimes`)
+   * and compares with the target at the same instant, snapping when more than `SNAP_THRESHOLD_MS`
+   * off and else correcting by at most `SLEW_RATE` × that time (never past the target) outside the
+   * `SLEW_DEADBAND_MS` deadband. No-op until synced.
    *
-   * It advances by `frameMs` -- the interval smoothed by `FRAME_ALPHA`, reset outright by a change
-   * of `FRAME_RESET_MS` or more -- rather than by the raw elapsed time, because frame timestamps
-   * are noisy by a millisecond or two even at a steady frame rate and that noise would otherwise
-   * land directly in rendered motion. The correction budget stays on the raw `dt`: it is a real
-   * time allowance, and smoothing loses nothing, since the slew is what holds the clock on the
-   * target in the long run.
+   * It advances by when frames are shown rather than by their raw timestamps, which are noisy by a
+   * millisecond or so even at a steady frame rate: that noise would otherwise land directly in
+   * rendered motion. Nor by an average frame interval: on a display whose frames come one, two or
+   * three refreshes apart, as a 120 Hz display's do when the page cannot keep up, an average is
+   * wrong by up to a whole refresh on many frames, and everything drawn at this tick jumps.
    */
   update(nowMs: number): void {
     if (!this.synced) return;
-    const target = nowMs + this.offsetMs - (this.interpDelayTicks * 1000) / this.rate;
+    const shownMs = this.frames.at(nowMs);
+    const target = shownMs + this.offsetMs - (this.interpDelayTicks * 1000) / this.rate;
     if (this.renderMs === null) {
       this.renderMs = target;
-      this.lastUpdateMs = nowMs;
-      this.frameMs = null;
+      this.lastShownMs = shownMs;
       return;
     }
-    const dt = Math.max(0, nowMs - this.lastUpdateMs);
-    this.lastUpdateMs = nowMs;
-    if (this.frameMs === null || Math.abs(dt - this.frameMs) >= FRAME_RESET_MS) this.frameMs = dt;
-    else this.frameMs += FRAME_ALPHA * (dt - this.frameMs);
-    const advanced = this.renderMs + this.frameMs;
+    const elapsed = Math.max(0, shownMs - this.lastShownMs);
+    this.lastShownMs = shownMs;
+    const advanced = this.renderMs + elapsed;
     const err = target - advanced;
     const absErr = Math.abs(err);
     if (absErr > SNAP_THRESHOLD_MS) {
@@ -247,7 +250,8 @@ export class NetClock {
       return;
     }
     let correction = 0;
-    if (absErr > SLEW_DEADBAND_MS) correction = Math.sign(err) * Math.min(dt * SLEW_RATE, absErr);
+    if (absErr > SLEW_DEADBAND_MS)
+      correction = Math.sign(err) * Math.min(elapsed * SLEW_RATE, absErr);
     this.renderMs = advanced + correction;
   }
 
@@ -301,8 +305,8 @@ export class NetClock {
     this.rttMeasured = false;
     this.resetJitter();
     this.renderMs = null;
-    this.frameMs = null;
-    this.lastUpdateMs = 0;
+    this.frames.reset();
+    this.lastShownMs = 0;
     this.maxServerTick = 0;
     this.snapCount = 0;
   }

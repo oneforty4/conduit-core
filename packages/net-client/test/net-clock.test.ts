@@ -264,7 +264,7 @@ describe('NetClock render clock', () => {
     expect(clock.renderTimeMs! - before).toBeCloseTo(dt * (1 + SLEW_RATE), 9);
   });
 
-  it('advances by a smoothed frame interval, keeping timestamp noise out of rendered motion', () => {
+  it('advances by when frames are shown, keeping timestamp noise out of rendered motion', () => {
     // A display running at a dead-steady 60 Hz still reports intervals a millisecond or two either
     // side of 16.667, and successive ones come out anti-correlated: it is noise on the timestamps,
     // not the frames really arriving early and late. Advancing by the raw interval would put that
@@ -280,7 +280,7 @@ describe('NetClock render clock', () => {
       clock.update(time.now);
       const advance = (clock.renderTimeMs as number) - previous;
       previous = clock.renderTimeMs as number;
-      if (i >= 60) advances.push(advance); // once the smoothing has settled
+      if (i >= 60) advances.push(advance); // once the refresh has been fitted
     }
     // The raw intervals span 4 ms; what the clock advances by must not.
     expect(Math.max(...advances) - Math.min(...advances)).toBeLessThan(1);
@@ -293,6 +293,62 @@ describe('NetClock render clock', () => {
     const before = clock.renderTimeMs as number;
     clock.update(time.now);
     expect((clock.renderTimeMs as number) - before).toBeGreaterThan(1000 / 30 - 1);
+    expect(clock.refreshMs).toBeCloseTo(1000 / 60, 0);
+  });
+
+  /**
+   * `count` frames shown on a 120 Hz refresh, each one, two or three refreshes after the one
+   * before as `pick` chooses, and their timestamps up to `noise` ms either side of when shown.
+   */
+  function at120(count: number, pick: (r: number) => number, noise: number) {
+    const rng = new Rng(7);
+    const shown: number[] = [];
+    let at = 1000;
+    for (let i = 0; i < count; i++) shown.push((at += (1000 / 120) * pick(rng.float())));
+    return { shown, stamps: shown.map((t) => t + (rng.float() * 2 - 1) * noise) };
+  }
+  /** Of frames `from` on: the most a step and the clock miss the target at when each is shown. */
+  function misses(clock: NetClock, time: { now: number }, stamps: number[], shown: number[]) {
+    const target = (ms: number) => ms + clock.offsetMs - clock.interpDelayTicks * clock.tickMs;
+    let step = 0;
+    let off = 0;
+    let previous = Number.NaN;
+    for (const [i, stamp] of stamps.entries()) {
+      time.now = stamp;
+      clock.update(stamp);
+      const got = clock.renderTimeMs as number;
+      if (i >= 200) {
+        const want = target(shown[i] as number) - target(shown[i - 1] as number);
+        step = Math.max(step, Math.abs(got - previous - want));
+        off = Math.max(off, Math.abs(got - target(shown[i] as number)));
+      }
+      previous = got;
+    }
+    return { step, off };
+  }
+
+  it('moves on by the time between frames as shown at 120 Hz with dropped frames', () => {
+    const { clock, time } = clockAt(0);
+    clock.addSample(10_000, 600, 0);
+    const { shown, stamps } = at120(2000, (r) => (r < 0.3 ? 2 : 1), 1);
+    const { step, off } = misses(clock, time, stamps, shown);
+    expect(step).toBeLessThan(1);
+    expect(off).toBeLessThan(1.2);
+    expect(clock.refreshMs).toBeCloseTo(1000 / 120, 1);
+    expect(clock.snaps).toBe(0);
+  });
+
+  it('keeps to frames one, two and three refreshes apart on a 120 Hz display', () => {
+    // A MacBook's 120 Hz display drawn at full resolution. An average frame interval is wrong by
+    // up to a refresh on a quarter of these frames, and drifts until it snaps: everything drawn at
+    // the render tick jumped by up to 2 m a frame at 250 m/s.
+    const { clock, time } = clockAt(0);
+    clock.addSample(10_000, 600, 0);
+    const { shown, stamps } = at120(3000, (r) => (r < 0.5 ? 1 : r < 0.85 ? 2 : 3), 1);
+    const { step, off } = misses(clock, time, stamps, shown);
+    expect(step).toBeLessThan(1);
+    expect(off).toBeLessThan(1.2);
+    expect(clock.snaps).toBe(0);
   });
 
   it('tracks the target without snapping when updates are throttled to 1 Hz', () => {

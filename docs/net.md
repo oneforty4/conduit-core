@@ -517,8 +517,11 @@ Dependencies: `@conduit/protocol`, `@conduit/sim` (component types, `EntityId`),
 | `JITTER_ALPHA` | `0.1` |
 | `JITTER_MIN_MS` / `JITTER_MAX_MS` | `0` / `50` |
 | `SLEW_RATE` | `0.02` (render clock runs at 0.98..1.02) |
-| `FRAME_ALPHA` | `0.08` (EWMA weight of the frame interval the render clock advances by) |
-| `FRAME_RESET_MS` | `8` (a frame interval this far from the smoothed one replaces it) |
+| `REFRESH_WINDOW` / `REFRESH_MIN_FRAMES` | `32` / `8` (frame intervals the display's refresh is fitted to, and the fewest it is fitted to at all, B.4 `FrameTimes`) |
+| `REFRESH_FIT` | `0.18` (how far frames may miss a refresh on average, as a share of its period, to be put on it) |
+| `REFRESH_PULL` | `0.15` (the share of the way from a frame's place on the refresh to its timestamp it is moved) |
+| `REFRESH_BAND` / `REFRESH_BAND_MS` | `0.2` / `2` (a frame is put no further from its timestamp than this share of a period, nor these ms) |
+| `FRAME_STALL_MS` | `250` (frames further apart are a stall or a new clock: the frame is taken at its timestamp) |
 | `SLEW_DEADBAND_MS` | `1` |
 | `SNAP_THRESHOLD_MS` | `250` |
 | `INPUT_RING` | `8` frames |
@@ -668,7 +671,7 @@ export class NetClock {
   addSample(serverTimeMs: number, serverTick: number, clientRecvMs: number): void;
   onPong(clientTimeMs: number, serverTimeMs: number, serverTick: number, recvMs: number): void;
   onSnapshotArrival(serverTimeMs: number, serverTick: number, recvMs: number): void;
-  update(nowMs: number): void;                                 // slews render clock
+  update(nowMs: number): void;                                 // the frame's timestamp: advances and slews the render clock
   serverTimeNow(): number;                                     // estimated server ms
   serverTickNow(): number;                                     // floor
   renderTick(): number;                                        // fractional tick
@@ -676,8 +679,14 @@ export class NetClock {
   readonly rttMs: number; readonly jitterMs: number; readonly offsetMs: number; readonly synced: boolean;
   readonly tickRate; snapshotEvery; tickMs; snapshotIntervalMs; tickEpochMs; interpDelayMs; interpDelayTicks; inputLead; snaps: number;
   readonly renderTimeMs: number | null; samples(): number[];   // the window's offset samples s, oldest first
+  readonly refreshMs: number | undefined;                      // the display refresh frames are put on (FrameTimes); undefined while none fits
   resetJitter(): void;
   reset(): void;                                               // forgets everything but the rates (a new session)
+}
+export class FrameTimes {                                      // when each frame is shown (below); NetClock keeps one
+  at(stampMs: number): number;                                 // the time the frame stamped stampMs is shown at
+  readonly refreshMs: number | undefined;
+  reset(): void;
 }
 export function toU32Ms(ms: number): number;                    // floor(ms) mod 2^32, sent as Ping.clientTimeMs
 ```
@@ -715,14 +724,37 @@ targetRenderTimeMs(now) = (now + offsetMs) − interpDelayTicks × tickMs   // s
 
 update(now):
   if !synced: return
-  target = targetRenderTimeMs(now)
-  if renderTimeMs == null: renderTimeMs = target; lastUpdateMs = now; return
-  dt = now − lastUpdateMs; lastUpdateMs = now
-  frameMs = (frameMs == null or |dt − frameMs| >= FRAME_RESET_MS) ? dt : frameMs + FRAME_ALPHA × (dt − frameMs)
-  renderTimeMs += frameMs                          // advance first: an error measured before advancing settles one frame
+  shown = frames.at(now)                           // FrameTimes: when the display shows this frame, below
+  target = targetRenderTimeMs(shown)
+  if renderTimeMs == null: renderTimeMs = target; lastShownMs = shown; return
+  elapsed = max(0, shown − lastShownMs); lastShownMs = shown
+  renderTimeMs += elapsed                          // advance first: an error measured before advancing settles one frame
   err = target − renderTimeMs                      // ahead of the target and snaps on every update at 1 Hz
   if |err| > SNAP_THRESHOLD_MS: renderTimeMs = target; snaps++
-  else if |err| > SLEW_DEADBAND_MS: renderTimeMs += sign(err) × min(SLEW_RATE × dt, |err|)   // rate 1 ± SLEW_RATE, never past the target
+  else if |err| > SLEW_DEADBAND_MS: renderTimeMs += sign(err) × min(SLEW_RATE × elapsed, |err|)   // rate 1 ± SLEW_RATE, never past the target
+refreshMs = frames.refreshMs                       // the refresh period frames are put on; undefined while none fits
+
+FrameTimes.at(stamp):                              // stamp: the frame's requestAnimationFrame timestamp
+  interval = stamp − lastStamp
+  if !(0 ≤ interval ≤ FRAME_STALL_MS): forget the window; shown = stamp; return stamp
+  P = period()                                     // the refresh the last REFRESH_WINDOW intervals fit, or none
+  steps = P ? round((stamp − shown) / P) : 1
+  if steps < 1: return max(stamp, shown)           // too soon for the refresh (an uncapped rate): not recorded
+  record interval; lastStamp = stamp
+  if !P: shown = max(stamp, shown); return shown
+  placed = shown + steps × P                       // the whole number of refreshes on that the timestamp is nearest
+  band = min(REFRESH_BAND_MS, REFRESH_BAND × P)
+  shown = clamp(placed + REFRESH_PULL × (stamp − placed), stamp − band, stamp + band)
+  return shown
+
+period():                                          // none before REFRESH_MIN_FRAMES intervals
+  if the last period, refitted, still fits: keep it          // a display keeps its refresh
+  for seed in the intervals at ranks 0.5, 0.25, 0.1 (shortest first), span in 1..4 (seed/span ≥ 3 ms):
+    P = least-squares fit of the intervals as whole numbers of periods, from seed / span (3 rounds)
+    miss = max(the timestamps' mean distance from their mean place off P's refresh,
+               the intervals' mean distance from a whole number of P) / P
+    fits if miss ≤ REFRESH_FIT and at most a tenth of the intervals miss by over 0.3 P
+  of those that fit, the least miss / P                      // longer first on a tie
 
 renderTick()  = (renderTimeMs − tickEpoch) / tickMs                // fractional; NaN-safe: 0 before first update
 inputLead     = min(maxInputLeadTicks, ceil((rttMs / 2) / tickMs) + 1)
@@ -731,9 +763,11 @@ inputTick()   = serverTickNow() + inputLead
 
 **Each estimate is the extreme its bias points away from.** Everything that delays a message -- the network, the server sending after it stamped `serverTimeMs`, and above all a client whose main thread handles the message late because it was busy -- lowers `s`, so the least delayed sample (the highest) is the best estimate of the offset, short only of the way back, which half the RTT stands for; a tick start can only be late, which raises `e`, so the lowest is the best estimate of the epoch, and since the server keeps its ticks on one grid for the whole session (docs/sim.md 2.10) the lowest since `reset()` stays right. A sample keeps no RTT of its own: the offset adds the estimate as it is now, so a mismeasured RTT is undone by the next Pong that measures less, not by the window turning over. The offset was once the window's minimum of `s + rtt/2`, its most delayed sample: the snapshots a 120 ms hitch held back set it ~75 ms low for the window's 0.8 s, `serverTickNow` trailed the server by 7 ticks, every input frame arrived after its tick and was dropped (A.7), and the vehicle held its last orders for most of a second after every hitch (measured in a browser: 47 ticks without an applied input after a 120 ms hitch, 56 after 300 ms). And the epoch was the window's minimum: a server starting every tick a few ms late for longer than the window raised it, and the render tick stepped back by that much in one frame.
 
-The RTT falls to a lower sample at once because stalls only ever add to a sample: a browser client handles its first Pong while it builds the WebGL renderer right after Welcome, and a ~300 ms sample that decayed at `RTT_ALPHA` per 1 Hz Pong kept `inputLead` near 10 ticks for half a minute, so every input frame arrived more than `INPUT_QUEUE_MAX` ticks early and was dropped by the server's queue (A.7) before its tick. Tick counts are floored and ceiled with a 1e-6-tick tolerance so exact multiples of `tickMs` do not fall a tick short. `resetJitter()` sets `jitterRaw = 0`, `jitterMs = 0`, `lastSnapshotRecvMs = null`. The window (and the RTT estimate) survives a resync because the server clock is the same session; a reconnect that ends in a fresh join calls `reset()` instead, since the server may be a restarted session whose time and ticks started over (B.3). Background-tab throttling (long gaps between updates) needs no correction because such a gap is far past `FRAME_RESET_MS` and advances the clock by the whole elapsed time; a large `err` from an offset or delay change is handled by the snap.
+The RTT falls to a lower sample at once because stalls only ever add to a sample: a browser client handles its first Pong while it builds the WebGL renderer right after Welcome, and a ~300 ms sample that decayed at `RTT_ALPHA` per 1 Hz Pong kept `inputLead` near 10 ticks for half a minute, so every input frame arrived more than `INPUT_QUEUE_MAX` ticks early and was dropped by the server's queue (A.7) before its tick. Tick counts are floored and ceiled with a 1e-6-tick tolerance so exact multiples of `tickMs` do not fall a tick short. `resetJitter()` sets `jitterRaw = 0`, `jitterMs = 0`, `lastSnapshotRecvMs = null`. The window (and the RTT estimate) survives a resync because the server clock is the same session; a reconnect that ends in a fresh join calls `reset()` instead, since the server may be a restarted session whose time and ticks started over (B.3). Background-tab throttling (long gaps between updates) needs no correction because such a gap is past `FRAME_STALL_MS`, so the frame is taken at its timestamp and advances the clock by the whole elapsed time; a large `err` from an offset or delay change is handled by the snap.
 
-The clock advances by `frameMs`, the smoothed frame interval, rather than by the raw `dt`, because **the interval a frame reports is noisy even when frames are not**. A display held at a dead-steady 60 Hz reports intervals a millisecond or two either side of 16.667 ms, and successive intervals come out strongly anti-correlated (measured lag-1 autocorrelation −0.60 on an idle page), which is the signature of noise on the timestamps rather than of frames really arriving early and late. Advancing by that raw interval puts ±12 % into how far the world moves each frame — shimmer on everything in motion, worst where a chase camera holds the player still and the scenery slides past. Smoothing costs nothing, since it is the slew, not `dt`, that holds the clock on the target in the long run; the correction budget stays on the raw `dt` because it is an allowance of real time. A genuine change of cadence — a dropped frame, a 120 Hz display, a stall — differs by at least `FRAME_RESET_MS` and replaces the estimate outright, so the clock follows it on the same frame instead of easing into it.
+The clock advances by the time between frames **as the display shows them**, not by their raw timestamps, because **the interval a frame reports is noisy even when frames are not**. A display held at a dead-steady 60 Hz reports intervals a millisecond or two either side of 16.667 ms, and successive intervals come out strongly anti-correlated (measured lag-1 autocorrelation −0.60 on an idle page), which is the signature of noise on the timestamps rather than of frames really arriving early and late. Advancing by that raw interval puts ±12 % into how far the world moves each frame — shimmer on everything in motion, worst where a chase camera holds the player still and the scenery slides past. A display shows each frame on a refresh, a whole number of refresh periods after the one before, so `FrameTimes` fits the refresh period to the last `REFRESH_WINDOW` intervals and puts each frame on it, drawn a little towards its timestamp to stay in phase and never further from it than the band. The fit is judged on where the timestamps lie, not on the intervals alone: noise moves a timestamp, and so two intervals, one each way, while frames that keep to no refresh (an uncapped frame rate, a variable-refresh display) wander ever further from any; where none fits, a frame is taken at its timestamp. A display keeps its refresh, so once fitted the period is held while it still fits, which keeps noise from fitting a fraction or multiple of it instead now and then.
+
+The clock once advanced by an average of the intervals instead (weight `0.08`, replaced outright by an interval 8 ms or more from it). That holds a steady display smooth, but on a display whose frames come one, two and three refreshes apart, as a 120 Hz display's do when the page cannot keep up, the average was wrong by up to a whole refresh on a quarter of frames: an interval 7.7 ms from the average (8.3 plus a millisecond of noise) was taken for noise, and the clock fell behind or ran ahead until the slew or a snap caught it. Measured with the same frames given to both (one, two and three 120 Hz refreshes apart, timestamps ±1 ms): the average stepped wrong by more than 2 ms on 28 % of frames, by 9 ms at worst, and strayed up to 108 ms from its target (and with a quarter of frames dropped, to the snap); `FrameTimes` stepped wrong by 0.3 ms at worst and strayed 0.9 ms. Everything a game draws at the render tick moved with those errors: a remote vehicle at 250 m/s jumped up to 2 m in a frame. `test/net-clock.test.ts` and `test/frame-times.test.ts` keep both the steady display and the uneven one.
 
 `update(now)` must be called with **the frame's own timestamp**, which is what `requestAnimationFrame` passes its callback, and never with a clock read somewhere inside the frame: the latter measures when that line ran, after however much work came first, and feeds exactly the jitter this smoothing exists to remove. `RenderHost` exposes the frame's timestamp as `host.timeMs` for that reason (docs/render.md §2, docs/game.md §4).
 

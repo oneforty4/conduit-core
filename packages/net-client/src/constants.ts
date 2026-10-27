@@ -20,18 +20,25 @@ export const JITTER_MAX_MS = 50;
 /** The render clock runs at `1 - SLEW_RATE .. 1 + SLEW_RATE` while it converges. */
 export const SLEW_RATE = 0.02;
 /**
- * EWMA weight of the frame interval the render clock advances by. Frame timestamps carry a
- * millisecond or two of noise even on a display running at a dead-steady rate (successive intervals
- * come out strongly anti-correlated), and advancing by the raw interval turns that into several
- * percent of velocity noise every frame, which reads as shimmer on everything that moves.
+ * Frame intervals the display's refresh period is fitted to (`FrameTimes`, docs/net.md B.4), and
+ * the fewest it is fitted to at all.
  */
-export const FRAME_ALPHA = 0.08;
+export const REFRESH_WINDOW = 32;
+export const REFRESH_MIN_FRAMES = 8;
 /**
- * A frame interval this many ms from the smoothed one is real, not noise -- a dropped frame, a
- * display at another rate, a stall -- and replaces it outright, so the clock follows a genuine
- * change of cadence immediately instead of easing into it.
+ * How far frames may miss a refresh, on average, as a share of its period, for them to be put on
+ * it (`FrameTimes`). Frames that keep to no refresh miss one by a quarter of a period, and are
+ * better taken at their timestamps than put on one wrongly; timestamp noise of a millisecond and
+ * a half either side on a 120 Hz display misses by an eighth.
  */
-export const FRAME_RESET_MS = 8;
+export const REFRESH_FIT = 0.18;
+/** The share of the way from a frame's place on the refresh to its timestamp that it is moved. */
+export const REFRESH_PULL = 0.15;
+/** How far a frame is put from its timestamp at most: this share of a period, and `REFRESH_BAND_MS`. */
+export const REFRESH_BAND = 0.2;
+export const REFRESH_BAND_MS = 2;
+/** Frames further apart than this, ms, are a stall (a hidden tab) or a new clock, not the display. */
+export const FRAME_STALL_MS = 250;
 /** Render-clock errors this small are not corrected. */
 export const SLEW_DEADBAND_MS = 1;
 /** Render-clock errors larger than this snap instead of slewing. */

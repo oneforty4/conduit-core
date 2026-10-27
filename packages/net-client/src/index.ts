@@ -4,6 +4,7 @@ export * from './state.ts';
 export * from './frame-io.ts';
 export * from './snapshot-assembly.ts';
 export * from './net-clock.ts';
+export * from './frame-times.ts';
 export * from './sample-ring.ts';
 export * from './interpolate.ts';
 export * from './replica-world.ts';
