@@ -13,8 +13,8 @@ The `Session` (`docs/net.md`) drives this package each tick in the canonical ord
 `docs/sim.md` 2.9, of which the relevant part is:
 
 ```
-regions.update(players, ctx, pending)   // every tick, before sim.step: activations land on a tick boundary
-sim.step(tick)                          // tail = [regions.membershipSystem.run, spatial.rebuild]  (docs/sim.md 2.9)
+regions.update(players, ctx, pending, interest)   // every tick, before sim.step: activations land on a tick boundary
+sim.step(tick)                                     // tail = [regions.membershipSystem.run, spatial.rebuild]  (docs/sim.md 2.9)
 ```
 
 ---
@@ -248,7 +248,7 @@ export type RegionState = 'inactive' | 'loading' | 'active' | 'saving';
 export class RegionManager implements RegionsApi {
   constructor(opts: RegionManagerOpts);
   readonly membershipSystem: System;               // phase 'postSim'; run via Simulation.tail
-  update(players: readonly EntityId[], ctx: SimContext, pending?: readonly RegionId[]): void;   // pending: regions kept wanted for players not yet spawned (docs/net.md A.6 PlayerSpawn.regionId)
+  update(players: readonly EntityId[], ctx: SimContext, pending?: readonly RegionId[], interest?: readonly RegionId[]): void;   // pending: regions kept wanted, with their neighbourhood, for players not yet spawned (docs/net.md A.6 PlayerSpawn.regionId); interest: regions kept wanted exactly, the game's simulation interest (docs/net.md A.5 SessionHooks.simulationInterest); UnknownRegion for an interest id the graph lacks
   migrate(e: EntityId, to: RegionId, newLocalPos?: Vec3): MigrateResult;
   entitiesIn(id: RegionId): readonly EntityId[];   // ascending; [] if not active; the live list: copy it before migrating the entities it lists
   regionOf(e: EntityId): RegionId | undefined;     // Region.id if the entity has one
@@ -323,11 +323,12 @@ during a step, from that step's membership pass.
 `loading` is never wanted-checked for eviction: a region that stops being wanted while loading
 still activates, then lingers normally.
 
-### 5.2 `update(players, ctx, pending?)`
+### 5.2 `update(players, ctx, pending?, interest?)`
 
 ```
-update(players, ctx, pending = []):
+update(players, ctx, pending = [], interest = []):
   if world.stepping: throw Error                       // between steps only (docs/sim.md 2.12 rule 6)
+  for id of interest: if graph.get(id) === undefined: throw UnknownRegion(id)   // before anything changes
   tick = ctx.tick + 1                                  // update runs before step(tick); use the tick about to be simulated
   playerSet = new Set(players)
 
@@ -346,6 +347,7 @@ update(players, ctx, pending = []):
     r = regionOf(p); if r === undefined: continue          // player not yet placed
     for id of graph.wanted(r): if !wanted.includes(id): wanted.push(id)
   for r of pending: for id of graph.wanted(r): if !wanted.includes(id): wanted.push(id)   // spawn regions of joined-but-unspawned players
+  for id of interest: if !wanted.includes(id): wanted.push(id)   // simulation interest: exactly these regions, no graph.wanted neighbourhood
   wanted.sort(stringCompare); wantedSet = new Set(wanted)
 
   // 4. transitions
@@ -360,6 +362,18 @@ update(players, ctx, pending = []):
     if rec.lingerUntil === Infinity: rec.lingerUntil = tick + lingerTicks
     else if tick >= rec.lingerUntil: deactivate(rec, ctx, tick)
 ```
+
+**Simulation interest.** `interest` lets a game keep regions simulated that no player is in or near,
+such as the path of a long-range projectile (`docs/net.md` A.5, `SessionHooks.simulationInterest`,
+which the Session validates, deduplicates and sorts before passing it here). Unlike players and
+`pending`, each interest region is wanted alone: its neighbours are not, so a game names every
+region it needs. Wanted is wanted: an interest region loads, activates at the next `update`, stays
+active while named, and once no longer wanted by anyone lingers `lingerTicks` and is saved and
+evicted (5.1). Because membership (6.1) holds an entity at the border of a wanted region that is
+loading, saving, or inactive awaiting a load retry, a non-player entity crossing into an interest
+region waits in place until it activates; crossing into an inactive region nobody wants still
+inboxes it. Simulation interest is not client interest: `InterestPolicy` (section 9) and the
+RegionSet are built from player regions only. With no `interest` (the default) `update` is unchanged.
 
 A `populate` that throws propagates out of `update`: its region stays `active` with the entities it
 created (and its arrivals), and the rest of the batch activates at the next `update` instead of
@@ -767,7 +781,7 @@ For `GridWorld`, `depth + 1` uses `wantedDepth + 1`; for `NodeWorld`, `2` hops.
 | `test/gridWorld.test.ts` | `locate` floor division at cell edges (exactly `cellSize` belongs to the next cell), negative coordinates return `null`, hint fast path returns hint when inside and re-locates when outside; `wanted` corner cell has 4 entries, interior 9, depth 2 interior 25, order is self then row-major; ids parse round-trip; seeds differ per cell and are stable; `toJson`/`fromJson` round-trip yields identical `locate`/`wanted` for 1000 random points; custom `originOf` that is not grid-consistent throws |
 | `test/nodeWorld.test.ts` | `locate` returns hint or null; `wanted` BFS order and depth; override wanted forces self first; missing neighbour and duplicate id throw; Spike 4 (section 3): positions out to a 1 000 km system edge replicate through the core `Transform` codec within 0.5 mm, the range outlasts 1.8 h at the replicated speed cap, the codec saturates past ±2 147 km, and a ship crossing its system stays in its node region until an explicit `migrate` |
 | `test/coords.test.ts` | `toWorld`/`toLocal` inverse; `rebase` preserves world position across two regions; `contains` half-open; `clampToBounds` result is contained |
-| `test/regionManager.test.ts` | every transition in 5.1 driven by a scripted `players` array and a controllable `RegionStore` (resolve/reject on demand); a region listed in `pending` is loaded and kept active without any player entity; load on wanted, activation at the next `update`, linger exactly `lingerTicks`, re-wanted cancels linger, save on expiry removes entities and writes the blob, put failure re-activates from memory, wanted-while-saving reactivates without `get`, get failure retries after `retryTicks`; `deactivate` with a player present throws `InvariantViolation`; an eviction during `flushAll` saves after the flush commits |
+| `test/regionManager.test.ts` | every transition in 5.1 driven by a scripted `players` array and a controllable `RegionStore` (resolve/reject on demand); a region listed in `pending` is loaded and kept active without any player entity; load on wanted, activation at the next `update`, linger exactly `lingerTicks`, re-wanted cancels linger, save on expiry removes entities and writes the blob, put failure re-activates from memory, wanted-while-saving reactivates without `get`, get failure retries after `retryTicks`; `deactivate` with a player present throws `InvariantViolation`; an eviction during `flushAll` saves after the flush commits; simulation interest: an interest region activates alone (no neighbour is loaded), with no player, in any order and with repeats, unioned with player neighbourhoods; an unknown interest id throws `UnknownRegion` before anything changes; a dropped interest region lingers exactly `lingerTicks`, then is saved and evicted; an entity crossing into a loading interest region waits at the border and moves in once it activates, while one crossing into an unwanted neighbour of it is inboxed; an interest region whose load failed keeps the entity waiting, and once dropped the crossing inboxes |
 | `test/borderOscillation.test.ts` | 3 x 3 grid; one player entity moves back and forth across the `cell/1_1`/`cell/2_1` border every 30 ticks for 7200 ticks (2 min at 60 Hz) with 20 persisted crates per cell populated procedurally; asserts: no region ever reaches `saving`, region count stays 9 wanted minus clipped, total crate count is constant every tick, no crate appears in two regions' `entitiesIn`, the player's `Region.id` matches `graph.locate` after every tick, `world.hash()` sequence is identical on a second run |
 | `test/inbox.test.ts` | an entity walking into an inactive unwanted region is inboxed and removed; activating that region later re-creates it with the rebased position; `flushAll` writes inbox items into the stored blob and a fresh manager loads them; a `persist: false`-only entity is destroyed, not inboxed; `flushAll` racing a load or an activation stores arrivals once; `migrate` returns each `MigrateResult` value under the matching setup |
 | `test/blob.test.ts` | `serializeEntity` includes only `persist: true` components in id order; entities with none serialize to `null`; encode/decode round-trip; `rngState` restore continues the stream exactly; bad version throws `BlobError` |

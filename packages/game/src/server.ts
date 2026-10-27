@@ -63,6 +63,7 @@ export interface CreateServerOpts<I extends InputFrame = InputFrame> extends Pic
   | 'diagnostics'
   | 'replication'
   | 'snapshotLimits'
+  | 'maxSimulationInterestRegions'
 > {
   /** Default 0 (ephemeral); the bound port is `GameServer.port`. */
   port?: number | undefined;
@@ -180,6 +181,7 @@ export function createServer<I extends InputFrame>(
     verifier,
     sessionId: DEV_SESSION_ID,
     maxPlayers: opts.maxPlayers,
+    maxSimulationInterestRegions: opts.maxSimulationInterestRegions,
     reconnectGraceMs: opts.reconnectGraceMs,
     log,
     ...(opts.replication === undefined ? {} : { replication: opts.replication }),

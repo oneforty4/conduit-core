@@ -244,10 +244,11 @@ const NO_REGIONS: readonly RegionId[] = Object.freeze([]);
 function noLog(): void {}
 
 /**
- * Activates the regions players need, tracks which entities are in each active region, saves and
- * evicts regions nobody wants, and moves entities between regions (docs/world.md §5, §6). Driven by
- * the Session every tick: `update` before `Simulation.step`, `membershipSystem.run` first in
- * `Simulation.tail`. Satisfies sim's `RegionsApi` and `InterestPolicy`'s `RegionMembership`.
+ * Activates the regions players and the game's simulation interest need, tracks which entities are
+ * in each active region, saves and evicts regions nobody wants, and moves entities between regions
+ * (docs/world.md §5, §6). Driven by the Session every tick: `update` before `Simulation.step`,
+ * `membershipSystem.run` first in `Simulation.tail`. Satisfies sim's `RegionsApi` and
+ * `InterestPolicy`'s `RegionMembership`.
  */
 export class RegionManager implements RegionsApi {
   /**
@@ -371,19 +372,24 @@ export class RegionManager implements RegionsApi {
    * regions whose load (or failed save) completed, in id order; records entities hooks created
    * since the last pass; then applies the §5.1 transitions to the regions in `graph.wanted` of each
    * player's region and of each `pending` region (spawn regions of joined players that have no
-   * entity yet, docs/net.md A.6): wanted inactive regions start loading, wanted lingering regions
-   * stop lingering, active regions nobody wants linger and, once the linger expires, are saved and
-   * evicted. A throwing `populate` propagates (regions queued behind it activate at the next
-   * `update`), as does a throwing eviction (see `deactivate`).
+   * entity yet, docs/net.md A.6), plus each `interest` region itself, without its neighbourhood
+   * (simulation interest, docs/net.md A.5): wanted inactive regions start loading, wanted lingering
+   * regions stop lingering, active regions nobody wants linger and, once the linger expires, are
+   * saved and evicted. `interest` may be in any order and repeat ids. Throws `UnknownRegion`, before
+   * changing anything, for an `interest` id the graph does not know. A throwing `populate`
+   * propagates (regions queued behind it activate at the next `update`), as does a throwing
+   * eviction (see `deactivate`).
    */
   update(
     players: readonly EntityId[],
     ctx: SimContext,
     pending: readonly RegionId[] = NO_REGIONS,
+    interest: readonly RegionId[] = NO_REGIONS,
   ): void {
     if (this.world.stepping) {
       throw new Error('RegionManager.update must run between steps, not inside Simulation.step');
     }
+    for (const id of interest) if (this.graph.get(id) === undefined) throw new UnknownRegion(id);
     const tick = ctx.tick + 1; // the tick about to be simulated
     this.ctx = ctx;
     this.playerSet = new Set(players);
@@ -449,13 +455,15 @@ export class RegionManager implements RegionsApi {
     // 2. Entities created or moved by hooks since the last pass, so an eviction below saves them.
     this.track();
 
-    // 3. Wanted regions: the neighbourhood of every placed player, plus pending spawn regions.
+    // 3. Wanted regions: the neighbourhood of every placed player and of every pending spawn
+    // region, plus the interest regions exactly.
     const wanted: RegionId[] = [];
     for (const p of players) {
       const r = this.regionOf(p);
       if (r !== undefined) for (const id of this.graph.wanted(r)) wanted.push(id);
     }
     for (const r of pending) for (const id of this.graph.wanted(r)) wanted.push(id);
+    for (const id of interest) wanted.push(id);
     wanted.sort(stringCompare);
     this.wantedSet = new Set(wanted);
 

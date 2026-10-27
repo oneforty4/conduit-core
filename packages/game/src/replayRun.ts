@@ -46,6 +46,8 @@ export interface ReplayRunOpts<I extends InputFrame = InputFrame> {
   tickRate?: number | undefined;
   /** 1..8; default 8. */
   maxPlayers?: number | undefined;
+  /** `SessionOptions.maxSimulationInterestRegions`; must be the recorded session's. */
+  maxSimulationInterestRegions?: number | undefined;
   /** Default `consoleServerLog`: stage failures, hook throws and `ServerContext.log`. */
   log?: ServerLog | undefined;
 }
@@ -79,7 +81,10 @@ interface ReplayPlayer {
   leaveQueued: boolean;
 }
 
-/** A Session whose `players()` are the replayed players, so `ServerContext.players` sees them. */
+/**
+ * A Session whose `players()` are the replayed players, so `ServerContext.players` sees them, and
+ * whose validated simulation interest the run's pipeline reads.
+ */
 class ReplaySession extends Session {
   private readonly replayPlayers: () => readonly PlayerInfo[];
 
@@ -91,6 +96,11 @@ class ReplaySession extends Session {
   override players(): readonly PlayerInfo[] {
     return this.replayPlayers();
   }
+
+  /** The Session's `hooks.simulationInterest` call, with its validation and fault. */
+  simulationInterestRegions(): readonly RegionId[] {
+    return this.simulationInterest();
+  }
 }
 
 /** Resolves on a later macrotask, once every promise callback queued so far has run. */
@@ -99,7 +109,7 @@ function nextTurn(): Promise<void> {
 }
 
 class Replay<I extends InputFrame> implements GameReplayRun {
-  readonly session: Session;
+  readonly session: ReplaySession;
   private readonly hooks: SessionHooks;
   private readonly input: Schema<I>;
   private readonly log: ServerLog;
@@ -121,6 +131,7 @@ class Replay<I extends InputFrame> implements GameReplayRun {
         regionLoader: opts.regionLoader,
         hooks: this.hooks,
         maxPlayers: opts.maxPlayers,
+        maxSimulationInterestRegions: opts.maxSimulationInterestRegions,
         log,
         manualLoop: true,
       },
@@ -193,10 +204,10 @@ class Replay<I extends InputFrame> implements GameReplayRun {
   }
 
   /**
-   * One Session tick without networking (docs/net.md A.5): lifecycle, the held frames, then
-   * `regions.update` and `simulation.step` (docs/sim.md 2.9), each stage guarded as the Session
-   * guards it; then a macrotask turn, so the region loads this step started settle before the next
-   * one, as between the ticks of a live loop.
+   * One Session tick without networking (docs/net.md A.5): lifecycle, the held frames, then the
+   * simulation interest and `regions.update`, and `simulation.step` (docs/sim.md 2.9), each stage
+   * guarded as the Session guards it; then a macrotask turn, so the region loads this step started
+   * settle before the next one, as between the ticks of a live loop.
    */
   async step(tick: number): Promise<void> {
     if (this.failure !== null) throw this.failure;
@@ -212,9 +223,10 @@ class Replay<I extends InputFrame> implements GameReplayRun {
       this.guard(tick, 'input', () => {
         for (let p = 0; p < this.held.length; p++) simulation.inputFrames[p] = this.held[p];
       });
-      this.guard(tick, 'regions.update', () =>
-        session.regions.update(this.playerEntities(), ctx, this.spawnRegions()),
-      );
+      this.guard(tick, 'regions.update', () => {
+        const interest = session.simulationInterestRegions();
+        session.regions.update(this.playerEntities(), ctx, this.spawnRegions(), interest);
+      });
       this.guard(tick, 'simulation.step', () => simulation.step(tick));
       this.guard(tick, 'events', () => {
         simulation.events.drainOutbox();
@@ -451,6 +463,8 @@ export interface JournalReplayRunOpts<I extends InputFrame = InputFrame> {
   stateSerializers?: readonly StateSerializer[] | undefined;
   spawnPlanSerializer?: SpawnPlanSerializer | undefined;
   maxPlayers?: number | undefined;
+  /** `SessionOptions.maxSimulationInterestRegions`; must be the recorded session's. */
+  maxSimulationInterestRegions?: number | undefined;
   log?: ServerLog | undefined;
 }
 export interface GameJournalReplayRun extends JournalReplayRun {
@@ -506,6 +520,7 @@ export async function createJournalReplayRun<I extends InputFrame>(
       replayExternal: true,
       sessionEpoch: journal.sessionEpoch,
       maxPlayers: journal.capacity,
+      maxSimulationInterestRegions: options.maxSimulationInterestRegions,
       simulationMessages: options.simulationMessages,
       externalCommands: options.externalCommands,
       stateSerializers: options.stateSerializers,

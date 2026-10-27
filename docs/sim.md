@@ -628,9 +628,9 @@ export class Simulation {
 
 Canonical tick pipeline. `docs/net.md`, `docs/world.md` and CONCEPT.md refer to this list; it is
 not restated there. The Session's per-tick sequence is, in order: (a) lifecycle and input intake
-(Session-owned, `docs/net.md` A.5), (b) `regions.update(players, ctx, pending)` (`docs/world.md`
-5.2), (c) `simulation.step(tick)` below, (d) `events.drainOutbox()` into per-client event queues,
-(e) on snapshot ticks, RegionSet refresh and snapshot build (`docs/net.md` A.8). Snapshots are
+(Session-owned, `docs/net.md` A.5), (b) the game's simulation interest, then
+`regions.update(players, ctx, pending, interest)` (`docs/world.md` 5.2), (c) `simulation.step(tick)`
+below, (d) `events.drainOutbox()` into per-client event queues, (e) on snapshot ticks, RegionSet refresh and snapshot build (`docs/net.md` A.8). Snapshots are
 therefore built after destroys have been applied and after `endTick`, so the snapshot for tick
 `T` already carries the destroys of tick `T`.
 
@@ -665,8 +665,8 @@ drops (2.10), and a replay of it the same ones (2.11). What was written or emitt
 keeps its stamp (`tick + 1` for a write, `tick` for an event) and reaches the next step as it would
 have.
 
-Outside `step`, before it, the Session runs `regions.update(players, ctx, pending)` (`docs/world.md`
-section 5) so region activation always lands on a tick boundary; it runs every tick, not only on
+Outside `step`, before it, the Session runs `regions.update(players, ctx, pending, interest)`
+(`docs/world.md` section 5) so region activation always lands on a tick boundary; it runs every tick, not only on
 snapshot ticks. Sim never clears `inputFrames`;
 the "hold last frame" policy is the Session's (`docs/net.md`).
 

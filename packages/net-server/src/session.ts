@@ -130,9 +130,11 @@ import {
 import {
   ACK_TIMEOUT_MS,
   CloseCode,
+  DEFAULT_MAX_SIMULATION_INTEREST_REGIONS,
   HANDSHAKE_TIMEOUT_MS,
   MAX_GAME_MESSAGES_PER_TICK,
   RECONNECT_GRACE_MS,
+  SIMULATION_INTEREST_REGIONS_LIMIT,
 } from './constants.ts';
 import { eventsData, queueEvent, wantsEvent } from './events-outbox.ts';
 import { rejectCloseCode, rejectDetail, resolveIdentity, validateHello } from './hello.ts';
@@ -230,6 +232,19 @@ export interface SessionHooks {
   relevance?(player: PlayerInfo, entity: EntityId, ctx: HookContext): boolean;
   /** c2s/both game messages, dispatched in arrival order before the tick's systems. */
   onMessage?(player: PlayerInfo, def: MessageDef, payload: unknown, ctx: HookContext): void;
+  /**
+   * Regions the game needs simulated independent of players and pending spawns (docs/net.md A.5,
+   * docs/world.md §5.2). Called once per tick between steps, after lifecycle, input intake, game
+   * messages and external commands, immediately before `regions.update`, which keeps exactly these
+   * regions wanted (not their neighbourhood): they load, stay active and an entity crossing into
+   * one waits at the border while it loads instead of being inboxed. Must be a deterministic
+   * function of simulation state and must not change it: it is not journaled, and a replay calls it
+   * at the same point. The result must be an array of region ids of the world graph, at most
+   * `SessionOptions.maxSimulationInterestRegions` distinct ones, in any order; a throw or any other
+   * result faults the session. Never changes a client's RegionSet, replication, relevance or
+   * permissions. Absent: no interest regions.
+   */
+  simulationInterest?(ctx: HookContext): readonly RegionId[];
 }
 
 export type LogLevel = 'info' | 'warn' | 'error';
@@ -360,6 +375,12 @@ export interface SessionOptions {
   simulationMessages?: readonly MessageDef[] | undefined;
   externalCommands?: readonly ExternalCommand[] | undefined;
   inputQueue?: Omit<InputQueueBounds, 'serverTick'> | undefined;
+  /**
+   * Most distinct regions `hooks.simulationInterest` may return in one tick; more fault the
+   * session. Integer in 0..`SIMULATION_INTEREST_REGIONS_LIMIT` (`RangeError` otherwise); default
+   * `DEFAULT_MAX_SIMULATION_INTEREST_REGIONS`. A replay of the session must use the same value.
+   */
+  maxSimulationInterestRegions?: number | undefined;
   /** Receives the first authoritative failure. The session permanently stops stepping. */
   onFault?: ((fault: SimulationFault) => void) | undefined;
   store: BlobStore;
@@ -614,6 +635,7 @@ export class Session {
   private readonly saveRegistryAdapter: SessionOptions['saveRegistryAdapter'];
   private readonly verifier: TokenVerifier | undefined;
   private readonly maxPlayers: number;
+  private readonly maxSimulationInterestRegions: number;
   private readonly now: () => number;
   private readonly diagnostics: DiagnosticOptions | undefined;
   private readonly timers: SessionTimers;
@@ -760,6 +782,17 @@ export class Session {
         `Session: maxPlayers must be an integer in 1..${QUALIFIED_SESSION_CAPACITY}`,
       );
     }
+    const maxInterest =
+      opts.maxSimulationInterestRegions ?? DEFAULT_MAX_SIMULATION_INTEREST_REGIONS;
+    if (
+      !Number.isInteger(maxInterest) ||
+      maxInterest < 0 ||
+      maxInterest > SIMULATION_INTEREST_REGIONS_LIMIT
+    ) {
+      throw new RangeError(
+        `Session: maxSimulationInterestRegions must be an integer in 0..${SIMULATION_INTEREST_REGIONS_LIMIT}, got ${maxInterest}`,
+      );
+    }
     for (const [name, value] of [
       ['tickRate', game.tickRate],
       ['snapshotEvery', game.snapshotEvery],
@@ -796,6 +829,7 @@ export class Session {
     this.saveRegistryAdapter = opts.saveRegistryAdapter;
     this.verifier = opts.verifier;
     this.maxPlayers = maxPlayers;
+    this.maxSimulationInterestRegions = maxInterest;
     this.now = opts.now ?? defaultNow;
     this.timers = opts.timers ?? DEFAULT_TIMERS;
     this.reconnectGraceMs = opts.reconnectGraceMs ?? RECONNECT_GRACE_MS;
@@ -1775,9 +1809,10 @@ export class Session {
       }
       this.guard(t, 'lifecycle', () => this.runLifecycle(t));
       this.guard(t, 'input', () => this.intake(t));
-      this.guard(t, 'regions.update', () =>
-        this.regions.update(this.playerEntities(), ctx, this.pendingSpawnRegions()),
-      );
+      this.guard(t, 'regions.update', () => {
+        const interest = this.simulationInterest();
+        this.regions.update(this.playerEntities(), ctx, this.pendingSpawnRegions(), interest);
+      });
       if (this.journal !== null)
         for (const decision of this.regions.drainDecisions())
           this.appendJournal({ kind: 'region', decision });
@@ -2237,6 +2272,42 @@ export class Session {
       }
     }
     return out;
+  }
+
+  /**
+   * Pipeline step 4 (A.5), right before `regions.update`: `hooks.simulationInterest`, deduplicated
+   * and ascending (`stringCompare`); `[]` without the hook. A throw, or a result that is not an
+   * array of region ids the world graph knows, at most `maxSimulationInterestRegions` distinct, is a
+   * `SimulationFault` (system `simulationInterest`, phase `hook`) that faults the session: never
+   * truncated or skipped, which would silently change the simulation. Protected so that
+   * `@conduit/game`'s replay run calls it at the same point of its own pipeline.
+   */
+  protected simulationInterest(): readonly RegionId[] {
+    const hooks = this.hooks;
+    if (hooks.simulationInterest === undefined) return [];
+    const max = this.maxSimulationInterestRegions;
+    let interest: RegionId[] = [];
+    this.callHook('simulationInterest', () => {
+      const result: unknown = hooks.simulationInterest?.(this.ctx);
+      if (!Array.isArray(result)) {
+        throw new TypeError(`simulationInterest must return an array, got ${String(result)}`);
+      }
+      const ids = new Set<RegionId>();
+      for (const id of result as unknown[]) {
+        if (typeof id !== 'string' || this.graph.get(id) === undefined) {
+          const shown = typeof id === 'string' ? `'${id}'` : String(id);
+          throw new RangeError(`simulationInterest: ${shown} is not a region of the world graph`);
+        }
+        ids.add(id);
+        if (ids.size > max) {
+          throw new RangeError(
+            `simulationInterest: more than ${max} regions (maxSimulationInterestRegions)`,
+          );
+        }
+      }
+      interest = [...ids].sort(stringCompare);
+    });
+    return interest;
   }
 
   /** `plan.regionId` of conns in joined/loading/ready. */

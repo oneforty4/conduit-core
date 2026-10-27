@@ -15,7 +15,13 @@ import type {
   Simulation,
   System,
 } from '@conduit/sim';
-import type { RegionLoader, RegionManager, WorldGraph, WorldGraphJson } from '@conduit/world';
+import type {
+  RegionId,
+  RegionLoader,
+  RegionManager,
+  WorldGraph,
+  WorldGraphJson,
+} from '@conduit/world';
 import type {
   HookContext,
   PlayerInfo,
@@ -156,6 +162,14 @@ export interface ServerHooks<I extends InputFrame = InputFrame> {
   ): readonly EntityId[];
   /** Keyed by message name; c2s/both messages without a handler are ignored and counted. */
   onMessage?: Record<string, (player: PlayerInfo, msg: unknown, ctx: ServerContext<I>) => void>;
+  /**
+   * Regions the game needs simulated independent of players and pending spawns: net-server's
+   * `SessionHooks.simulationInterest` (docs/net.md A.5). Once per tick, right before
+   * `regions.update`, which keeps exactly these regions wanted. A deterministic function of
+   * simulation state that does not change it; at most `maxSimulationInterestRegions` distinct ids
+   * of the world graph, else the session faults. Never grants visibility or permissions.
+   */
+  simulationInterest?(ctx: ServerContext<I>): readonly RegionId[];
 }
 
 /** What a game module's session factory builds per session (docs/game.md 3). */
@@ -169,6 +183,7 @@ export interface SessionFactoryResult<I extends InputFrame = InputFrame> extends
   | 'replication'
   | 'snapshotLimits'
   | 'maxPlayers'
+  | 'maxSimulationInterestRegions'
 > {
   regionLoader: RegionLoader;
   hooks: ServerHooks<I>;
@@ -194,6 +209,7 @@ export type SessionFactory = (
   | 'replication'
   | 'snapshotLimits'
   | 'maxPlayers'
+  | 'maxSimulationInterestRegions'
 >;
 
 /** One game served by `createHost` (M5): `module` exports `game` and `sessionFactory`. */

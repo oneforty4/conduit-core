@@ -61,6 +61,7 @@ export type SessionFactory = (
   | 'snapshotLimits'
   | 'diagnostics'
   | 'maxPlayers'
+  | 'maxSimulationInterestRegions'
 >;
 
 /** The parts of a `ws` `WebSocket` the host uses for a game socket; `ws`'s class satisfies it. */

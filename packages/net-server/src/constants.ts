@@ -28,6 +28,10 @@ export const RTT_ALPHA = 0.1;
 export const RECONNECT_TOKEN_BYTES = 24;
 /** Game messages dispatched per client per tick; excess dropped and counted. */
 export const MAX_GAME_MESSAGES_PER_TICK = 64;
+/** Default `SessionOptions.maxSimulationInterestRegions`: distinct regions one tick's interest may name. */
+export const DEFAULT_MAX_SIMULATION_INTEREST_REGIONS = 64;
+/** Largest accepted `SessionOptions.maxSimulationInterestRegions`. */
+export const SIMULATION_INTEREST_REGIONS_LIMIT = 1024;
 /** Messages a link queues before `onMessage` is registered; one more closes it with 4003. */
 export const LINK_QUEUE_MAX = 64;
 /** `WsLink.close` terminates a socket that has not closed after this long. */

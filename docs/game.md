@@ -130,6 +130,7 @@ export interface ServerHooks<I extends InputFrame = InputFrame> {
   onWorldEdge?(entity: EntityId, ctx: ServerContext<I>): void;
   relevance?(player: PlayerInfo, entity: EntityId, ctx: ServerContext<I>): boolean;
   onMessage?: Record<string, (player: PlayerInfo, msg: unknown, ctx: ServerContext<I>) => void>;   // keyed by message name; adapted to SessionHooks.onMessage by def.name
+  simulationInterest?(ctx: ServerContext<I>): readonly RegionId[];        // regions to keep simulated independent of players and pending spawns, wanted exactly (no neighbourhood); once per tick right before regions.update; deterministic, not journaled; an invalid result faults the session (docs/net.md A.5); absent: none, behaviour unchanged
 }
 
 export type { PlayerInfo, PlayerSpawn } from '@conduit/net-server';       // { playerId, accountId, displayName, state, entity } / { regionId, spawn(ctx) }
@@ -157,6 +158,7 @@ export interface CreateServerOpts<I extends InputFrame = InputFrame> {   // opti
   devAuth?: boolean;                     // true: devVerifier() (any token accepted, warning logged once); default false
   secret?: string;                       // required unless devAuth; hmacVerifier(secret) (docs/persist.md 2.4)
   maxPlayers?: number;                   // default 8
+  maxSimulationInterestRegions?: number; // SessionOptions (docs/net.md A.5): most distinct regions simulationInterest may name per tick; default 64
   reconnectGraceMs?: number;             // default 120000 (docs/net.md)
   log?: ServerLog;                       // default console-backed; also given to the Session, its WsLinks and every ServerContext
 }
@@ -215,7 +217,7 @@ slot only if `accountId` differs). With a `secret`, tokens must be minted by `mi
 call the game's hooks with a `ServerContext` built lazily on the first call by `buildServerContext(ctx, game, log)`:
 an object whose prototype is the `HookContext` (so `tick`, `dt`, `rng`, `inputs`, … stay live) plus the members
 listed above delegating to `ctx.session`. Hooks the game leaves out stay unset (so the Session skips
-`relevance` entirely); a missing `onPlayerJoin` throws `TypeError`. `PlayerSpawn.spawn` is wrapped to
+`relevance` entirely, and without `simulationInterest` keeps no interest regions); a missing `onPlayerJoin` throws `TypeError`. `PlayerSpawn.spawn` is wrapped to
 receive the `ServerContext` too. `onSave`/`onLoad` are wrapped with `JSON.stringify` +
 `TextEncoder` / `TextDecoder` + `JSON.parse`. `onMessage` is dispatched by `def.name` (own properties
 of the map only); unknown names are ignored and counted. The same adapter is used by `defineSessionFactory` (section 3), so hooks
@@ -234,6 +236,7 @@ export interface ReplayRunOpts<I extends InputFrame = InputFrame> {   // optiona
   seed?: number;                         // u32; default game.seed
   tickRate?: number;                     // integer in 1..255; default game.tickRate
   maxPlayers?: number;                   // 1..8; default 8
+  maxSimulationInterestRegions?: number; // the recorded session's SessionOptions value (docs/net.md A.5); default 64
   log?: ServerLog;                       // default consoleServerLog: stage failures, hook throws and ServerContext.log
 }
 export interface GameReplayRun extends ReplayRun {
@@ -246,7 +249,7 @@ export function createReplayRun<I extends InputFrame>(game: Game<I>, opts: Repla
 
 ```
 createReplayRun(game, opts):            // TypeError without regionLoader.populate or hooks.onPlayerJoin; RangeError for seed, tickRate, maxPlayers
-  session = new Session({ ...game, seed, tickRate }, { store, regionLoader, hooks: adaptHooks(hooks, game, log), maxPlayers, log, manualLoop: true })
+  session = new Session({ ...game, seed, tickRate }, { store, regionLoader, hooks: adaptHooks(hooks, game, log), maxPlayers, maxSimulationInterestRegions, log, manualLoop: true })
             // a subclass whose players() lists the run's players, ascending playerId, leaving ones omitted:
             // state Joined, Ready while a spawn waits for its region, Playing once spawned
   await session.start()                 // onLoad or onInit, as a live session
@@ -266,7 +269,8 @@ run.step(t):                            // TickOrder unless t === world.tick + 1
        spawns in playerId order, once the plan's region is active: entity = plan.spawn(ctx), alive and in an active region, else the player leaves
        leaves in playerId order: onPlayerLeave (if its join ran), destroy the entity if alive, free the slot and its frame
   2. simulation.inputFrames[p] = held[p] for every player
-  3. regions.update(entities of players that have one alive, ctx, planned regions of players not yet spawned)
+  3. interest = the Session's simulationInterest(): hooks.simulationInterest(ctx), validated, deduplicated and sorted as live (docs/net.md A.5); [] without the hook
+     regions.update(entities of players that have one alive, ctx, planned regions of players not yet spawned, interest)
   4. simulation.step(t)
   5. simulation.events.drainOutbox()    // stages 1-5 guarded as the Session's runTick: `tick <t>: <stage> failed`, counted in stats.tickErrors
   6. await one macrotask turn (setImmediate)
@@ -280,7 +284,9 @@ the region activates in step `t + 1`, as under a live loop whose wakes each run 
 microtask hop is not enough for a store that answers after several promise hops.
 
 A replayed session receives no game messages: `onMessage` handlers never run, so a game whose handlers
-change the world does not replay from an input log. `ctx.send`, `ctx.broadcast` and `ctx.kick` reach no
+change the world does not replay from an input log. `simulationInterest` is not recorded: it is a
+function of the replayed state, called at the same point as live, so interest-driven region loads
+replay as player-driven ones do. `ctx.send`, `ctx.broadcast` and `ctx.kick` reach no
 client, and what a kick caused is replayed from the recorded *leave*. `ctx.players` is exact except for
 states the log does not carry: a replayed player is never `Away`, `Ready` only while its spawn waits,
 and one leaving in a tick is omitted from the start of that tick's lifecycle.
@@ -624,6 +630,7 @@ expect(entry.imports.filter(i => i.kind === 'dynamic-import')) to be one chunk w
 | `test/frame.test.ts` | `FrameLoop` interval and rAF drivers, `dt` clamping, a throwing frame stops the loop |
 | `test/module-graph.test.ts` + `test/trace-loader.mjs` | specified in `docs/render.md` 10.1: no `three` module is loaded by the server entry or a headless `createClient`. The trace loader uses `module.registerHooks` (falling back to `module.register`) and writes the resolved URLs to `CONDUIT_TRACE_OUT` at exit; children run with Node's own type stripping (tsx via `@conduit/tooling` on a Node without it). Scenarios: the server entry; the headless client entries; a headless client that connects to a `createServer`, plays and disposes; and a positive control importing `@conduit/render`, whose trace must contain `three` |
 | `test/headless.test.ts` | the CONCEPT.md integration row on the sandbox game: in-process `createServer` plus headless `createClient`s (A near B; C, joining later, far away): A and B each load the nine wanted cells and the 16-cell prefetch ring around them, as `regions.loaded()` and `FrameContext.regions` (`wanted`, `prefetch`) show; after 300 ticks server `world.hash()` equals a hash built from each client's replica over its visible set (delta-equals-full, before C joins); A's throttle input moves A's entity as observed in B's replica by `> 1 m` within 60 ticks; (M2) B receives A's `Horn` event with A's entity and region once per `BUTTON_HORN` press (held 20 ticks: one event; a second press: a second one), emitted once B's render tick reached the event tick, and A hears it at the same tick; A's `Chat` reaches both players as `'A: <text>'`; C, spawned by a hooks wrapper in `cell/2_2` (its nine cells and prefetch ring share no cell with A's and B's), receives zero `Snapshot` creates or updates for A/B and no create outside its own nine cells (recorded at `ReplicaWorld.applySnapshot`), and zero `Events` from their region while A drives and A and B honk, whereas C's own Horn reaches C (and not A or B); C then leaves; A `disconnect()` causes B to observe A's entity destroyed within `reconnectGraceMs` set to 0; bytes received per client over 10 s with 300 crates in view is `< 60 KB/s`; the hooks' `ctx.log` join lines reach the server's log. (M5) The same suite runs again through `createHost` (skipped when `node:sqlite` is unavailable): the host's SQLite file in a temp directory, the game module `test/fixtures/headless-game.ts` (the sandbox game with the crowded spawn cell and the distant C, which the session worker imports), and players that `register`, `login` and join through `@conduit/lobby-client` (A creates a private session with `createSession`; B and C `join` it with the invite code, then their clients connect with `lobby` and `sessionId`). The server-side checks read what the worker reports over a `BroadcastChannel` (each tick: tick, players, active regions and live vehicles; on snapshot ticks the world hash and entity count; a `sync` request answered between ticks) instead of the in-process Session; the join lines arrive through `createHost`'s `log` prefixed `[session <id>]`; and a lobby client's replica exists only once its join answered. (M6) The `createServer` run happens twice, the second time with every client's `prediction: { enabled: true }` (docs/net.md B.10), which must change nothing the scenarios observe: the runs without it check that the stub is off by default (`net.prediction` `null`, no `prediction` key in `stats()`), and the prediction run that each client's stub followed the acknowledgements (while A drives, A's and B's `lastAckedTick`, at most the server tick, `ackedFrames` and `authoritativeTick` rise; sampled on every frame over the run, C's until it left, the acked tick never goes back, pending frames stay within half a second of ticks and none is dropped) |
+| `test/simulation-interest.test.ts` | `ServerHooks.simulationInterest` keeps a drone no player is near simulated along row 0 of an 8 x 3 grid in a live `Session` (`manualLoop`, `recordLog` and a command journal, one far player): it crosses every column, the pad and first column it left are evicted after `LINGER_MS`, and only the named regions load; `replay` through `createReplayRun` matches every checkpoint, the final hash and active regions, and without the hook fails at the first checkpoint; `createJournalReplayRun` reaches a state without differences from the live checkpoint, and without the hook rejects the journal; an invalid interest faults the replay step (`simulationInterest`/`hook`) before `regions.update`, and an out-of-range `maxSimulationInterestRegions` is a `RangeError` |
 | `test/replay.test.ts` | `createReplayRun` on the sandbox game: record 600 ticks of scripted inputs from two players (joined and spawned by lifecycle entries; one drives into the next cells, so regions load during the run) with checkpoints every 60, `replay` passes; flipping one input byte (the `throttle` byte of one frame) fails at the first checkpoint after it; with a `MemoryStore` and with a store that answers after 20 promise hops, a region a step started loading activates at the next step and the spawn waits for it (`ctx.players` goes `Joined`, `Ready`, `Playing`); another `seed` builds another world; option, player, lifecycle and tick-order errors. A live `Session` (sandbox hooks, `manualLoop`, a macrotask turn between ticks, `recordLog`) with scripted in-memory clients: A joins, B joins, Y's join creates an entity and throws, Z drops before its join runs, A drops and reconnects, B leaves, C joins into B's slot; the recorded lifecycle and `null` frames are as expected, `replay` through `createReplayRun` matches all ten checkpoints and the final hash, players and active regions, and the same log without its lifecycle fails at the first checkpoint; ticks 200 to 212 are skipped (`Session.skip`), recorded as `[200, 13]` with no frames, replayed, and without its skips the log fails at the next checkpoint (240) |
 
 
@@ -656,7 +663,9 @@ is not captured automatically. A serializer restore failure permanently invalida
 construct a fresh adapter rather than continuing partially restored state.
 
 `createJournalReplayRun(game, journal, {regionLoader, hooks: effects => replaySafeHooks, ...})` uses
-the Session pipeline with no network admission or autosaving. Supply fresh replay-safe hooks and
+the Session pipeline with no network admission or autosaving. Its pipeline calls `simulationInterest`
+as live (not journaled; the recorded region decisions then apply to the regions it wants); pass the
+recording's `maxSimulationInterestRegions` when it was not the default. Supply fresh replay-safe hooks and
 recorded-result handlers; replace account/achievement/service writes with the provided bounded
 observation sink. Core cannot intercept arbitrary external calls hidden inside consumer closures.
 Recorded connection transitions reproduce Away/ready/rebind behavior, while live grace clocks and

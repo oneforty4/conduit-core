@@ -29,6 +29,8 @@ Dependencies: `@conduit/protocol`, `@conduit/sim`, `@conduit/world`, `@conduit/p
 | `RTT_ALPHA` | `0.1` | EWMA weight |
 | `RECONNECT_TOKEN_BYTES` | `24` | random bytes, base64url → 32 chars |
 | `MAX_GAME_MESSAGES_PER_TICK` | `64` | per client; excess dropped and counted |
+| `DEFAULT_MAX_SIMULATION_INTEREST_REGIONS` | `64` | default `SessionOptions.maxSimulationInterestRegions` (A.5) |
+| `SIMULATION_INTEREST_REGIONS_LIMIT` | `1024` | largest accepted `maxSimulationInterestRegions` |
 | `LINK_QUEUE_MAX` | `64` | messages a link queues before `onMessage` is registered (A.2) |
 | `WS_CLOSE_TIMEOUT_MS` | `2000` | `WsLink.close` terminates a socket still open after this (A.2) |
 
@@ -135,6 +137,7 @@ export interface SessionHooks {
   onWorldEdge?(entity: EntityId, ctx: HookContext): void;              // see docs/world.md
   relevance?(player: PlayerInfo, entity: EntityId, ctx: HookContext): boolean;
   onMessage?(player: PlayerInfo, def: MessageDef, payload: unknown, ctx: HookContext): void;
+  simulationInterest?(ctx: HookContext): readonly RegionId[];        // regions simulated independent of players and pending spawns; pipeline step 4, below
 }
 export interface SessionOptions {
   store: BlobStore; regionLoader: RegionLoader; hooks: SessionHooks;
@@ -148,6 +151,7 @@ export interface SessionOptions {
   log?: (level: 'info'|'warn'|'error', msg: string, data?: unknown) => void;   // SessionLog: the same shape as docs/game.md ServerContext.log; default: warn/error to the console
   autosaver?: (save: () => Promise<void>) => SessionAutosaver;   // the Autosaver hookup: called once by the constructor with save = flushAll; e.g. save => new Autosaver(save, AUTOSAVE_INTERVAL_MS, { onError }) (docs/persist.md 1.8)
   recordLog?: InputLog;                            // (M6) replay recording (docs/sim.md 2.11), below; an empty version 1 log with the game's seed and tickRate, else RangeError
+  maxSimulationInterestRegions?: number;           // most distinct regions simulationInterest may name per tick; integer 0..SIMULATION_INTEREST_REGIONS_LIMIT (RangeError otherwise); default DEFAULT_MAX_SIMULATION_INTEREST_REGIONS (64); a replay must use the recording's value
 }
 export interface SessionAutosaver { start(): void; stop(): Promise<void> }   // persist's Autosaver satisfies it; start() at the end of start(); stop() once, from stop(): cancels the periodic saves and performs the final save, which is the shutdown flush
 // every optional SessionOptions field also accepts `undefined`, so callers can pass their own options straight through
@@ -186,8 +190,9 @@ The order is the canonical one in docs/sim.md 2.9 and is not restated in full he
 ```
 1. tickStartMs = now(); serverTimeMs = (tickStartMs − sessionStartMs) >>> 0
 2. lifecycle: process pending joins (onPlayerJoin), spawns (plan.spawn), leaves/grace expiries (onPlayerLeave + destroy)   // A.6
-3. drain inputs for every playing client (A.7); dispatch queued c2s game messages to hooks.onMessage (≤ MAX_GAME_MESSAGES_PER_TICK each)
-4. regions.update(playerEntities(), ctx, pendingSpawnRegions())     // every tick, before step (docs/world.md 5.2); pending = plan.regionId of conns in joined/loading/ready
+3. drain inputs for every playing client (A.7); dispatch queued c2s game messages to hooks.onMessage (≤ MAX_GAME_MESSAGES_PER_TICK each); run the external commands due this tick (docs/game.md, recorded decisions)
+4. interest = simulationInterest()                                  // hooks.simulationInterest(ctx), validated, deduplicated, sorted; [] without the hook (below)
+   regions.update(playerEntities(), ctx, pendingSpawnRegions(), interest)   // every tick, before step (docs/world.md 5.2); pending = plan.regionId of conns in joined/loading/ready
 5. simulation.step(t)                                               // phases, tail [membershipSystem, spatial.rebuild], applyDestroys, events.endTick (docs/sim.md 2.9)
 6. for ev of events.drainOutbox(): queue to interested playing clients (A.8.3)
 7. if t % snapshotEvery === 0:
@@ -198,6 +203,25 @@ The order is the canonical one in docs/sim.md 2.9 and is not restated in full he
 ```
 
 Step 7 from M3 (PLAN.md): `refreshRegionSet` sends `RegionSet{ active, prefetch }` built from `interest.wantedForRegion`/`prefetchForRegion` (A.8.2), and the snapshot interest is `wantedRegions ∩ reportedRegions` (A.8.1): a wanted region reaches a client's snapshots and events only once the client reported it loaded, and a reported region that is not wanted contributes nothing. (M1 sent `prefetch: []` and used `wantedRegions` alone.)
+
+**Simulation interest.** Regions are wanted for players (the `graph.wanted` neighbourhood of each
+player entity's region) and for pending spawns (the neighbourhood of `plan.regionId`, A.6). A game
+that must keep other regions simulated, for example along the path of a projectile no player is
+near, names them in `hooks.simulationInterest(ctx)`. The Session calls it once per tick, in step 4,
+after the lifecycle (step 2), input intake, game messages and external commands (step 3), so their
+changes are visible to it, and immediately before `regions.update`, which wants exactly
+these regions, not their neighbourhood (`docs/world.md` 5.2): they load, stay active while named,
+then linger and are evicted as usual, and an entity crossing into one that is still loading waits
+at the border instead of being inboxed. The result must be a deterministic function of simulation
+state and the hook must not change that state: it is not journaled, and a replay (`createReplayRun`,
+`createJournalReplayRun`, `docs/game.md` 2) calls it at the same point with the same validation.
+It must be an array of region ids the world graph knows (`graph.get`), at most
+`maxSimulationInterestRegions` distinct ones, in any order; the Session deduplicates and sorts it
+(`stringCompare`). A throw or any other result is an authoritative fault (`SimulationFault`, system
+`simulationInterest`, phase `hook`), before `regions.update` runs: an invalid interest is never
+truncated or skipped, which would silently change the simulation. Simulation interest never changes
+a client's RegionSet, snapshot interest (`wanted ∩ reported`), events, `relevance` or what it may
+send. Without the hook nothing changes.
 
 `world.tick` is advanced by `simulation.step`; the Session never sets it. The `SimContext` (as `HookContext`) is built once in `start()` with `inputs: p => conn(p).held`. Lifecycle and message dispatch run inside the tick so hooks always see a consistent context; message parsing itself happens on arrival. Because `applyDestroys` runs inside `step`, the snapshot built in step 7 for tick `t` already reports entities destroyed during tick `t`.
 
@@ -475,6 +499,7 @@ Evaluated per playing client on every snapshot tick before building, in this ord
 | `test/events.test.ts` | events region-filtered by `wanted ∩ reported`; global events reach everyone playing; cap at 256 drops oldest; events ride in the same frame after the Snapshot message; a halved-rate client gets them in their own frame on skipped snapshot ticks unless backpressured; an event that does not encode is dropped once with one error; a backlog too large for one payload arrives as several `Events` messages in order; nothing queued before or during an outage is delivered after a reconnect |
 | `test/record.test.ts` | (M6) with `recordLog` (harness, `manualLoop`): frames are recorded as the steps consume them (a new frame, a changed tick field, nothing while held, a late frame never, `null` once when the player goes away), and the lifecycle with its ticks: joins with `accountId` and `displayName`, spawns, a Leave and a grace expiry; a join whose hook throws and a spawn that returns a dead entity are each recorded with their *leave* in the same tick; without `recordLog` no hook is installed, and a log of another version, seed or tick rate, or one that is not empty, is a `RangeError` |
 | `test/session-pipeline.test.ts` | `manualLoop` `step()` runs the docs/sim.md 2.9 order (spy systems record order): `regions.update` before phases, `membershipSystem` and `spatial.rebuild` after `postSim`, destroys applied before the snapshot is built (an entity destroyed in `sim` at tick `T` appears as a destroy in the snapshot for `T`), `drainOutbox` called once per tick, `serverTimeMs` monotonic; the byte stats count frames a link takes ownership of (a `PortLink` over a `MessageChannel` transfers them, leaving the sent buffers empty); `wakeLateness` records each FixedLoop wake once, not each tick (injected timers firing 0.1 ms late, and every tenth time 20.1 ms late for a two-tick catch-up wake, fill buckets 0 and 63), a wake held up 290 ms runs the latest five of the 18 ticks due and the world skips the 13 before them (`tick` 48, `dropped ticks` logged, `[31, 13]` in `recordLog.skips`, `tickStats().dropped` 13) and on time again after, and `skip(n)` with `manualLoop` (recorded; an `Error` with a loop or before `start()`), and `LatenessHistogram` gives bucket-edge quantiles capped at the exact maximum, puts early wakes in the first bucket and anything past the last edge in the last. World streaming (M3): `RegionSet` carries `wantedForRegion` as `active` and the ring one step beyond as `prefetch`, only `active` regions load, an unchanged set is never re-sent and a region change re-sends it before that tick's snapshot; snapshots cover `wanted ∩ reported` filtered by `relevance` (an entity leaving a client's interest is destroyed on that client while it lives on; a throwing `relevance` fails only that player's snapshot); spatial queries, between steps and from the next tick's systems, see positions moved in `sim` this tick, and an entity that crossed a border in its new region (membership ran before the rebuild; `queryRadiusAcross` from the old region finds it with `outRegions` naming the new one); a player still loading keeps its spawn region's wanted set active, not lingering, past the linger time, and once it leaves those regions linger and are evicted; `onWorldEdge`: an entity moved off the world is clamped back into its region before the hook runs with the hook context, and a throwing hook is logged (`hook onWorldEdge threw`) and counted in `tickErrors` while the tick still rebuilds the index and sends its snapshot |
+| `test/simulation-interest.test.ts` | `hooks.simulationInterest` runs once per tick, after `onMessage` and external commands (whose world changes it sees) and right before `regions.update`, which gets the result deduplicated and sorted; exactly the named regions load, not their neighbours; an interest region stays active with no player connected and, dropped, lingers `LINGER_MS` and is evicted; repeats within `maxSimulationInterestRegions` are accepted, and the option outside 0..`SIMULATION_INTEREST_REGIONS_LIMIT` is a `RangeError`; an unknown id, a non-string, more than the cap, a non-array or a throw faults the session (`simulationInterest`/`hook`, terminal 4012, `onFault` once) before `regions.update` runs; a client elsewhere never gets the interest region in its RegionSet, nor its entities in snapshots (even when it reports the region loaded), nor its events, and `relevance` is never asked about them |
 | `test/integration.test.ts` | two `@conduit/net-client` `NetClient`s (Node global WebSocket) over `WsLink` + a real `FixedLoop` on a minimal game: both reach Playing, A's input moves A's entity as seen by B within 10 snapshots, B's `mirror` hash of latest values equals server stores after quiescing, disconnect of A despawns on B, bandwidth per client measured and printed (Spike 1: 300 crates in view at `snapshotEvery` 3, a few moving and all moving; `< 60 KB/s` and `< 240 KB/s`) |
 
 ## Part B. `@conduit/net-client`

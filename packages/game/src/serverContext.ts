@@ -140,5 +140,9 @@ export function adaptHooks<I extends InputFrame>(
   if (hooks.eventDependencies !== undefined)
     adapted.eventDependencies = (player, event, ctx) =>
       hooks.eventDependencies!(player, event, serverContext(ctx));
+  const { simulationInterest } = hooks;
+  if (simulationInterest !== undefined) {
+    adapted.simulationInterest = (ctx) => simulationInterest.call(hooks, serverContext(ctx));
+  }
   return adapted;
 }

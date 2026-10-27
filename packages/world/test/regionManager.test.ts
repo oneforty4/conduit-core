@@ -23,6 +23,7 @@ import {
   InvariantViolation,
   RegionManager,
   RegionNotActive,
+  UnknownRegion,
   contains,
   decodeBlob,
   stringCompare,
@@ -1156,5 +1157,146 @@ describe('determinism', () => {
     for (const id of a.h.regions.active()) {
       expect(b.h.regions.entitiesIn(id)).toEqual(a.h.regions.entitiesIn(id));
     }
+  });
+});
+
+// ---------------------------------------------------------------------------------------------
+// Simulation interest (docs/world.md §5.2): `update`'s `interest` regions are wanted exactly.
+
+/** A 4 x 4 grid of wanted depth 1, regions lingering `LINGER_TICKS`, loads settled on demand. */
+function interestRig(): Rig & { store: ControlledStore } {
+  const store = new ControlledStore();
+  return { ...rig({ store, lingerMs: 500 }), store };
+}
+
+/** Two ticks wanting `pending`, its loads resolved in between: every region it wants is active. */
+async function home(h: Rig & { store: ControlledStore }, pending: RegionId[]): Promise<void> {
+  await h.tick([], pending);
+  for (const id of h.store.pendingGets()) h.store.resolveGet(id, null);
+  await settle();
+  await h.tick([], pending);
+}
+
+describe('simulation interest (docs/world.md §5.2)', () => {
+  it('an interest region activates exactly, without its neighbourhood, with no player', async () => {
+    const h = interestRig();
+    await h.tick([], [], ['cell/2_2']);
+    expect(h.regions.state('cell/2_2')).toBe('loading');
+    expect(h.store.pendingGets()).toEqual(['cell/2_2']); // no neighbour is wanted
+    h.store.resolveGet('cell/2_2', null);
+    await settle();
+    await h.tick([], [], ['cell/2_2']);
+    expect(h.regions.active()).toEqual(['cell/2_2']);
+    expect(h.populated.map((p) => p.region)).toEqual(['cell/2_2']);
+    for (const id of h.graph.wanted('cell/2_2').filter((id) => id !== 'cell/2_2')) {
+      expect(h.regions.state(id), id).toBe('inactive');
+    }
+
+    // Any order and repeats, joined with the players' neighbourhoods: the union, each region once.
+    const player = place(h.world, 'cell/0_0', at(50, 50));
+    const interest = ['cell/3_0', 'cell/2_2', 'cell/3_0'];
+    await h.tick([player], [], interest);
+    for (const id of h.store.pendingGets()) h.store.resolveGet(id, null);
+    await settle();
+    await h.tick([player], [], interest);
+    expect(h.regions.active()).toEqual(
+      sortedIds([...h.graph.wanted('cell/0_0'), 'cell/2_2', 'cell/3_0']),
+    );
+    expect(h.regions.state('cell/3_1')).toBe('inactive');
+    expect(h.populated).toHaveLength(6);
+
+    // An id the graph does not know throws before anything changes.
+    const active = [...h.regions.active()];
+    expect(() => h.regions.update([player], h.sim.ctx, [], ['cell/2_2', 'nowhere'])).toThrow(
+      UnknownRegion,
+    );
+    expect(h.regions.active()).toEqual(active);
+    expect(h.regions.lingering('cell/3_0')).toBe(false);
+    expect(h.store.pendingGets()).toEqual([]);
+  });
+
+  it('a dropped interest region lingers for lingerTicks, then is saved and evicted', async () => {
+    const h = interestRig();
+    await h.tick([], [], ['cell/1_1']);
+    h.store.resolveGet('cell/1_1', null);
+    await settle();
+    await h.tick([], [], ['cell/1_1']);
+    expect(h.regions.active()).toEqual(['cell/1_1']);
+    for (let i = 0; i < 3 * LINGER_TICKS; i++) await h.tick([], [], ['cell/1_1']);
+    expect(h.regions.lingering('cell/1_1')).toBe(false);
+    expect(h.store.pendingPuts()).toEqual([]);
+
+    await h.tick([], [], []); // dropped: lingers until this tick + LINGER_TICKS
+    const dropped = h.world.tick;
+    expect(h.regions.lingering('cell/1_1')).toBe(true);
+    for (let t = dropped + 1; t < dropped + LINGER_TICKS; t++) {
+      await h.tick([], [], []);
+      expect(h.regions.state('cell/1_1'), `tick ${t}`).toBe('active');
+    }
+    await h.tick([], [], []);
+    expect(h.world.tick).toBe(dropped + LINGER_TICKS);
+    expect(h.regions.state('cell/1_1')).toBe('saving');
+    expect(h.regions.active()).toEqual([]);
+    h.store.resolvePut('cell/1_1');
+    await settle();
+    await h.tick([], [], []); // the save's completion becomes authoritative at this boundary
+    expect(h.regions.state('cell/1_1')).toBe('inactive');
+    expect(h.store.data.has('region/cell/1_1')).toBe(true);
+  });
+
+  it('an entity crossing into a loading interest region waits at the border and moves in once it is active; one crossing into its unwanted neighbour is inboxed', async () => {
+    const h = interestRig();
+    const HOME = ['cell/0_0']; // keeps cell/0_0, cell/0_1, cell/1_0 and cell/1_1 active
+    await home(h, HOME);
+    const inbound = place(h.world, 'cell/1_1', at(99.5, 50), at(1, 0));
+    h.world.add(inbound, Crate, { n: 1 });
+    const stray = place(h.world, 'cell/1_1', at(50, 99.5), at(0, 1));
+    h.world.add(stray, Crate, { n: 2 });
+
+    await h.tick([], HOME, ['cell/2_1']); // tick 3: cell/2_1 starts loading; both cross
+    expect(h.store.pendingGets()).toEqual(['cell/2_1']);
+    expect(h.regions.regionOf(inbound)).toBe('cell/1_1'); // waits outside its region
+    expect(h.world.get(inbound, Transform).pos).toEqual(at(100.5, 50));
+    expect(h.regions.entitiesIn('cell/1_1')).toEqual([inbound]);
+    // cell/1_2 neighbours the interest region but is not wanted: the stray is inboxed there.
+    expect(h.world.alive(stray)).toBe(false);
+    expect(h.regions.state('cell/1_2')).toBe('inactive');
+    expect(h.regions.inboxSize('cell/1_2')).toBe(1);
+
+    await h.tick([], HOME, ['cell/2_1']); // tick 4: still loading, still waiting
+    expect(h.regions.regionOf(inbound)).toBe('cell/1_1');
+    expect(h.regions.inboxSize('cell/2_1')).toBe(0);
+    h.store.resolveGet('cell/2_1', null);
+    await settle();
+    await h.tick([], HOME, ['cell/2_1']); // tick 5: activates at the update, then the entity moves in
+    expect(h.regions.active()).toEqual(sortedIds([...h.graph.wanted('cell/0_0'), 'cell/2_1']));
+    expect(h.regions.regionOf(inbound)).toBe('cell/2_1');
+    expect(h.world.get(inbound, Transform).pos).toEqual(at(2.5, 50));
+    expect(h.changes).toEqual([{ tick: 5, entity: inbound, from: 'cell/1_1', to: 'cell/2_1' }]);
+    expect(h.regions.inboxSize('cell/2_1')).toBe(0);
+    expectRecordsMatchWorld(h);
+  });
+
+  it('an interest region whose load failed keeps an entity waiting at the border; dropped from interest, the entity is inboxed', async () => {
+    const h = interestRig();
+    const HOME = ['cell/0_0'];
+    await home(h, HOME);
+    const inbound = place(h.world, 'cell/1_1', at(99.5, 50), at(1, 0));
+    h.world.add(inbound, Crate, { n: 1 });
+    await h.tick([], HOME, ['cell/2_1']);
+    h.store.rejectGet('cell/2_1');
+    await settle();
+    await h.tick([], HOME, ['cell/2_1']); // the failure applies at this update: inactive, retried later
+    expect(h.regions.state('cell/2_1')).toBe('inactive');
+    for (let i = 0; i < 3; i++) await h.tick([], HOME, ['cell/2_1']);
+    expect(h.world.alive(inbound)).toBe(true);
+    expect(h.regions.regionOf(inbound)).toBe('cell/1_1');
+    expect(h.regions.inboxSize('cell/2_1')).toBe(0);
+    expect(h.logs.map((l) => l.level)).toEqual(['error']);
+
+    await h.tick([], HOME, []); // no longer wanted: the crossing inboxes, as without interest
+    expect(h.world.alive(inbound)).toBe(false);
+    expect(h.regions.inboxSize('cell/2_1')).toBe(1);
+    expect(h.changes).toEqual([]);
   });
 });

@@ -224,10 +224,14 @@ export interface Rig {
   edges: { entity: EntityId; tick: number }[];
   logs: LogEntry[];
   /**
-   * One Session tick (docs/sim.md 2.9): `regions.update(players, ctx, pending)`, then `step`, then
-   * a macrotask turn so that store operations that completed land before the next tick.
+   * One Session tick (docs/sim.md 2.9): `regions.update(players, ctx, pending, interest)`, then
+   * `step`, then a macrotask turn so that store operations that completed land before the next tick.
    */
-  tick(players?: readonly EntityId[], pending?: readonly RegionId[]): Promise<void>;
+  tick(
+    players?: readonly EntityId[],
+    pending?: readonly RegionId[],
+    interest?: readonly RegionId[],
+  ): Promise<void>;
 }
 
 export interface RigOpts {
@@ -313,8 +317,8 @@ export function rig(opts: RigOpts = {}): Rig {
     changes,
     edges,
     logs,
-    async tick(players = [], pending) {
-      manager.update(players, sim.ctx, pending);
+    async tick(players = [], pending, interest) {
+      manager.update(players, sim.ctx, pending, interest);
       sim.step(world.tick + 1);
       await settle();
     },
