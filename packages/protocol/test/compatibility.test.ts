@@ -81,9 +81,9 @@ describe('compatibility declarations', () => {
     frame.begin();
     frame.message(CoreKind.Hello, 0, 0, (w) => encodeWith(w, HelloSchema, hello));
     const encoded = frame.finish();
-    expect(encoded[0]).toBe(4);
-    expect(WIRE_VERSION).toBe(4);
-    for (const oldVersion of [1, 2, 3]) {
+    expect(encoded[0]).toBe(5);
+    expect(WIRE_VERSION).toBe(5);
+    for (const oldVersion of [1, 2, 3, 4]) {
       encoded[0] = oldVersion;
       expect(() => readFrame(encoded, () => {})).toThrow('wire version');
     }

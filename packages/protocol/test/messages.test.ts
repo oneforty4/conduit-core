@@ -12,6 +12,8 @@ import {
   f,
   FrameWriter,
   HelloSchema,
+  defineSchema,
+  INPUT_FLAG_GAPS,
   INPUT_FRAMES_PER_MESSAGE,
   inputMessageSchema,
   KickedSchema,
@@ -272,8 +274,8 @@ describe('byte-exact fixtures', () => {
     const fw = new FrameWriter();
     fw.begin();
     fw.message(CoreKind.Leave, 0, 3, (w) => encodeWith(w, LeaveSchema, {}));
-    // 04 01 | 07 kind | 00 00 00 00 tick | 03 00 seq | 00 00 payloadLength
-    expect(hex(fw.finish())).toBe('04 01 07 00 00 00 00 03 00 00 00');
+    // 05 01 | 07 kind | 00 00 00 00 tick | 03 00 seq | 00 00 payloadLength
+    expect(hex(fw.finish())).toBe('05 01 07 00 00 00 00 03 00 00 00');
   });
 
   it('Spawned', () => {
@@ -319,8 +321,8 @@ describe('byte-exact fixtures', () => {
     fw.message(CoreKind.Rejected, 0, 0, (w) =>
       encodeWith(w, RejectedSchema, { reason: RejectReason.ProtocolVersion, detail: 'full' }),
     );
-    // 04 01 | 27 (39) | 00 00 00 00 | 00 00 | 06 00 | 04 04 66 75 6c 6c
-    expect(hex(fw.finish())).toBe('04 01 27 00 00 00 00 00 00 06 00 04 04 66 75 6c 6c');
+    // 05 01 | 27 (39) | 00 00 00 00 | 00 00 | 06 00 | 04 04 66 75 6c 6c
+    expect(hex(fw.finish())).toBe('05 01 27 00 00 00 00 00 00 06 00 04 04 66 75 6c 6c');
   });
 });
 
@@ -335,7 +337,7 @@ describe('inputMessageSchema', () => {
     );
   });
 
-  it('encodes u32 firstTick | u16 count | frames', () => {
+  it('encodes u32 firstTick | u8 count | frames without their ticks', () => {
     const msg: InputPayload<ReturnType<typeof SampleInput.create>> = {
       firstTick: 100,
       frames: [
@@ -348,18 +350,77 @@ describe('inputMessageSchema', () => {
       msg,
       [
         '64 00 00 00', // firstTick 100
-        '02 00', // count 2
-        '64 00 00 00 64 00 ce ff 01', // tick 100 | move (100, -50) as fixed16(0.01) | fire
-        '65 00 00 00 00 00 00 00 00', // tick 101 | move (0, 0) | no fire
+        '02', // count 2, no gaps: ticks 100, 101
+        '64 00 ce ff 01', // move (100, -50) as fixed16(0.01) | fire
+        '00 00 00 00 00', // move (0, 0) | no fire
       ].join(' '),
     );
   });
 
+  it('writes a gap before each later frame when the ticks do not follow on', () => {
+    const at = (tick: number, fire: boolean) => ({ tick, move: { x: 0, y: 0 }, fire });
+    fixture(
+      InputMessage,
+      { firstTick: 7, frames: [at(7, false), at(8, true), at(10, false), at(140, true)] },
+      [
+        '07 00 00 00', // firstTick 7
+        '84', // count 4 | INPUT_FLAG_GAPS
+        '00 00 00 00 00', // tick 7
+        '00 00 00 00 00 01', // gap 0: tick 8
+        '01 00 00 00 00 00', // gap 1: tick 10
+        '81 01 00 00 00 00 01', // gap 129 (varuint): tick 140
+      ].join(' '),
+    );
+    expect(INPUT_FLAG_GAPS).toBe(0x80);
+    fixture(InputMessage, { firstTick: 9, frames: [] }, '09 00 00 00 00');
+  });
+
+  it('decodes into the frames it is given, and rejects counts, ticks and flags it cannot be', () => {
+    const msg = {
+      firstTick: 5,
+      frames: [
+        { tick: 5, move: { x: 1, y: 1 }, fire: true },
+        { tick: 7, move: { x: 2, y: 2 }, fire: false },
+      ],
+    };
+    const w = new ByteWriter();
+    encodeWith(w, InputMessage, msg);
+    const target = InputMessage.create();
+    const kept = SampleInput.create();
+    target.frames.push(kept, SampleInput.create(), SampleInput.create());
+    InputMessage.decodeInto(new ByteReader(w.view()), target);
+    expect(target).toEqual(msg);
+    expect(target.frames[0]).toBe(kept); // reused, two of three
+    const decode = (text: string) => () => decodeWith(new ByteReader(fromHex(text)), InputMessage);
+    expect(decode('00 00 00 00 05')).toThrow(expect.objectContaining({ code: 'count', offset: 4 }));
+    // 0xfffffffe, then a frame at 0xffffffff, then one beyond u32.
+    expect(decode('fe ff ff ff 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00')).toThrow(
+      expect.objectContaining({ code: 'range', offset: 15 }),
+    );
+    expect(decode('00 00 00 00 01 00 00 00')).toThrow(expect.objectContaining({ code: 'eof' }));
+  });
+
+  it('rejects frames that do not start at firstTick and ascend', () => {
+    const at = (tick: number) => ({ tick, move: { x: 0, y: 0 }, fire: false });
+    for (const frames of [[at(4)], [at(6)], [at(5), at(5)], [at(5), at(4)], [at(5), at(5.5)]]) {
+      const w = new ByteWriter();
+      w.u8(0xaa);
+      expect(() => encodeWith(w, InputMessage, { firstTick: 5, frames })).toThrow(
+        expect.objectContaining({ code: 'range' }),
+      );
+      expect(w.length).toBe(1); // rolled back
+    }
+  });
+
   it('allows at most INPUT_FRAMES_PER_MESSAGE frames', () => {
-    const frame = SampleInput.create();
-    const five = { firstTick: 0, frames: [frame, frame, frame, frame, frame] };
+    const at = (tick: number) => ({ ...SampleInput.create(), tick });
+    const five = { firstTick: 1, frames: [at(1), at(2), at(3), at(4), at(5)] };
     expect(() => encodeWith(new ByteWriter(), InputMessage, five)).toThrow(EncodeError);
-    const four = { firstTick: 0, frames: [frame, frame, frame, frame] };
+    const four = { firstTick: 1, frames: [at(1), at(2), at(3), at(4)] };
     expect(() => encodeWith(new ByteWriter(), InputMessage, four)).not.toThrow();
+  });
+
+  it('needs a schema that begins with tick: f.u32', () => {
+    expect(() => inputMessageSchema(defineSchema({ fire: f.bool }) as never)).toThrow(RangeError);
   });
 });

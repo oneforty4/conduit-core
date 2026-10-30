@@ -46,6 +46,7 @@ import { type RegionId, stringCompare, type WorldGraph } from '@conduit/world';
 import {
   CONNECT_TIMEOUT_MS,
   consoleLog,
+  DEFERRED_SEND_TICKS,
   gcLagTicks,
   isReconnectableClose,
   type LogFn,
@@ -118,6 +119,13 @@ export interface NetClientOptions {
   extrapolation?: { horizonMs: number; onLimit?: 'hold' | 'reset' } | undefined;
   /** Default true: send Ready right after Welcome. */
   autoReady?: boolean;
+  /**
+   * true: an Ack waits for the next frame the client sends, normally the next tick's Input, and
+   * goes in it (docs/net.md B.6), so a playing client sends one frame per tick and a Ping a
+   * second; it goes on its own after `DEFERRED_SEND_TICKS` ticks at most. Nothing else waits.
+   * Default false: every message in its own frame, at once, as before.
+   */
+  batchSends?: boolean | undefined;
   /**
    * Default true: a reconnectable close (docs/net.md A.3) while Playing or Resyncing moves to
    * Reconnecting, which retries after `RECONNECT_DELAYS_MS` with the Welcome's reconnect token. With
@@ -403,6 +411,13 @@ export class NetClient {
   private readonly log: LogFn;
   private readonly autoReady: boolean;
   private readonly autoReconnect: boolean;
+  private readonly batchSends: boolean;
+  /** The newest snapshot tick to ack in the next frame (B.6); -1 for none. */
+  private deferredAck = -1;
+  /** When the waiting Ack began to wait. */
+  private deferredSinceMs = 0;
+  /** Sends the waiting Ack on its own if no frame took it first. */
+  private deferredTimer: unknown = null;
   private readonly inputSchema: Schema<InputPayload>;
   private readonly diagnostics: DiagnosticOptions | undefined;
   private readonly inputSender: InputSender;
@@ -496,6 +511,7 @@ export class NetClient {
     this.log = opts.log ?? consoleLog;
     this.autoReady = opts.autoReady ?? true;
     this.autoReconnect = opts.autoReconnect ?? true;
+    this.batchSends = opts.batchSends ?? false;
     this.sessionTickRate = game.tickRate;
     this.sessionSnapshotEvery = game.snapshotEvery;
 
@@ -529,12 +545,13 @@ export class NetClient {
     // Disabled, the input path is exactly the plain send (docs/net.md B.10).
     const sendInput =
       stub === null
-        ? (msg: InputPayload): void => this.sendMessage(CoreKind.Input, this.inputSchema, msg)
-        : (msg: InputPayload): void => {
-            if (this.transport === null) return; // nothing goes out
-            const seq = this.encoder.seq; // the envelope seq this message gets
+        ? (msg: InputPayload): void => {
             this.sendMessage(CoreKind.Input, this.inputSchema, msg);
-            stub.onInputSent(msg, seq);
+          }
+        : (msg: InputPayload): void => {
+            // The envelope seq the Input got, after a waiting Ack in its frame.
+            const seq = this.sendMessage(CoreKind.Input, this.inputSchema, msg);
+            if (seq >= 0) stub.onInputSent(msg, seq);
           };
     this.inputSender = new InputSender(registry.input, sendInput, this.clock, opts.sampleInput, {
       now: this.now,
@@ -814,6 +831,7 @@ export class NetClient {
     const state = this.current;
     if (state !== 'Connecting' && state !== 'Reconnecting') return;
     this.encoder.reset();
+    this.clearDeferred();
     this.resetAssembly();
     this.expectedSeqIn = 0;
     this.sendMessage(CoreKind.Hello, HelloSchema, {
@@ -832,6 +850,12 @@ export class NetClient {
 
   private onFrame(t: Transport, buf: Uint8Array, handlers: ServerMessageHandlers): void {
     this.frameRecvMs = this.now();
+    // A throttled timer (a hidden tab) must not hold the Ack back: frames keep arriving.
+    if (
+      this.deferredTimer !== null &&
+      this.frameRecvMs - this.deferredSinceMs >= this.deferredSendMs()
+    )
+      this.flushDeferred();
     this.counters.bytesIn += buf.byteLength;
     this.bytesInRate.add(buf.byteLength, this.frameRecvMs);
     try {
@@ -947,7 +971,7 @@ export class NetClient {
             });
           }
         }
-        this.sendMessage(CoreKind.Ack, AckSchema, { lastSnapshotTick: s.header.serverTick });
+        this.sendAck(s.header.serverTick);
         this.counters.snapshots++;
         this.counters.lastSnapshotTick = s.header.serverTick;
         if (this.current === 'Resyncing' && (s.header.flags & SNAPSHOT_FLAG_FULL) !== 0) {
@@ -1224,14 +1248,88 @@ export class NetClient {
     this.sendMessage(CoreKind.Ready, ReadySchema, {});
   }
 
+  /**
+   * Never deferred, though it takes a waiting Ack along: a Ping is a clock sample, and one riding
+   * in an Input frame measured a lower RTT on a jittery link than the input frames then met,
+   * lowering the input lead (docs/net.md B.6).
+   */
   private sendPing(): void {
     this.sendMessage(CoreKind.Ping, PingSchema, { clientTimeMs: toU32Ms(this.now()) });
   }
 
-  private sendMessage<T>(kind: number, schema: Schema<T>, payload: T): void {
+  /** Acks are cumulative, so of several waiting only the newest goes (docs/net.md B.6). */
+  private sendAck(lastSnapshotTick: number): void {
+    if (!this.batchSends) {
+      this.sendMessage(CoreKind.Ack, AckSchema, { lastSnapshotTick });
+      return;
+    }
+    this.deferredAck = Math.max(this.deferredAck, lastSnapshotTick);
+    if (this.deferredTimer !== null) return;
+    this.deferredSinceMs = this.now();
+    this.deferredTimer = this.timers.setTimeout(() => {
+      this.deferredTimer = null;
+      this.flushDeferred();
+    }, this.deferredSendMs());
+  }
+
+  private deferredSendMs(): number {
+    return (DEFERRED_SEND_TICKS * 1000) / this.sessionTickRate;
+  }
+
+  /** Appends the waiting Ack to the open frame. */
+  private addDeferred(tick: number): void {
+    if (this.deferredAck >= 0)
+      this.encoder.add(CoreKind.Ack, tick, AckSchema, { lastSnapshotTick: this.deferredAck });
+  }
+
+  private clearDeferred(): void {
+    this.deferredAck = -1;
+    this.clearTimer('deferredTimer');
+  }
+
+  /** The waiting Ack in a frame of its own, now. */
+  private flushDeferred(): void {
     const t = this.transport;
-    if (t === null) return;
-    const buf = this.encoder.single(kind, this.clock.serverTickNow(), schema, payload);
+    if (t === null || this.deferredAck < 0) {
+      this.clearDeferred();
+      return;
+    }
+    this.encoder.begin();
+    try {
+      this.addDeferred(this.clock.serverTickNow());
+    } catch (err) {
+      this.encoder.abort();
+      throw err;
+    }
+    this.clearDeferred();
+    this.transmit(t, this.encoder.finish());
+  }
+
+  /**
+   * `payload` in a frame sent now, after a waiting Ack (B.6). Returns the message's envelope seq,
+   * or -1 when there is no transport. On a throw nothing is consumed or sent.
+   */
+  private sendMessage<T>(kind: number, schema: Schema<T>, payload: T): number {
+    const t = this.transport;
+    if (t === null) return -1;
+    const tick = this.clock.serverTickNow();
+    const encoder = this.encoder;
+    encoder.begin();
+    let seq: number;
+    try {
+      this.addDeferred(tick);
+      seq = encoder.seq;
+      encoder.add(kind, tick, schema, payload);
+    } catch (err) {
+      encoder.abort();
+      throw err;
+    }
+    this.clearDeferred();
+    this.transmit(t, encoder.finish());
+    return seq;
+  }
+
+  private transmit(t: Transport, buf: Uint8Array): void {
     t.send(buf);
     this.counters.bytesOut += buf.byteLength;
     this.bytesOutRate.add(buf.byteLength, this.now());
@@ -1390,6 +1488,7 @@ export class NetClient {
     this.clearTimer('connectTimer');
     this.clearTimer('pingTimer');
     this.clearTimer('tickTimer');
+    this.clearDeferred(); // a waiting Ack belongs to the connection
     t?.close(1000, reason);
   }
 
@@ -1467,12 +1566,13 @@ export class NetClient {
     if (info !== null) this.emit('disconnected', info);
   }
 
-  private clearTimer(which: 'connectTimer' | 'pingTimer' | 'tickTimer' | 'reconnectTimer'): void {
+  private clearTimer(
+    which: 'connectTimer' | 'pingTimer' | 'tickTimer' | 'reconnectTimer' | 'deferredTimer',
+  ): void {
     const handle = this[which];
     if (handle === null) return;
     this[which] = null;
-    if (which === 'connectTimer' || which === 'reconnectTimer' || which === 'tickTimer')
-      this.timers.clearTimeout(handle);
+    if (which !== 'pingTimer') this.timers.clearTimeout(handle);
     else this.timers.clearInterval(handle);
   }
 }

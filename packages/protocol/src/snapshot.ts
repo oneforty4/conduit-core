@@ -1,5 +1,5 @@
 import type { ByteReader, ByteWriter } from './bytes.ts';
-import { MAX_REGION_TABLE, REGION_IDX_NONE } from './constants.ts';
+import { ENTITY_NONE, MAX_REGION_TABLE, REGION_IDX_NONE } from './constants.ts';
 import { DecodeError, EncodeError } from './errors.ts';
 import type { EntityId } from './fields.ts';
 import { REGION_ID_MAX } from './messages.ts';
@@ -153,10 +153,11 @@ function writeCount16(w: ByteWriter, n: number, what: string): void {
 }
 
 /**
- * Encodes a Snapshot payload (docs/protocol.md 9.11). Producers order creates, updates and destroys
- * by ascending entity id and components by ascending id. With `SNAPSHOT_FLAG_MASKED` set, update
- * components carry field masks (9.11.1); without it the bytes are those of the unmasked layout. On a
- * throw the writer is truncated back.
+ * Encodes a Snapshot payload (docs/protocol.md 9.11). Creates, updates and destroys must each be in
+ * strictly ascending entity id (each id is written as its gap from the one before,
+ * `EncodeError('range')` otherwise); producers order components by ascending id. With
+ * `SNAPSHOT_FLAG_MASKED` set, update components carry field masks (9.11.1); without it the bytes
+ * are those of the unmasked layout. On a throw the writer is truncated back.
  */
 export function encodeSnapshot(w: ByteWriter, registry: SchemaRegistry, s: SnapshotData): void {
   const start = w.length;
@@ -170,8 +171,9 @@ export function encodeSnapshot(w: ByteWriter, registry: SchemaRegistry, s: Snaps
     for (const id of s.regions) w.utf8(id, REGION_ID_MAX);
 
     writeCount16(w, s.creates.length, 'creates');
+    let previous = ENTITY_NONE;
     for (const c of s.creates) {
-      w.u32(c.entity);
+      previous = writeEntity(w, c.entity, previous);
       if ((s.header.flags & SNAPSHOT_FLAG_STATE_TICKS) !== 0)
         writeStateTick(w, c.stateTick ?? s.header.serverTick, s.header.serverTick);
       if (c.regionIdx !== REGION_IDX_NONE && !(c.regionIdx >= 0 && c.regionIdx < regionCount)) {
@@ -183,8 +185,9 @@ export function encodeSnapshot(w: ByteWriter, registry: SchemaRegistry, s: Snaps
 
     const masked = (s.header.flags & SNAPSHOT_FLAG_MASKED) !== 0;
     writeCount16(w, s.updates.length, 'updates');
+    previous = ENTITY_NONE;
     for (const u of s.updates) {
-      w.u32(u.entity);
+      previous = writeEntity(w, u.entity, previous);
       if ((s.header.flags & SNAPSHOT_FLAG_STATE_TICKS) !== 0)
         writeStateTick(w, u.stateTick ?? s.header.serverTick, s.header.serverTick);
       writeComponents(w, registry, u.components, masked);
@@ -198,7 +201,8 @@ export function encodeSnapshot(w: ByteWriter, registry: SchemaRegistry, s: Snaps
     }
 
     writeCount16(w, s.destroys.length, 'destroys');
-    for (const e of s.destroys) w.u32(e);
+    previous = ENTITY_NONE;
+    for (const e of s.destroys) previous = writeEntity(w, e, previous);
   } catch (err) {
     truncateOnThrow(w, start, err);
   }
@@ -262,8 +266,10 @@ export function decodeSnapshot(r: ByteReader, registry: SchemaRegistry): Snapsho
 
   const createCount = r.u16();
   const creates: SnapshotCreate[] = [];
+  let previous = ENTITY_NONE;
   for (let i = 0; i < createCount; i++) {
-    const entity = r.u32();
+    const entity = readEntity(r, previous);
+    previous = entity;
     const stateTick =
       (header.flags & SNAPSHOT_FLAG_STATE_TICKS) !== 0
         ? readStateTick(r, header.serverTick)
@@ -289,8 +295,10 @@ export function decodeSnapshot(r: ByteReader, registry: SchemaRegistry): Snapsho
   const masked = (header.flags & SNAPSHOT_FLAG_MASKED) !== 0;
   const updateCount = r.u16();
   const updates: SnapshotUpdate[] = [];
+  previous = ENTITY_NONE;
   for (let i = 0; i < updateCount; i++) {
-    const entity = r.u32();
+    const entity = readEntity(r, previous);
+    previous = entity;
     const stateTick =
       (header.flags & SNAPSHOT_FLAG_STATE_TICKS) !== 0
         ? readStateTick(r, header.serverTick)
@@ -309,20 +317,44 @@ export function decodeSnapshot(r: ByteReader, registry: SchemaRegistry): Snapsho
 
   const destroyCount = r.u16();
   const destroys: EntityId[] = [];
-  for (let i = 0; i < destroyCount; i++) destroys.push(r.u32());
+  previous = ENTITY_NONE;
+  for (let i = 0; i < destroyCount; i++) {
+    previous = readEntity(r, previous);
+    destroys.push(previous);
+  }
 
   return { header, regions, creates, updates, destroys };
 }
 
-function writeStateTick(writer: ByteWriter, tick: number, maximum: number): void {
-  if (!Number.isInteger(tick) || tick < 0 || tick > maximum)
-    throw new EncodeError('range', 'Snapshot: invalid authoritative unit tick');
-  writer.u32(tick);
+/**
+ * A record's entity (docs/protocol.md 9.11): the varuint of its id less the previous record's of
+ * the same list (`ENTITY_NONE` before the first) less 1, so ids must strictly ascend. Returns it.
+ */
+export function writeEntity(w: ByteWriter, entity: EntityId, previous: EntityId): EntityId {
+  if (!Number.isInteger(entity) || entity <= previous || entity > 0xffffffff)
+    throw new EncodeError('range', `Snapshot: entity ${entity} does not ascend from ${previous}`);
+  w.varuint(entity - previous - 1);
+  return entity;
 }
-function readStateTick(reader: ByteReader, maximum: number): number {
+
+/** The entity of a record whose list's previous record was `previous` (`writeEntity`). */
+export function readEntity(r: ByteReader, previous: EntityId): EntityId {
+  const offset = r.offset;
+  const entity = previous + 1 + r.varuint();
+  if (entity > 0xffffffff) throw new DecodeError('range', offset, 'Snapshot: entity id beyond u32');
+  return entity;
+}
+
+/** STATE_TICKS (9.11.2): `tick` as the varuint of its age, `serverTick - tick`. */
+function writeStateTick(writer: ByteWriter, tick: number, serverTick: number): void {
+  if (!Number.isInteger(tick) || tick < 0 || tick > serverTick)
+    throw new EncodeError('range', 'Snapshot: invalid authoritative unit tick');
+  writer.varuint(serverTick - tick);
+}
+function readStateTick(reader: ByteReader, serverTick: number): number {
   const offset = reader.offset;
-  const tick = reader.u32();
-  if (tick > maximum)
-    throw new DecodeError('range', offset, 'Snapshot: authoritative unit tick is in the future');
-  return tick;
+  const age = reader.varuint();
+  if (age > serverTick)
+    throw new DecodeError('range', offset, 'Snapshot: authoritative unit tick before tick 0');
+  return serverTick - age;
 }

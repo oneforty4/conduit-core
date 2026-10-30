@@ -129,6 +129,7 @@ export interface ServerHooks<I extends InputFrame = InputFrame> {
   onPlayerLeave?(player: PlayerInfo, ctx: ServerContext<I>): void;        // `player.entity` still alive; core destroys it after the hook returns
   onWorldEdge?(entity: EntityId, ctx: ServerContext<I>): void;
   relevance?(player: PlayerInfo, entity: EntityId, ctx: ServerContext<I>): boolean;
+  withheldComponents?(player: PlayerInfo, entity: EntityId, ctx: ServerContext<I>): readonly ComponentType<unknown>[] | undefined;   // replicated components of entity not sent to player, e.g. owner-only prediction state (docs/net.md A.8.4); return frozen arrays
   onMessage?: Record<string, (player: PlayerInfo, msg: unknown, ctx: ServerContext<I>) => void>;   // keyed by message name; adapted to SessionHooks.onMessage by def.name
   simulationInterest?(ctx: ServerContext<I>): readonly RegionId[];        // regions to keep simulated independent of players and pending spawns, wanted exactly (no neighbourhood); once per tick right before regions.update; deterministic, not journaled; an invalid result faults the session (docs/net.md A.5); absent: none, behaviour unchanged
 }
@@ -151,6 +152,7 @@ export interface ServerContext<I extends InputFrame = InputFrame> extends HookCo
 export interface CreateServerOpts<I extends InputFrame = InputFrame> {   // optional fields also accept `undefined` (as SessionOptions, docs/net.md A.5); so do CreateClientOpts' and GameDefInput's tickRate/snapshotEvery
   port?: number;                         // default 0 (ephemeral); integer 0..65535 (RangeError); the resolved port is returned
   host?: string;                         // default '127.0.0.1'
+  compression?: boolean | WsCompressionOptions;   // permessage-deflate on the game sockets, createWsServer's option (docs/net.md A.2): true for DEFAULT_WS_COMPRESSION (level 3, memLevel 8, windowBits 15); default false
   store?: BlobStore;                     // default new MemoryStore(); e.g. new SqliteStore(path) (M4). The server owns it: close(), and a failed start, close it when it has a close() method
   autosaveIntervalMs?: number;           // (M4) period of the Autosaver (docs/persist.md 1.8); default AUTOSAVE_INTERVAL_MS (60 000); outside (0, 2^31 - 1] the Autosaver's RangeError
   regionLoader: RegionLoader;
@@ -180,7 +182,7 @@ createServer(game, opts):             // everything before the first await throw
                                         // the Session constructor calls the factory, so a bad interval throws here; save = session.flushAll
   await session.start()                 // builds World, Simulation, RegionManager, SpatialIndex, InterestPolicy; loads 'session'/'state'; calls onLoad or onInit; starts sim's FixedLoop, then autosaver.start()
                                         // on a start error: close the store, reject
-  wss = createWsServer({ host, port })  // docs/net.md A.2
+  wss = createWsServer({ host, port, compression })  // docs/net.md A.2
   wss.on('connection', socket => session.attach(new WsLink(socket, nextLinkId++, { log })))   // no identity: the Session verifies Hello.sessionToken through `verifier`
   await listening                       // on a listen error: wss.close(), await session.stop() (which saves), close the store, reject with the listen error
   return { port: wss.address().port, session, url: `ws://${host}:${port}`, close }
@@ -376,6 +378,7 @@ export interface CreateClientOpts<I extends InputFrame = InputFrame> {
   maxSessionCapacity?: number;                // client admission/decode limit 1..16; default 16, not the server support limit
   snapshotLimits?: Partial<SnapshotLimits>;  // bounded transaction/assembly limits offered in Hello
   extrapolation?: { horizonMs: number; onLimit?: 'hold' | 'reset' }; // horizon 0..10000 ms
+  batchSends?: boolean;                      // NetClient's (docs/net.md B.6): true, an Ack rides with the next Input; default false
   diagnostics?: DiagnosticOptions;           // optional isolated observer with an injected timing function
 }
 

@@ -153,6 +153,15 @@ export interface ServerHooks<I extends InputFrame = InputFrame> {
   onWorldEdge?(entity: EntityId, ctx: ServerContext<I>): void;
   /** Entities it rejects are not replicated to `player`. */
   relevance?(player: PlayerInfo, entity: EntityId, ctx: ServerContext<I>): boolean;
+  /**
+   * Replicated components of `entity` not sent to `player`: net-server's
+   * `SessionHooks.withheldComponents` (docs/net.md A.8.4). Return frozen arrays.
+   */
+  withheldComponents?(
+    player: PlayerInfo,
+    entity: EntityId,
+    ctx: ServerContext<I>,
+  ): readonly ComponentType<unknown>[] | undefined;
   replicationGroups?(player: PlayerInfo, ctx: ServerContext<I>): readonly ReplicationGroup[];
   replicationPriority?(player: PlayerInfo, group: ReplicationGroup, ctx: ServerContext<I>): number;
   eventDependencies?(

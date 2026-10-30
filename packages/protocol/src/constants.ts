@@ -2,8 +2,12 @@ import { FNV_BASIS } from '@conduit/math';
 
 export { FNV_PRIME } from '@conduit/math';
 
-/** u8 in every frame header. Bumped only when the envelope or a core payload changes. */
-export const WIRE_VERSION = 4;
+/**
+ * u8 in every frame header. Bumped only when the envelope or a core payload changes: 5 made Input
+ * frames tickless (docs/protocol.md 9.7) and entity ids and state ticks in Snapshot records varuints
+ * (9.11).
+ */
+export const WIRE_VERSION = 5;
 /** Default session size; remains independent of schema/protocol ceilings. */
 export const DEFAULT_SESSION_CAPACITY = 8;
 /** Publicly qualified capacity; larger sessions stay gated until load/reconnect/save qualification. */

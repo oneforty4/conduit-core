@@ -13,10 +13,10 @@ describe('finite network admission', () => {
       const before = h.session.tick;
       const writer = new FrameWriter();
       writer.begin();
+      // docs/protocol.md 9.7: firstTick | count 1 | the frame's fields after its tick
       writer.message(CoreKind.Input, 0, client.seq++, (bytes) => {
         bytes.u32(before + 1);
-        bytes.u16(1);
-        bytes.u32(before + 1);
+        bytes.u8(1);
         bytes.f32(value);
       });
       client.link.receive(writer.finish());

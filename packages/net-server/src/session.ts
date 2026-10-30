@@ -25,6 +25,7 @@ import {
   copyCompatibilityDescriptor,
   compatibilityDifferences,
   type CompatibilityDescriptor,
+  type ComponentLike,
   DecodeError,
   decodeWith,
   EncodeError,
@@ -201,6 +202,20 @@ export interface HookContext extends SimContext {
 }
 
 export interface SessionHooks {
+  /**
+   * Replicated components of `entity` that are not sent to `player` (docs/net.md A.8.4), e.g. state
+   * only its owner's prediction reads: called per snapshot for every entity of the player's
+   * interest that `relevance` admits. A component that becomes withheld is removed on the client;
+   * one that stops being withheld arrives whole. `undefined` or `[]` withholds nothing. Return
+   * frozen arrays (module constants) so each is resolved once; a component that is not replicated
+   * is a `RangeError`. Pure policy, like `relevance`: a throw fails that player's snapshot for the
+   * tick.
+   */
+  withheldComponents?(
+    player: PlayerInfo,
+    entity: EntityId,
+    ctx: HookContext,
+  ): readonly ComponentLike[] | undefined;
   /** Pure consumer policy; permissions/relevance are applied before these declarations. */
   replicationGroups?(player: PlayerInfo, ctx: HookContext): readonly ReplicationGroup[];
   replicationPriority?(player: PlayerInfo, group: ReplicationGroup, ctx: HookContext): number;
@@ -671,6 +686,8 @@ export class Session {
   private readonly slots: (ClientConn | null)[];
   private messageQueue: QueuedGameMessage[] = [];
   private readonly baseSource: SnapshotSource;
+  /** `withheldComponents` results resolved to component ids, by frozen array. */
+  private readonly withheldIds = new WeakMap<readonly ComponentLike[], ReadonlySet<number>>();
   private hookCtx: HookContext | null = null;
   private failure: SimulationFault | null = null;
   get fault(): SimulationFault | null {
@@ -2440,10 +2457,39 @@ export class Session {
 
   private snapshotSource(conn: ClientConn): SnapshotSource {
     const hooks = this.hooks;
-    if (hooks.relevance === undefined) return this.baseSource;
+    const { relevance, withheldComponents } = hooks;
+    if (relevance === undefined && withheldComponents === undefined) return this.baseSource;
     const player = this.playerInfo(conn);
     const ctx = this.ctx;
-    return { ...this.baseSource, relevance: (e) => hooks.relevance?.(player, e, ctx) !== false };
+    return {
+      ...this.baseSource,
+      ...(relevance === undefined
+        ? {}
+        : { relevance: (e: EntityId) => relevance.call(hooks, player, e, ctx) !== false }),
+      ...(withheldComponents === undefined
+        ? {}
+        : {
+            withheld: (e: EntityId) => {
+              const list = withheldComponents.call(hooks, player, e, ctx);
+              return list === undefined || list.length === 0 ? undefined : this.withheldSet(list);
+            },
+          }),
+    };
+  }
+
+  /** The ids of a `withheldComponents` result; cached when the array is frozen (A.8.4). */
+  private withheldSet(list: readonly ComponentLike[]): ReadonlySet<number> {
+    const cached = this.withheldIds.get(list);
+    if (cached !== undefined) return cached;
+    const ids = new Set<number>();
+    for (const component of list) {
+      const id = this.registry.componentId(component);
+      if (this.registry.component(id)?.replicate !== true)
+        throw new RangeError(`withheldComponents: ${component.name} is not replicated`);
+      ids.add(id);
+    }
+    if (Object.isFrozen(list)) this.withheldIds.set(list, ids);
+    return ids;
   }
 
   /**
@@ -2656,6 +2702,16 @@ export class Session {
               break;
             }
           }
+          // Nor a component that has become withheld since it was built (A.8.4).
+          const withheld = source.withheld;
+          if (allowed && withheld !== undefined)
+            for (const record of [...transaction.data.creates, ...transaction.data.updates]) {
+              const hidden = withheld(record.entity);
+              if (hidden !== undefined && record.components.some((c) => hidden.has(c.id))) {
+                allowed = false;
+                break;
+              }
+            }
         } catch {
           allowed = false;
         }

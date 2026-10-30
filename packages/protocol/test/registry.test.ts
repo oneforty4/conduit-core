@@ -339,7 +339,7 @@ describe('registry hash', () => {
       input: defineInput({ tick: f.u32, fire: f.bool }),
     });
     const expected =
-      'wire=4' +
+      'wire=5' +
       ';components[Health=struct{hp:u8}:r;Secret=struct{s:str(4)}:n]' +
       ';messages[' +
       [
@@ -376,7 +376,7 @@ describe('registry hash', () => {
       input: defineInput({ tick: f.u32 }),
     });
     expect(r.descriptor()).toMatch(
-      /^wire=4;components\[\];messages\[1:Hello=.*:s2c\];events\[\];input=struct\{tick:u32\}$/,
+      /^wire=5;components\[\];messages\[1:Hello=.*:s2c\];events\[\];input=struct\{tick:u32\}$/,
     );
   });
 

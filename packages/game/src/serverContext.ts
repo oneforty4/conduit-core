@@ -131,6 +131,9 @@ export function adaptHooks<I extends InputFrame>(
     adapted.relevance = (player, entity, ctx) =>
       relevance.call(hooks, player, entity, serverContext(ctx));
   }
+  if (hooks.withheldComponents !== undefined)
+    adapted.withheldComponents = (player, entity, ctx) =>
+      hooks.withheldComponents!(player, entity, serverContext(ctx));
   if (hooks.replicationGroups !== undefined)
     adapted.replicationGroups = (player, ctx) =>
       hooks.replicationGroups!(player, serverContext(ctx));

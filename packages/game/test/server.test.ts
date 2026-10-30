@@ -320,6 +320,7 @@ async function start(
     regionLoader?: RegionLoader;
     autosaveIntervalMs?: number;
     port?: number;
+    compression?: boolean | undefined;
   } = {},
 ): Promise<GameServer> {
   const server = await createServer(game, {
@@ -331,6 +332,7 @@ async function start(
     store: opts.store,
     autosaveIntervalMs: opts.autosaveIntervalMs,
     port: opts.port,
+    compression: opts.compression,
   });
   servers.push(server);
   return server;
@@ -390,6 +392,16 @@ describe('createServer', () => {
     expect(server.session.id).toBe('dev');
     const warnings = logs.entries.filter((e) => e.msg === DEV_AUTH_WARNING);
     expect(warnings).toEqual([{ level: 'warn', msg: DEV_AUTH_WARNING, data: undefined }]);
+  });
+
+  it('compresses the game sockets with compression: true, and not by default', async () => {
+    for (const compression of [undefined, true]) {
+      const server = await start(newRecord(), { devAuth: true, compression });
+      const a = await rawHello(server.url, { token: '', displayName: 'Alice' });
+      sockets.push(a.ws);
+      expect(a.first.kind).toBe(CoreKind.Welcome);
+      expect(a.ws.extensions).toBe(compression === true ? 'permessage-deflate' : '');
+    }
   });
 
   it('accepts any token with devAuth and passes the Hello displayName to onPlayerJoin', async () => {

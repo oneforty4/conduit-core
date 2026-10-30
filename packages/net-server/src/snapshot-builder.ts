@@ -1,6 +1,7 @@
 import {
   ByteWriter,
   EncodeError,
+  ENTITY_NONE,
   type EntityId,
   MAX_REGION_TABLE,
   REGION_ID_MAX,
@@ -8,11 +9,13 @@ import {
   type SchemaRegistry,
   SNAPSHOT_FLAG_FULL,
   SNAPSHOT_FLAG_MASKED,
+  SNAPSHOT_FLAG_STATE_TICKS,
   type SnapshotComponent,
   type SnapshotCreate,
   type SnapshotData,
   type SnapshotHeader,
   type SnapshotUpdate,
+  writeEntity,
   writeSnapshotHeader,
 } from '@conduit/protocol';
 import type { RegionId } from '@conduit/world';
@@ -41,6 +44,11 @@ export interface SnapshotSource {
   slot(e: EntityId): number;
   /** Bound to (player, ctx); entities it rejects are not in interest. */
   relevance?: ((e: EntityId) => boolean) | undefined;
+  /**
+   * Bound to (player, ctx): ids of the replicated components of `e` this client is not sent
+   * (`SessionHooks.withheldComponents`, docs/net.md A.8.4); `undefined` or empty withholds none.
+   */
+  withheld?: ((e: EntityId) => ReadonlySet<number> | undefined) | undefined;
 }
 
 /** A client's replication state; `ClientConn` satisfies it. */
@@ -50,12 +58,20 @@ export interface ReplicationState {
   baselineTick: number;
   /** The next snapshot is FULL (and `known` counts as empty). */
   fullNext: boolean;
+  /**
+   * The component ids withheld from the client, as of the last snapshot sent, of each known entity
+   * that had some (A.8.4). Absent: none withheld.
+   */
+  withheld?: Map<EntityId, ReadonlySet<number>>;
 }
 
 export type SnapshotHeaderFields = Omit<SnapshotHeader, 'baselineTick' | 'flags' | 'serverTick'>;
 
 const EMPTY_KNOWN: ReadonlySet<EntityId> = new Set();
+const NONE_WITHHELD: ReadonlyMap<EntityId, ReadonlySet<number>> = new Map();
 const replicatedIdCache = new WeakMap<SchemaRegistry, readonly number[]>();
+/** What `buildSnapshot` withheld per entity, for `commitSnapshot` to keep once it was sent. */
+const withheldBuilt = new WeakMap<SnapshotData, Map<EntityId, ReadonlySet<number>>>();
 
 function ascending(a: number, b: number): number {
   return a - b;
@@ -76,9 +92,10 @@ function replicatedIds(registry: SchemaRegistry): readonly number[] {
  * passing `relevance`; creates for interest not known (every replicated component), updates for
  * known entities with a component written (`version > baselineTick`) or removed
  * (`removedAt > baselineTick`) since the baseline, destroys for known entities that left interest.
- * With `fullNext` the snapshot is FULL: `known` counts as empty, `baselineTick` is 0. Records and
- * components are ascending by id; the region table is in first-use order. Nothing is committed:
- * call `commitSnapshot` once the snapshot was sent.
+ * Components `withheld` from the client are left out (A.8.4): one that becomes withheld is sent as
+ * removed, one that stops being withheld whole. With `fullNext` the snapshot is FULL: `known`
+ * counts as empty, `baselineTick` is 0. Records and components are ascending by id; the region
+ * table is in first-use order. Nothing is committed: call `commitSnapshot` once it was sent.
  */
 export function buildSnapshot(
   src: SnapshotSource,
@@ -105,14 +122,24 @@ export function buildSnapshot(
   const creates: SnapshotCreate[] = [];
   const updates: SnapshotUpdate[] = [];
   const destroys: EntityId[] = [];
+  const withheldOf = src.withheld;
+  const withheldBefore = full ? NONE_WITHHELD : (rs.withheld ?? NONE_WITHHELD);
+  const withheld =
+    withheldOf === undefined && withheldBefore.size === 0
+      ? undefined
+      : new Map<EntityId, ReadonlySet<number>>();
 
   const ordered = Array.from(interest).sort(ascending);
   for (const e of ordered) {
+    const hidden = withheldOf?.(e);
+    const hides = hidden !== undefined && hidden.size > 0;
+    if (hides) withheld!.set(e, hidden);
     if (!known.has(e)) {
       const components: SnapshotComponent[] = [];
       for (const id of replicated) {
         const store = src.store(id);
-        if (store.has(e)) components.push({ id, value: store.read(e) });
+        if (store.has(e) && !(hides && hidden.has(id)))
+          components.push({ id, value: store.read(e) });
       }
       const region = src.regionOf(e);
       let idx: number = REGION_IDX_NONE;
@@ -129,15 +156,22 @@ export function buildSnapshot(
       continue;
     }
     const slot = src.slot(e);
+    const hid = withheldBefore.get(e);
     let changed: SnapshotComponent[] | null = null;
     let removed: number[] | null = null;
     for (const id of replicated) {
       const store = src.store(id);
+      const wasHidden = hid !== undefined && hid.has(id);
       if (store.has(e)) {
-        if ((store.version[slot] ?? 0) > baseline) {
+        if (hides && hidden.has(id)) {
+          // Leaves the client's view: it may hold the component (a removal of one it never got is
+          // a no-op on the client).
+          if (!wasHidden) (removed ??= []).push(id);
+        } else if (wasHidden || (store.version[slot] ?? 0) > baseline) {
+          // Changed, or no longer withheld: the client has no value of it, so it goes whole.
           (changed ??= []).push({ id, value: store.read(e) });
         }
-      } else if ((store.removedAt[slot] ?? 0) > baseline) {
+      } else if (!wasHidden && (store.removedAt[slot] ?? 0) > baseline) {
         (removed ??= []).push(id);
       }
     }
@@ -151,7 +185,7 @@ export function buildSnapshot(
     for (const e of knownOrdered) if (!interest.has(e)) destroys.push(e);
   }
 
-  return {
+  const data: SnapshotData = {
     header: {
       serverTick: tick,
       serverTimeMs: header.serverTimeMs,
@@ -165,13 +199,15 @@ export function buildSnapshot(
     updates,
     destroys,
   };
+  if (withheld !== undefined) withheldBuilt.set(data, withheld);
+  return data;
 }
 
 /**
  * Commits a snapshot that was sent with its first `createsWritten` creates (A.8.1):
  * `known = (known - destroys) + those creates` (everything when FULL: the creates only), so deferred
  * creates stay unknown and are created by the next build; `baselineTick = serverTick`;
- * `fullNext = false`.
+ * `fullNext = false`; `withheld` becomes what the build withheld from the entities now known.
  */
 export function commitSnapshot(
   rs: ReplicationState,
@@ -182,6 +218,14 @@ export function commitSnapshot(
   else for (const e of data.destroys) rs.known.delete(e);
   const n = Math.min(createsWritten, data.creates.length);
   for (let i = 0; i < n; i++) rs.known.add((data.creates[i] as SnapshotCreate).entity);
+  const withheld = withheldBuilt.get(data);
+  if (withheld !== undefined) {
+    for (let i = n; i < data.creates.length; i++)
+      withheld.delete((data.creates[i] as SnapshotCreate).entity);
+    rs.withheld = withheld;
+  } else if (rs.withheld !== undefined && rs.withheld.size > 0) {
+    rs.withheld = new Map();
+  }
   rs.baselineTick = data.header.serverTick;
   rs.fullNext = false;
 }
@@ -192,9 +236,9 @@ let tailScratch: ByteWriter | null = null;
  * Encodes `s` exactly as `encodeSnapshot` does (docs/protocol.md 9.11), except that creates stop
  * being added once the payload so far plus the updates and destroys (always written in full) reaches
  * `softLimitBytes`. Returns, and reports through `onCreatesWritten`, how many creates were written.
- * It writes whole records only: `SNAPSHOT_FLAG_MASKED` or a component `mask` (9.11.1) is
- * `EncodeError('range')` until the builder produces masks. On a throw the writer is truncated back
- * to where the snapshot started.
+ * It writes whole records without state ticks only: `SNAPSHOT_FLAG_MASKED`,
+ * `SNAPSHOT_FLAG_STATE_TICKS` or a component `mask` (9.11.1) is `EncodeError('range')`. On a throw
+ * the writer is truncated back to where the snapshot started.
  */
 export function encodeSnapshotBounded(
   w: ByteWriter,
@@ -208,15 +252,16 @@ export function encodeSnapshotBounded(
   tail.reset();
   let written = 0;
   try {
-    if ((s.header.flags & SNAPSHOT_FLAG_MASKED) !== 0) {
+    if ((s.header.flags & (SNAPSHOT_FLAG_MASKED | SNAPSHOT_FLAG_STATE_TICKS)) !== 0) {
       throw new EncodeError(
         'range',
-        'SNAPSHOT_FLAG_MASKED: the bounded encoder writes whole records',
+        'SNAPSHOT_FLAG_MASKED, SNAPSHOT_FLAG_STATE_TICKS: the bounded encoder writes whole records',
       );
     }
     writeUpdates(tail, registry, s.updates);
     writeCount16(tail, s.destroys.length, 'destroys');
-    for (const e of s.destroys) tail.u32(e);
+    let destroyed = ENTITY_NONE;
+    for (const e of s.destroys) destroyed = writeEntity(tail, e, destroyed);
 
     writeSnapshotHeader(w, s.header);
     const regionCount = s.regions.length;
@@ -228,9 +273,10 @@ export function encodeSnapshotBounded(
     if (s.creates.length > 65535)
       throw new EncodeError('count', `${s.creates.length} creates > 65535`);
     const countOffset = w.reserveU16();
+    let previous = ENTITY_NONE;
     for (const c of s.creates) {
       if (w.length - start + tail.length >= softLimitBytes) break;
-      w.u32(c.entity);
+      previous = writeEntity(w, c.entity, previous);
       if (c.regionIdx !== REGION_IDX_NONE && !(c.regionIdx >= 0 && c.regionIdx < regionCount)) {
         throw new EncodeError('range', `regionIdx ${c.regionIdx} outside the region table`);
       }
@@ -285,8 +331,9 @@ function writeComponents(
 
 function writeUpdates(w: ByteWriter, registry: SchemaRegistry, updates: SnapshotUpdate[]): void {
   writeCount16(w, updates.length, 'updates');
+  let previous = ENTITY_NONE;
   for (const u of updates) {
-    w.u32(u.entity);
+    previous = writeEntity(w, u.entity, previous);
     writeComponents(w, registry, u.components);
     if (u.removed.length > 255) throw new EncodeError('count', `${u.removed.length} removed > 255`);
     w.u8(u.removed.length);

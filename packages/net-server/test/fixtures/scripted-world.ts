@@ -108,6 +108,7 @@ class ScriptedStore implements SnapshotStore {
 export class ScriptedWorld implements SnapshotSource {
   readonly registry: SchemaRegistry;
   relevance: ((e: EntityId) => boolean) | undefined = undefined;
+  withheld: ((e: EntityId) => ReadonlySet<number> | undefined) | undefined = undefined;
   private readonly stores: ScriptedStore[];
   private readonly alive = new Set<EntityId>();
   private readonly dead = new Set<EntityId>();

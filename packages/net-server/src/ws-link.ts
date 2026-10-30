@@ -1,6 +1,6 @@
 import type { Server as HttpServer } from 'node:http';
 import { MAX_FRAME_BYTES } from '@conduit/protocol';
-import { type RawData, WebSocket, WebSocketServer } from 'ws';
+import { type PerMessageDeflateOptions, type RawData, WebSocket, WebSocketServer } from 'ws';
 import { CloseCode, WS_CLOSE_TIMEOUT_MS } from './constants.ts';
 import { QueuedLinkBase } from './link.ts';
 
@@ -54,6 +54,10 @@ export class WsLink extends QueuedLinkBase {
     this.socket.send(buf, { binary: true });
   }
 
+  /**
+   * `socket.bufferedAmount`: bytes in the socket's write buffer, which are wire bytes (compressed
+   * when permessage-deflate is on), plus frames still waiting for zlib at their own size.
+   */
   bufferedAmount(): number {
     return this.socket.bufferedAmount;
   }
@@ -78,6 +82,61 @@ export class WsLink extends QueuedLinkBase {
   }
 }
 
+/**
+ * permessage-deflate (RFC 7692) on Session sockets (docs/net.md A.2), with context takeover both
+ * ways: each message is compressed against those before it, which is what makes a snapshot, much
+ * like the last, compress well. `ws` then compresses every message, however small.
+ */
+export interface WsCompressionOptions {
+  /** zlib level, 0..9. Default 3. */
+  level?: number | undefined;
+  /** zlib memLevel, 1..9. Default 8. */
+  memLevel?: number | undefined;
+  /** The server's window, 2^windowBits bytes (`server_max_window_bits`), 9..15. Default 15. */
+  windowBits?: number | undefined;
+  /**
+   * The window asked of clients that offer `client_max_window_bits` (browsers do), 9..15; a client
+   * that does not offer it keeps 15. Default: not asked, the client's own.
+   */
+  clientWindowBits?: number | undefined;
+}
+
+/** `WsCompressionOptions` defaults; why each, docs/net.md A.2. */
+export const DEFAULT_WS_COMPRESSION: Readonly<{
+  level: number;
+  memLevel: number;
+  windowBits: number;
+}> = Object.freeze({ level: 3, memLevel: 8, windowBits: 15 });
+
+function bounded(name: string, value: number, min: number, max: number): number {
+  if (!Number.isInteger(value) || value < min || value > max)
+    throw new RangeError(`compression.${name} must be an integer in ${min}..${max}`);
+  return value;
+}
+
+/**
+ * `ws`'s `perMessageDeflate` for `compression` (`WsServerOptions.compression`): `false` for
+ * `false`/`undefined`, else `DEFAULT_WS_COMPRESSION` overridden by what `compression` gives.
+ * `RangeError` for a value out of range.
+ */
+export function wsPerMessageDeflate(
+  compression: boolean | WsCompressionOptions | undefined,
+): false | PerMessageDeflateOptions {
+  if (compression === undefined || compression === false) return false;
+  const given = compression === true ? {} : compression;
+  const d = DEFAULT_WS_COMPRESSION;
+  const options: PerMessageDeflateOptions = {
+    zlibDeflateOptions: {
+      level: bounded('level', given.level ?? d.level, 0, 9),
+      memLevel: bounded('memLevel', given.memLevel ?? d.memLevel, 1, 9),
+    },
+    serverMaxWindowBits: bounded('windowBits', given.windowBits ?? d.windowBits, 9, 15),
+  };
+  if (given.clientWindowBits !== undefined)
+    options.clientMaxWindowBits = bounded('clientWindowBits', given.clientWindowBits, 9, 15);
+  return options;
+}
+
 export interface WsServerOptions {
   /** Default 0 (ephemeral). Ignored when `server` is given. */
   port?: number | undefined;
@@ -85,11 +144,16 @@ export interface WsServerOptions {
   /** Attach to an existing HTTP server instead of listening on `port`. */
   server?: HttpServer | undefined;
   path?: string | undefined;
+  /**
+   * permessage-deflate for clients that offer it (browsers and `ws` do): `true` for
+   * `DEFAULT_WS_COMPRESSION`, or options. Default `false`: frames go as they are.
+   */
+  compression?: boolean | WsCompressionOptions | undefined;
 }
 
 /**
- * A `ws` server for Session links: `perMessageDeflate` off (so `bufferedAmount` reflects real bytes
- * and no CPU is spent compressing quantized data) and `maxPayload` = `MAX_FRAME_BYTES`.
+ * A `ws` server for Session links: `maxPayload` = `MAX_FRAME_BYTES` (of the inflated message when
+ * compressed), and `perMessageDeflate` off unless `compression` (docs/net.md A.2).
  */
 export function createWsServer(opts: WsServerOptions = {}): WebSocketServer {
   const listen =
@@ -97,7 +161,7 @@ export function createWsServer(opts: WsServerOptions = {}): WebSocketServer {
   return new WebSocketServer({
     ...listen,
     path: opts.path,
-    perMessageDeflate: false,
+    perMessageDeflate: wsPerMessageDeflate(opts.compression),
     maxPayload: MAX_FRAME_BYTES,
   });
 }

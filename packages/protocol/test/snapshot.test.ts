@@ -112,19 +112,19 @@ const FIXTURE = [
   '02 72 30', //    20 'r0'
   '02 72 31', //    23 'r1'
   '01 00', //       26 createCount 1
-  '05 00 00 00', // 28 entity 5
-  '01', //          32 regionIdx 1
-  '02', //          33 compCount 2
-  '00 64', //       34 compId 0 (Hp) | hp 100
-  '01 fe ff 2c 01', // 36 compId 1 (Pos) | x -2 | y 300
-  '01 00', //       41 updateCount 1
-  '03 00 00 00', // 43 entity 3
-  '01', //          47 compCount 1
-  '03 02 68 69', // 48 compId 3 (Tag) | label 'hi'
-  '01', //          52 removedCount 1
-  '01', //          53 removed compId 1 (Pos)
-  '01 00', //       54 destroyCount 1
-  '09 00 00 00', // 56 entity 9
+  '04', //          28 entity 5: the gap from ENTITY_NONE, less 1
+  '01', //          29 regionIdx 1
+  '02', //          30 compCount 2
+  '00 64', //       31 compId 0 (Hp) | hp 100
+  '01 fe ff 2c 01', // 33 compId 1 (Pos) | x -2 | y 300
+  '01 00', //       38 updateCount 1
+  '02', //          40 entity 3 (each list starts from ENTITY_NONE)
+  '01', //          41 compCount 1
+  '03 02 68 69', // 42 compId 3 (Tag) | label 'hi'
+  '01', //          46 removedCount 1
+  '01', //          47 removed compId 1 (Pos)
+  '01 00', //       48 destroyCount 1
+  '08', //          50 entity 9
 ].join(' ');
 
 function patched(offset: number, value: number): Uint8Array {
@@ -201,25 +201,25 @@ const MASKED_FIXTURE = [
   '01', //          19 regionCount 1
   '02 72 30', //    20 'r0'
   '01 00', //       23 createCount 1
-  '05 00 00 00', // 25 entity 5
-  '00', //          29 regionIdx 0
-  '01', //          30 compCount 1
-  '00 64 fe ff 2c 01 02 68 69', // 31 compId 0 (Body), a create: no mask | hp 100 | pos -2, 300 | 'hi'
-  '02 00', //       40 updateCount 2
-  '03 00 00 00', // 42 entity 3
-  '03', //          46 compCount 3
-  '00 05 07 02 6f 6b', // 47 compId 0 (Body) | u8 mask 0b101 (hp, label) | hp 7 | label 'ok'
-  '01 00', //       53 compId 1 (Flag, no fields) | u8 mask 0
-  '03 00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f 10', // 55 compId 3 (Huge): no mask | h0-h16
-  '00', //          73 removedCount 0
-  '04 00 00 00', // 74 entity 4
-  '02', //          78 compCount 2
-  '00 00', //       79 compId 0 (Body) | u8 mask 0: no field bytes
-  '02 01 09 09 34 12 ff', // 81 compId 2 (Grid) | u16 mask 0x0901 (g0, g8, g11) | 9 | 0x1234 | 255
-  '01', //          88 removedCount 1
-  '01', //          89 removed compId 1 (Flag)
-  '01 00', //       90 destroyCount 1
-  '09 00 00 00', // 92 entity 9
+  '04', //          25 entity 5
+  '00', //          26 regionIdx 0
+  '01', //          27 compCount 1
+  '00 64 fe ff 2c 01 02 68 69', // 28 compId 0 (Body), a create: no mask | hp 100 | pos -2, 300 | 'hi'
+  '02 00', //       37 updateCount 2
+  '02', //          39 entity 3
+  '03', //          40 compCount 3
+  '00 05 07 02 6f 6b', // 41 compId 0 (Body) | u8 mask 0b101 (hp, label) | hp 7 | label 'ok'
+  '01 00', //       47 compId 1 (Flag, no fields) | u8 mask 0
+  '03 00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f 10', // 49 compId 3 (Huge): no mask | h0-h16
+  '00', //          67 removedCount 0
+  '00', //          68 entity 4: 3 + 1 + 0
+  '02', //          69 compCount 2
+  '00 00', //       70 compId 0 (Body) | u8 mask 0: no field bytes
+  '02 01 09 09 34 12 ff', // 72 compId 2 (Grid) | u16 mask 0x0901 (g0, g8, g11) | 9 | 0x1234 | 255
+  '01', //          79 removedCount 1
+  '01', //          80 removed compId 1 (Flag)
+  '01 00', //       81 destroyCount 1
+  '08', //          83 entity 9
 ].join(' ');
 
 function patchedMasked(offset: number, value: number): Uint8Array {
@@ -233,7 +233,7 @@ describe('Snapshot codec', () => {
     const w = new ByteWriter();
     encodeSnapshot(w, registry, data);
     expect(hex(w.view())).toBe(FIXTURE);
-    expect(w.length).toBe(60);
+    expect(w.length).toBe(51);
   });
 
   it('round-trips through a registry', () => {
@@ -278,52 +278,52 @@ describe('Snapshot codec', () => {
 
   it('accepts REGION_IDX_NONE for a create without a region', () => {
     expect(REGION_IDX_NONE).toBe(255);
-    const decoded = decodeSnapshot(new ByteReader(patched(32, 0xff)), registry);
+    const decoded = decodeSnapshot(new ByteReader(patched(29, 0xff)), registry);
     expect(decoded.creates[0]?.regionIdx).toBe(REGION_IDX_NONE);
   });
 
   it('rejects a compId that is not a replicated component with unknown', () => {
-    expect(decodeErr(() => decodeSnapshot(new ByteReader(patched(34, 2)), registry))).toEqual({
+    expect(decodeErr(() => decodeSnapshot(new ByteReader(patched(31, 2)), registry))).toEqual({
       code: 'unknown',
-      offset: 34,
+      offset: 31,
     }); // Secret is not replicated
-    expect(decodeErr(() => decodeSnapshot(new ByteReader(patched(36, 9)), registry))).toEqual({
+    expect(decodeErr(() => decodeSnapshot(new ByteReader(patched(33, 9)), registry))).toEqual({
       code: 'unknown',
-      offset: 36,
+      offset: 33,
     }); // no component 9
-    expect(decodeErr(() => decodeSnapshot(new ByteReader(patched(48, 4)), registry))).toEqual({
+    expect(decodeErr(() => decodeSnapshot(new ByteReader(patched(42, 4)), registry))).toEqual({
       code: 'unknown',
-      offset: 48,
+      offset: 42,
     });
-    expect(decodeErr(() => decodeSnapshot(new ByteReader(patched(53, 2)), registry))).toEqual({
+    expect(decodeErr(() => decodeSnapshot(new ByteReader(patched(47, 2)), registry))).toEqual({
       code: 'unknown',
-      offset: 53,
+      offset: 47,
     }); // removed id
   });
 
   it('rejects a bad regionIdx with range', () => {
-    expect(decodeErr(() => decodeSnapshot(new ByteReader(patched(32, 2)), registry))).toEqual({
+    expect(decodeErr(() => decodeSnapshot(new ByteReader(patched(29, 2)), registry))).toEqual({
       code: 'range',
-      offset: 32,
+      offset: 29,
     }); // regionCount is 2
-    expect(decodeErr(() => decodeSnapshot(new ByteReader(patched(32, 254)), registry))).toEqual({
+    expect(decodeErr(() => decodeSnapshot(new ByteReader(patched(29, 254)), registry))).toEqual({
       code: 'range',
-      offset: 32,
+      offset: 29,
     });
   });
 
   it('reports component schema errors and truncation', () => {
     // Tag label length 9 > str(8) max
-    expect(decodeErr(() => decodeSnapshot(new ByteReader(patched(49, 9)), registry))).toEqual({
+    expect(decodeErr(() => decodeSnapshot(new ByteReader(patched(43, 9)), registry))).toEqual({
       code: 'length',
-      offset: 49,
+      offset: 43,
     });
     const bytes = fromHex(FIXTURE);
     expect(
-      decodeErr(() => decodeSnapshot(new ByteReader(bytes.subarray(0, 58)), registry)),
+      decodeErr(() => decodeSnapshot(new ByteReader(bytes.subarray(0, 50)), registry)),
     ).toEqual({
       code: 'eof',
-      offset: 56,
+      offset: 50,
     });
     expect(
       decodeErr(() => decodeSnapshot(new ByteReader(bytes.subarray(0, 10)), registry)),
@@ -399,6 +399,83 @@ describe('Snapshot codec', () => {
       ),
     ).toBe('none');
   });
+
+  it('writes each entity as its gap from the one before, so ids must strictly ascend', () => {
+    const at = (entity: number) => ({ entity, regionIdx: REGION_IDX_NONE, components: [] });
+    // Generation 3 of slot 2 (docs/sim.md 2.1) after slot 1: one large gap, then small ones.
+    const gen3 = (3 << 20) | 2;
+    const s: SnapshotData = {
+      header: { ...header, flags: 0 },
+      regions: [],
+      creates: [at(1), at(2), at(130), at(gen3)],
+      updates: [],
+      destroys: [0xffffffff],
+    };
+    const w = new ByteWriter();
+    encodeSnapshot(w, registry, s);
+    expect(hex(w.view().subarray(19))).toBe(
+      [
+        '00 04 00', // regionCount 0 | createCount 4
+        '00 ff 00', // entity 1 | REGION_IDX_NONE | compCount 0
+        '00 ff 00', // entity 2: gap 0
+        '7f ff 00', // entity 130: 2 + 1 + 127
+        'ff fe bf 01 ff 00', // entity 0x300002: 130 + 1 + 3145599 (3-byte varuint)
+        '00 00 01 00', // updateCount 0 | destroyCount 1
+        'fe ff ff ff 0f', // entity 0xffffffff: the widest gap, 5 bytes
+      ].join(' '),
+    );
+    expect(decodeSnapshot(new ByteReader(w.view()), registry)).toEqual(s);
+    w.reset();
+    w.u8(0xee);
+    for (const creates of [[at(0)], [at(2), at(2)], [at(3), at(2)], [at(1.5)], [at(2 ** 32)]])
+      expect(encodeErr(() => encodeSnapshot(w, registry, { ...s, creates }))).toBe('range');
+    for (const destroys of [[0], [9, 9], [9, 3]])
+      expect(encodeErr(() => encodeSnapshot(w, registry, { ...s, destroys }))).toBe('range');
+    expect(w.length).toBe(1);
+    // A gap past 2^32 - 1 in any list: 0xffffffff, then one more.
+    const beyond = fromHex(`${hex(fromHex(FIXTURE).subarray(0, 48))} 02 00 fe ff ff ff 0f 00`);
+    expect(decodeErr(() => decodeSnapshot(new ByteReader(beyond), registry))).toEqual({
+      code: 'range',
+      offset: 55,
+    });
+  });
+
+  it('writes STATE_TICKS stamps as their age, serverTick - stateTick', () => {
+    const s: SnapshotData = {
+      header: { ...header, flags: SNAPSHOT_FLAG_STATE_TICKS },
+      regions: [],
+      creates: [{ entity: 4, stateTick: 300, regionIdx: REGION_IDX_NONE, components: [] }],
+      updates: [
+        { entity: 2, stateTick: 172, components: [], removed: [] },
+        { entity: 3, stateTick: 0, components: [], removed: [] },
+      ],
+      destroys: [],
+    };
+    const w = new ByteWriter();
+    encodeSnapshot(w, registry, s);
+    expect(hex(w.view().subarray(19))).toBe(
+      [
+        '00 01 00', // regionCount 0 | createCount 1
+        '03 00 ff 00', // entity 4 | age 0 | REGION_IDX_NONE | compCount 0
+        '02 00', // updateCount 2
+        '01 80 01 00 00', // entity 2 | age 128 (2-byte varuint) | compCount 0 | removedCount 0
+        '00 ac 02 00 00', // entity 3 | age 300: tick 0
+        '00 00', // destroyCount 0
+      ].join(' '),
+    );
+    expect(decodeSnapshot(new ByteReader(w.view()), registry)).toEqual(s);
+    // An age above serverTick would put the stamp before tick 0.
+    const bytes = new Uint8Array(w.view());
+    bytes[34] = 0xad; // entity 3's age: 301
+    expect(decodeErr(() => decodeSnapshot(new ByteReader(bytes), registry))).toEqual({
+      code: 'range',
+      offset: 34,
+    });
+    for (const stateTick of [301, -1, 1.5]) {
+      const later = { ...s, creates: [{ ...s.creates[0]!, stateTick }] };
+      expect(encodeErr(() => encodeSnapshot(new ByteWriter(), registry, later))).toBe('range');
+    }
+  });
 });
 
 describe('Snapshot field masks', () => {
@@ -408,7 +485,7 @@ describe('Snapshot field masks', () => {
     const w = new ByteWriter();
     encodeSnapshot(w, maskedRegistry, maskedData);
     expect(hex(w.view())).toBe(MASKED_FIXTURE);
-    expect(w.length).toBe(96);
+    expect(w.length).toBe(84);
   });
 
   it('decodes a masked record to its mask and exactly the flagged fields', () => {
@@ -458,23 +535,23 @@ describe('Snapshot field masks', () => {
         '02', //          18 flags MASKED
         '00 00 00', //    19 regionCount 0 | createCount 0
         '01 00', //       22 updateCount 1
-        '01 00 00 00', // 24 entity 1
-        '02', //          28 compCount 2
-        '00 00', //       29 compId 0 (Body) | u8 mask 0
-        '02 00 00', //    31 compId 2 (Grid) | u16 mask 0
-        '00 00 00', //    34 removedCount 0 | destroyCount 0
+        '00', //          24 entity 1
+        '02', //          25 compCount 2
+        '00 00', //       26 compId 0 (Body) | u8 mask 0
+        '02 00 00', //    28 compId 2 (Grid) | u16 mask 0
+        '00 00 00', //    31 removedCount 0 | destroyCount 0
       ].join(' '),
     );
-    expect(w.length).toBe(37);
+    expect(w.length).toBe(34);
     expect(decodeSnapshot(new ByteReader(w.view()), maskedRegistry)).toStrictEqual(zero);
   });
 
   it('keeps creates whole in a MASKED snapshot', () => {
-    // offsets 19-39 (region table and the create) are the same bytes with the flag off
+    // offsets 19-36 (region table and the create) are the same bytes with the flag off
     const unmasked = new ByteWriter();
     encodeSnapshot(unmasked, maskedRegistry, { ...maskedData, header, updates: [], destroys: [] });
-    expect(hex(unmasked.view().subarray(19, 40))).toBe(
-      hex(fromHex(MASKED_FIXTURE).subarray(19, 40)),
+    expect(hex(unmasked.view().subarray(19, 37))).toBe(
+      hex(fromHex(MASKED_FIXTURE).subarray(19, 37)),
     );
 
     const w = new ByteWriter();
@@ -493,15 +570,15 @@ describe('Snapshot field masks', () => {
   it('rejects unknown mask bits at the mask offset, and on encode', () => {
     const at = (offset: number, value: number): ReturnType<typeof decodeErr> =>
       decodeErr(() => decodeSnapshot(new ByteReader(patchedMasked(offset, value)), maskedRegistry));
-    expect(at(48, 0x08)).toEqual({ code: 'range', offset: 48 }); // Body has 3 fields: bit 3
-    expect(at(48, 0x87)).toEqual({ code: 'range', offset: 48 });
-    expect(at(54, 0x01)).toEqual({ code: 'range', offset: 54 }); // Flag has none: only 0
-    expect(at(83, 0x19)).toEqual({ code: 'range', offset: 82 }); // Grid has 12: bit 12 of the u16
-    expect(at(83, 0x89)).toEqual({ code: 'range', offset: 82 }); // bit 15
-    const truncated = fromHex(MASKED_FIXTURE).subarray(0, 83); // half of Grid's u16 mask
+    expect(at(42, 0x08)).toEqual({ code: 'range', offset: 42 }); // Body has 3 fields: bit 3
+    expect(at(42, 0x87)).toEqual({ code: 'range', offset: 42 });
+    expect(at(48, 0x01)).toEqual({ code: 'range', offset: 48 }); // Flag has none: only 0
+    expect(at(74, 0x19)).toEqual({ code: 'range', offset: 73 }); // Grid has 12: bit 12 of the u16
+    expect(at(74, 0x89)).toEqual({ code: 'range', offset: 73 }); // bit 15
+    const truncated = fromHex(MASKED_FIXTURE).subarray(0, 74); // half of Grid's u16 mask
     expect(decodeErr(() => decodeSnapshot(new ByteReader(truncated), maskedRegistry))).toEqual({
       code: 'eof',
-      offset: 82,
+      offset: 73,
     });
 
     const w = new ByteWriter();
@@ -575,10 +652,10 @@ describe('Snapshot field masks', () => {
       HEADER_HEX, //                                  0
       '00', //                                        18 flags 0
       '00 00 00 01 00', //                            19 regionCount 0 | createCount 0 | updateCount 1
-      '03 00 00 00 02', //                            24 entity 3 | compCount 2
-      '00 07 01 00 02 00 02 6f 6b', //                29 Body: hp 7 | pos 1, 2 | label 'ok'
-      '02 01 02 03 04 05 06 07 08 09 00 0a 0b 0c', // 38 Grid: g0-g7 1-8 | g8 9 (u16) | g9-g11 10-12
-      '00 00 00', //                                  52 removedCount 0 | destroyCount 0
+      '02 02', //                                     24 entity 3 | compCount 2
+      '00 07 01 00 02 00 02 6f 6b', //                26 Body: hp 7 | pos 1, 2 | label 'ok'
+      '02 01 02 03 04 05 06 07 08 09 00 0a 0b 0c', // 35 Grid: g0-g7 1-8 | g8 9 (u16) | g9-g11 10-12
+      '00 00 00', //                                  49 removedCount 0 | destroyCount 0
     ].join(' ');
     const w = new ByteWriter();
     encodeSnapshot(w, maskedRegistry, whole);
@@ -599,10 +676,10 @@ describe('Snapshot field masks', () => {
       HEADER_HEX, //                                        0
       '02', //                                              18 flags MASKED
       '00 00 00 01 00', //                                  19
-      '03 00 00 00 02', //                                  24
-      '00 07 07 01 00 02 00 02 6f 6b', //                   29 Body | u8 mask 0b111 | fields
-      '02 ff 0f 01 02 03 04 05 06 07 08 09 00 0a 0b 0c', // 39 Grid | u16 mask 0x0fff | fields
-      '00 00 00', //                                        55
+      '02 02', //                                           24
+      '00 07 07 01 00 02 00 02 6f 6b', //                   26 Body | u8 mask 0b111 | fields
+      '02 ff 0f 01 02 03 04 05 06 07 08 09 00 0a 0b 0c', // 36 Grid | u16 mask 0x0fff | fields
+      '00 00 00', //                                        52
     ].join(' ');
     w.reset();
     encodeSnapshot(w, maskedRegistry, { ...whole, header: maskedHeader });

@@ -134,8 +134,15 @@ class RefReplica {
   }
 }
 
-/** Server truth for `interest`, quantized through the wire codec like the replica's values. */
-function truth(world: ScriptedWorld, interest: string[]): ReturnType<RefReplica['live']> {
+/**
+ * Server truth for `interest`, quantized through the wire codec like the replica's values, less
+ * what `withheld` withholds.
+ */
+function truth(
+  world: ScriptedWorld,
+  interest: string[],
+  withheld?: (e: EntityId) => ReadonlySet<number> | undefined,
+): ReturnType<RefReplica['live']> {
   const out: ReturnType<RefReplica['live']> = [];
   const entities = interest.flatMap((r) => world.entitiesIn(r)).sort((a, b) => a - b);
   for (const e of entities) {
@@ -143,7 +150,7 @@ function truth(world: ScriptedWorld, interest: string[]): ReturnType<RefReplica[
     for (const def of registry.replicated) {
       const id = registry.componentId(def);
       const store = world.store(id);
-      if (!store.has(e)) continue;
+      if (!store.has(e) || withheld?.(e)?.has(id) === true) continue;
       const w = new ByteWriter();
       def.schema.encode(w, store.read(e));
       comps.push([id, def.schema.decode(new ByteReader(w.finish()))]);
@@ -413,6 +420,52 @@ describe('delta-equals-full under seeded random churn', () => {
     }
   }
 
+  it.each([4, 5, 6])(
+    'seed %i: with components withheld and given back as it runs, deltas equal the filtered truth and a FULL build',
+    (seed) => {
+      const timeline = randomTimeline(seed, 600);
+      const world = new ScriptedWorld();
+      const rs = newReplicationState();
+      const rng = new Rng(seed * 7919);
+      const filters = [new Set([O]), new Set([N, M]), new Set([T, O])];
+      const choice = new Map<EntityId, ReadonlySet<number>>();
+      const withheld = (e: EntityId): ReadonlySet<number> | undefined => choice.get(e);
+      world.withheld = withheld;
+      const replica = new RefReplica();
+      const replicaWorld = newReplicaWorld();
+      const byTick = new Map(timeline.ticks.map((t) => [t.tick, t]));
+      let interest = [...timeline.interest];
+      let changes = 0;
+      for (let tick = 1; tick <= 600; tick++) {
+        const entry = byTick.get(tick);
+        if (entry?.interest !== undefined) interest = [...entry.interest];
+        for (const op of entry?.ops ?? []) world.apply(tick, op);
+        if (tick % timeline.snapshotEvery !== 0) continue;
+        for (const e of interest.flatMap((r) => world.entitiesIn(r))) {
+          if (rng.int(0, 7) !== 0) continue;
+          changes++;
+          const pick = rng.int(0, 3);
+          if (pick === 3) choice.delete(e);
+          else choice.set(e, filters[pick]!);
+        }
+        const delta = buildSnapshot(world, rs, interest, tick, timelineHeader(tick));
+        const decoded = wire(delta);
+        replica.apply(decoded);
+        replicaWorld.applySnapshot(decoded);
+        const expected = truth(world, interest, withheld);
+        expect(replica.live(), `seed ${seed} tick ${tick}`).toEqual(expected);
+        expect(replicaLive(replicaWorld), `seed ${seed} tick ${tick}`).toEqual(expected);
+        const fresh = newReplicaWorld();
+        fresh.applySnapshot(
+          wire(buildSnapshot(world, newReplicationState(), interest, tick, timelineHeader(tick))),
+        );
+        expect(replicaLive(fresh), `seed ${seed} tick ${tick} (FULL)`).toEqual(expected);
+        commitSnapshot(rs, delta, delta.creates.length);
+      }
+      expect(changes).toBeGreaterThan(100);
+    },
+  );
+
   it.each([1, 2, 3])('seed %i: 600 ticks, compared at every snapshot tick', (seed) => {
     const timeline = randomTimeline(seed, 600);
     const replica = new RefReplica();
@@ -526,6 +579,79 @@ describe('buildSnapshot rules', () => {
     const data = buildSnapshot(src, newReplicationState(), ['x'], 3, HDR);
     expect(data.creates[0]?.regionIdx).toBe(REGION_IDX_NONE);
     expect(data.regions).toEqual([]);
+  });
+});
+
+describe('withheld components (docs/net.md A.8.4)', () => {
+  function world(ops: TimelineOp[], tick = 1): ScriptedWorld {
+    const w = new ScriptedWorld();
+    for (const op of ops) w.apply(tick, op);
+    return w;
+  }
+
+  it('leaves them out; one that becomes withheld is removed, one that stops being withheld comes whole', () => {
+    const w = world([
+      spawn(1, 'a', { Owner: { player: 0 }, Name: { value: 'one' } }),
+      spawn(2, 'a', { Owner: { player: 1 } }),
+    ]);
+    let hidden: ReadonlySet<number> | undefined = new Set([O]);
+    w.withheld = (e) => (e === 1 ? hidden : undefined);
+    const rs = newReplicationState();
+    const first = buildSnapshot(w, rs, ['a'], 3, HDR);
+    expect(shapeOf(first).creates).toEqual([
+      [1, 'a', [N, R, T]],
+      [2, 'a', [O, R, T]],
+    ]);
+    commitSnapshot(rs, first, 2);
+    expect(rs.withheld).toEqual(new Map([[1, new Set([O])]]));
+    // Written while withheld: nothing goes.
+    w.apply(4, { op: 'set', entity: 1, component: 'Owner', value: { player: 2 } });
+    const second = buildSnapshot(w, rs, ['a'], 6, HDR);
+    expect(second.updates).toEqual([]);
+    commitSnapshot(rs, second, 0);
+    // No longer withheld: the client has no value of it, so it goes whole, written or not.
+    hidden = undefined;
+    const third = buildSnapshot(w, rs, ['a'], 9, HDR);
+    expect(shapeOf(third).updates).toEqual([[1, [O], []]]);
+    expect(third.updates[0]?.components[0]?.value).toEqual({ player: 2 });
+    commitSnapshot(rs, third, 0);
+    expect(rs.withheld?.size).toBe(0);
+    // Becomes withheld: removed on the client, once.
+    hidden = new Set([N]);
+    const fourth = buildSnapshot(w, rs, ['a'], 12, HDR);
+    expect(shapeOf(fourth).updates).toEqual([[1, [], [N]]]);
+    commitSnapshot(rs, fourth, 0);
+    expect(buildSnapshot(w, rs, ['a'], 15, HDR).updates).toEqual([]);
+    // Removed from the store while withheld: the client does not have it, so no removal.
+    w.apply(16, { op: 'remove', entity: 1, component: 'Name' });
+    expect(buildSnapshot(w, rs, ['a'], 18, HDR).updates).toEqual([]);
+    // A FULL starts over with what is not withheld.
+    rs.fullNext = true;
+    hidden = new Set([O, T]);
+    const full = buildSnapshot(w, rs, ['a'], 21, HDR);
+    expect(shapeOf(full).creates).toEqual([
+      [1, 'a', [R]],
+      [2, 'a', [O, R, T]],
+    ]);
+  });
+
+  it('forgets an entity that leaves interest, and keeps nothing for a create that was not sent', () => {
+    const w = world([
+      spawn(1, 'a', { Owner: { player: 0 } }),
+      spawn(2, 'a', { Owner: { player: 0 } }),
+    ]);
+    const hidden = new Set([O]);
+    w.withheld = () => hidden;
+    const rs = newReplicationState();
+    const first = buildSnapshot(w, rs, ['a'], 3, HDR);
+    commitSnapshot(rs, first, 1); // entity 2's create deferred
+    expect([...(rs.withheld?.keys() ?? [])]).toEqual([1]);
+    w.apply(4, { op: 'set', entity: 1, component: 'Region', value: { id: 'b' } });
+    const second = buildSnapshot(w, rs, ['a'], 6, HDR);
+    expect(second.destroys).toEqual([1]);
+    expect(shapeOf(second).creates).toEqual([[2, 'a', [R, T]]]);
+    commitSnapshot(rs, second, 1);
+    expect([...(rs.withheld?.keys() ?? [])]).toEqual([2]);
   });
 });
 

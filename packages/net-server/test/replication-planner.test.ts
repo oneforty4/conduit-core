@@ -1,6 +1,10 @@
 import { PredictionDriver, ReplicaWorld, type ReconcileView } from '@conduit/net-client';
 import {
+  ByteReader,
+  ByteWriter,
+  decodeSnapshot,
   defineInput,
+  encodeSnapshot,
   f,
   SchemaRegistry,
   SNAPSHOT_FLAG_MASKED,
@@ -41,6 +45,115 @@ function setup(count = 3, component: ComponentType<unknown> = Value) {
 const header = { serverTimeMs: 0, lastInputSeq: 0, lastInputTick: 0 };
 const update = (snapshot: SnapshotData, entity: number) =>
   snapshot.updates.find((record) => record.entity === entity);
+
+describe('withheld components in the planner (docs/net.md A.8.4)', () => {
+  const Secret = defineComponent('Secret', { aim: f.u16 });
+  function twoComponents() {
+    const registry = new SchemaRegistry({
+      components: [Value, Secret],
+      messages: [],
+      events: [],
+      input: defineInput({ tick: f.u32 }),
+    });
+    const world = new World(registry);
+    const [mine, theirs] = [world.create(), world.create()] as [number, number];
+    for (const entity of [mine, theirs]) {
+      world.add(entity, Value);
+      world.add(entity, Secret, { aim: entity });
+    }
+    let hidden = true;
+    const secretId = registry.componentId(Secret);
+    const source: SnapshotSource = {
+      registry,
+      entitiesIn: () => world.query(),
+      regionOf: () => null,
+      entityAlive: (entity) => world.alive(entity),
+      store: (id) => world.stores()[id]!,
+      slot: (entity) => entity & 0xfffff,
+      withheld: (entity) => (entity === theirs && hidden ? new Set([secretId]) : undefined),
+    };
+    const state: ReplicationState = { known: new Set(), baselineTick: 0, fullNext: true };
+    const replica = new ReplicaWorld(registry, [Value, Secret], { tickRate: 60, snapshotEvery: 1 });
+    const send = (data: SnapshotData): SnapshotData => {
+      const w = new ByteWriter();
+      encodeSnapshot(w, registry, data);
+      const decoded = decodeSnapshot(new ByteReader(w.view()), registry);
+      replica.applySnapshot(decoded);
+      return decoded;
+    };
+    world.tick = 1;
+    return {
+      world,
+      mine,
+      theirs,
+      source,
+      state,
+      replica,
+      send,
+      secretId,
+      reveal: (value: boolean) => (hidden = !value),
+    };
+  }
+
+  it('leaves it out, removes it when it becomes withheld and sends it whole when it stops', () => {
+    const t = twoComponents();
+    const planner = new ReplicationPlanner({ heartbeatTicks: 1000 });
+    let prepared = planner.prepare(t.source, t.state, ['r'], 1, header, 1000, 10000);
+    const first = t.send(prepared.data);
+    prepared.commit();
+    const valueId = t.source.registry.componentId(Value);
+    expect(first.creates.map((c) => [c.entity, c.components.map((x) => x.id)])).toEqual([
+      [t.mine, [t.secretId, valueId].sort((a, b) => a - b)],
+      [t.theirs, [valueId]],
+    ]);
+    // A replica that never gets it reads nothing, now or as of any tick.
+    expect(t.replica.read(t.theirs, Secret)).toBeUndefined();
+    expect(t.replica.readAt(t.theirs, Secret, 1)).toBeUndefined();
+    expect(t.replica.read(t.mine, Secret)).toEqual({ aim: t.mine });
+    // Written while withheld: no record at all.
+    t.world.mutate(t.theirs, Secret, (v) => {
+      v.aim = 77;
+    });
+    prepared = planner.prepare(t.source, t.state, ['r'], 2, header, 1000, 10000);
+    expect(prepared.data.updates).toEqual([]);
+    t.send(prepared.data);
+    prepared.commit();
+    // Given back: whole (no mask), though the client has no baseline for it.
+    t.reveal(true);
+    prepared = planner.prepare(t.source, t.state, ['r'], 3, header, 1000, 10000);
+    expect(update(prepared.data, t.theirs)?.components).toEqual([
+      { id: t.secretId, value: { aim: 77 } },
+    ]);
+    t.send(prepared.data);
+    prepared.commit();
+    expect(t.replica.read(t.theirs, Secret)).toEqual({ aim: 77 });
+    // Withheld again: removed, and a coherent read before then still has it.
+    t.reveal(false);
+    prepared = planner.prepare(t.source, t.state, ['r'], 4, header, 1000, 10000);
+    expect(update(prepared.data, t.theirs)?.removed).toEqual([t.secretId]);
+    t.send(prepared.data);
+    prepared.commit();
+    expect(t.replica.read(t.theirs, Secret)).toBeUndefined();
+    expect(t.replica.readAt(t.theirs, Secret, 3)).toEqual({ aim: 77 });
+    expect(t.replica.readAt(t.theirs, Secret, 4)).toBeUndefined();
+    expect(t.replica.authoritativeTick(t.theirs)).toBe(4);
+    prepared = planner.prepare(t.source, t.state, ['r'], 5, header, 1000, 10000);
+    expect(prepared.data.updates).toEqual([]);
+  });
+
+  it('orders records by entity whatever order the groups are chosen in', () => {
+    const t = twoComponents();
+    const planner = new ReplicationPlanner({ heartbeatTicks: 1000 });
+    const prepared = planner.prepare(t.source, t.state, ['r'], 1, header, 1000, 10000, {
+      groups: [
+        { key: 'b', entities: [t.theirs] },
+        { key: 'a', entities: [t.mine] },
+      ],
+      priority: (group) => (group.key === 'b' ? 10 : 0),
+    });
+    expect(prepared.data.creates.map((c) => c.entity)).toEqual([t.mine, t.theirs]);
+  });
+});
 
 describe('per-client coherent replication planning', () => {
   it('retains stopped deferred writes across newer global baselines and ages low priority units', () => {

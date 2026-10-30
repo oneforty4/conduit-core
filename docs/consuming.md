@@ -1055,9 +1055,11 @@ install/build/CI scripts: tracking the newest branch tip bypasses this review bo
 
 Before adopting the improvements revision, check these separate migration surfaces:
 
-- Wire v4 requires coordinated server/client bundles. The `protocolVersion` declared by a game
+- Wire v5 requires coordinated server/client bundles. The `protocolVersion` declared by a game
   is separate from core's wire version. Pin simulation revisions/gameplay digests when schema
-  compatibility alone is insufficient.
+  compatibility alone is insufficient. The registry hash includes the wire version, so a game
+  that pins its `registryHash` (in a test or a recorded baseline) re-pins it; saves and exact
+  checkpoints pin `stateSchemaHash`, which the wire version does not enter.
 - Replace global definition `.id` reads with the relevant registry's `componentId`/`eventId`.
   Use scoped `world.mutate` or tracked writes, and treat read views as deeply readonly.
 - Use public `inputScheduling`/`pulseInput` and optional prediction/presentation adapters.

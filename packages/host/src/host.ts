@@ -12,6 +12,7 @@ import {
   PresenceHub,
   PURGE_INTERVAL_MS,
 } from '@conduit/lobby';
+import type { WsCompressionOptions } from '@conduit/net-server';
 import { migrate, SqliteStore } from '@conduit/persist';
 import { Hono } from 'hono';
 import { type HostConfig, type HostConfigOverrides, loadConfig } from './config.ts';
@@ -39,6 +40,8 @@ export interface HostOptions extends HostConfigOverrides {
   workerExtra?: Record<string, unknown> | undefined;
   /** Default: `Secure` cookies unless the request `Host` is localhost. */
   secureCookies?: boolean | undefined;
+  /** permessage-deflate on game sockets (`GatewayOptions.compression`). Default `false`. */
+  compression?: boolean | WsCompressionOptions | undefined;
   /** Default `consoleLogger(config.logLevel)`. */
   logger?: Logger | undefined;
   /**
@@ -137,6 +140,7 @@ export class Host {
       presence: this.presence,
       sessions: this.sessions,
       logger,
+      compression: opts.compression,
     });
 
     const routeOpts: LobbyRouteOptions = { trustProxy: config.trustProxy };

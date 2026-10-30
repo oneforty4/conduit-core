@@ -10,7 +10,7 @@ Cross-references: component definitions and `EntityId` semantics are in docs/sim
 
 | Name | Value | Meaning |
 | --- | --- | --- |
-| `WIRE_VERSION` | `4` | u8 in every frame header. Bumped only when the envelope or a core payload changes. |
+| `WIRE_VERSION` | `5` | u8 in every frame header. Bumped only when the envelope or a core payload changes (5: tickless Input frames, 9.7; varuint entity ids and state ticks in Snapshot records, 9.11). |
 | `FRAME_HEADER_BYTES` | `2` | `u8 wireVersion, u8 messageCount` |
 | `MESSAGE_HEADER_BYTES` | `9` | `u8 kind, u32 tick, u16 seq, u16 payloadLength` |
 | `MAX_MESSAGES_PER_FRAME` | `255` | u8 count |
@@ -483,7 +483,7 @@ Kinds (u8, exported as `CoreKind`):
 | --- | --- | --- | --- |
 | `Hello` | 1 | c2s | 9.1 |
 | `Ready` | 2 | c2s | empty |
-| `Input` | 3 | c2s | 9.7 |
+| `Input` | 3 | c2s | 9.7 (hand-coded) |
 | `Ack` | 4 | c2s | 9.8 |
 | `Ping` | 5 | c2s | 9.9 |
 | `RegionLoadState` | 6 | c2s | 9.10 |
@@ -499,7 +499,7 @@ Kinds (u8, exported as `CoreKind`):
 | `Kicked` | 40 | s2c | 9.13 |
 | game messages | 128–255 | per def | `defineMessage` |
 
-All non-hand-coded payloads are `defineSchema` structs and follow section 4 byte-for-byte. `CORE_MESSAGES: readonly MessageDef[]` exports each with `core: true`, in kind order; `CoreKind` holds the kinds above as a frozen `as const` object plus a same-named union type (`export type CoreKind = (typeof CoreKind)[keyof typeof CoreKind]`); the package uses no TypeScript `enum`, and `RejectReason`, `PlayerState` and `KickReason` follow the same pattern. The `Snapshot` and `Events` entries carry the placeholder schema `defineSchema({})` (descriptor `struct{}`) because their payloads are hand-coded; the `Input` entry carries `inputMessageSchema(defineInput({ tick: f.u32 }))`, which `SchemaRegistry` replaces with the game's input (section 7.1).
+All non-hand-coded payloads are `defineSchema` structs and follow section 4 byte-for-byte. `CORE_MESSAGES: readonly MessageDef[]` exports each with `core: true`, in kind order; `CoreKind` holds the kinds above as a frozen `as const` object plus a same-named union type (`export type CoreKind = (typeof CoreKind)[keyof typeof CoreKind]`); the package uses no TypeScript `enum`, and `RejectReason`, `PlayerState` and `KickReason` follow the same pattern. The `Snapshot` and `Events` entries carry the placeholder schema `defineSchema({})` (descriptor `struct{}`) because their payloads are hand-coded; the `Input` entry carries `inputMessageSchema(defineInput({ tick: f.u32 }))`, which `SchemaRegistry` replaces with the game's input (section 7.1). `inputMessageSchema` is hand-coded too (9.7), but a full `Schema`: `encode`/`decode` write and read the 9.7 bytes, and its descriptor is the payload's logical struct, `struct{firstTick:u32,frames:array(<input>,4)}`, so the registry hash still names the game's input frame.
 
 ### 9.1 Hello (c2s, kind 1)
 
@@ -535,9 +535,14 @@ invalid modes/versions/order before admission. Maximal Hello metadata plus token
 65,536 bytes (tested). Runtime senders always provide a descriptor; optional absence supports
 low-level schema-only callers during migration and never admits them to a declared session.
 
-This is a coordinated wire version 4 rollout. Endpoints with a different wire version reject
-frame headers; gateway and worker use the same version and Hello codec. Upgrade client/server/
-gateway bundles together. `protocolVersion` still identifies the consumer message contract,
+This is a coordinated wire version 5 rollout (version 5 drops the per-frame ticks of Input,
+9.7, and writes Snapshot record entity ids and state ticks as varuints, 9.11; version 4 added
+capacity admission). Endpoints with a different wire version reject frame headers: a version 4
+peer's first frame fails `readFrame` with `DecodeError('version')` and the server closes 4001,
+before any payload is read, so neither side ever misreads the other's Input or Snapshot bytes.
+The registry hash, which includes `wire=` (7.2), changes with it, so a pinned registry hash moves
+too. Gateway and worker use the same version and Hello codec. Upgrade client/server/gateway
+bundles together. `protocolVersion` still identifies the consumer message contract,
 `registryHash` identifies schemas, and the compatibility descriptor identifies declared
 simulation/data revisions. None proves that an untrusted client executes honest code.
 
@@ -591,17 +596,27 @@ sixteen-player lobby. Experimental qualification and any SQLite migration are se
 
 `defineSchema({ playerId: f.u8, entity: f.entity(), regionId: f.str(64) })`.
 
-### 9.7 Input (c2s, kind 3)
+### 9.7 Input (c2s, kind 3) — hand-coded
 
 ```ts
 export interface InputPayload<I extends InputFrameBase = InputFrameBase> { firstTick: number; frames: I[] }
-export function inputMessageSchema<I extends InputFrameBase>(input: Schema<I>): Schema<InputPayload<I>> {
-  return defineSchema({ firstTick: f.u32, frames: f.array(input.type, INPUT_FRAMES_PER_MESSAGE) });
-}
+export function inputMessageSchema<I extends InputFrameBase>(input: Schema<I>): Schema<InputPayload<I>>;   // RangeError unless input begins with tick: f.u32
 export const INPUT_FRAMES_PER_MESSAGE = 4;
+export const INPUT_FLAG_GAPS = 0x80;
 ```
 
-Layout: `u32 firstTick | u16 count (≤ 4) | InputFrame × count`. Validity (enforced by the receiver, not the codec): `count ≥ 1`, `frames[0].tick === firstTick`, `frames[i+1].tick > frames[i].tick`. The InputFrame schema comes from `defineInput` (section 10) and must begin with a `tick: f.u32` field — `tick` is the **first** field so a server can read the tick without decoding the rest.
+```
+u32 firstTick
+u8  count                 // bits 0-6: frames, 0..4 (more: DecodeError('count')); bit 7: INPUT_FLAG_GAPS
+    frame 0               // the InputFrame's fields after tick, in declaration order (section 4)
+    per later frame:
+      [varuint gap]       // only with INPUT_FLAG_GAPS
+      frame
+```
+
+A frame carries every field of the game's InputFrame but its `tick`, which the layout implies: frame 0's tick is `firstTick`, and each later frame's is the one before it plus 1 plus its gap (0 without `INPUT_FLAG_GAPS`). The sender's four frames are normally four consecutive ticks and cost no tick bytes at all; a late client wake that skipped a tick (docs/net.md B.6) sets the flag and pays a byte per later frame. Decoding gives each frame its `tick` back, as the first own key, so the application sees exactly the frames that were sent. Example: `frames` at ticks 7, 8, 10, 140 are `07 00 00 00 | 84 | f0 | 00 f1 | 01 f2 | 81 01 f3` (`fN` the frames' other fields).
+
+Encoding: more than four frames is `EncodeError('count')`; frames that do not start at `firstTick` and strictly ascend (or a tick that is not an integer in u32) are `EncodeError('range')`, since the layout cannot carry them; the writer is truncated back on any throw. Decoding: a tick past 2^32 − 1 is `DecodeError('range')` at its gap. An empty message (`count` 0) decodes; the receiver counts it as bad input (docs/net.md A.7). The InputFrame schema comes from `defineInput` (section 10) and must begin with a `tick: f.u32` field.
 
 ### 9.8 Ack (c2s, kind 4)
 
@@ -656,22 +671,24 @@ u8  regionCount                       // ≤ MAX_REGION_TABLE
     str(64) regionId × regionCount    // local table; index = position; REGION_IDX_NONE = no region
 u16 createCount
     per create:
-      u32 entity
+      varuint entity                  // gap from the previous create's id, less 1 (below)
       u8  regionIdx                   // index into table or REGION_IDX_NONE
       u8  compCount
       per component: u8 compId | component payload (registry.component(compId).schema, section 4)
 u16 updateCount
     per update:
-      u32 entity
+      varuint entity                  // gap from the previous update's id, less 1
       u8  compCount
       per component: u8 compId | payload    // MASKED: u8 compId | u8 or u16 mask | flagged fields (9.11.1)
       u8  removedCount
       u8  compId × removedCount
 u16 destroyCount
-    u32 entity × destroyCount
+    varuint entity × destroyCount     // gap from the previous destroy's id, less 1
 ```
 
-Ordering rules (producer): creates, updates and destroys each in ascending `entity` id; components within a record in ascending `compId`; region table in first-use order. Decode errors: `regionCount > MAX_REGION_TABLE` → `count`; `regionIdx ≥ regionCount && regionIdx !== REGION_IDX_NONE` → `range`; `compId` (in a component record or the removed list) not a replicated component → `unknown`; a field mask with a bit at or above the component's field count → `range` (9.11.1); anything else → the component schema's errors. Encode errors: more than `MAX_REGION_TABLE` regions, 255 components or removed ids in a record, or 65535 creates/updates/destroys → `EncodeError('count')`; a `regionIdx` outside the table, a component id that is not replicated, flag bits other than FULL, MASKED and STATE_TICKS, or a `mask` that 9.11.1 does not allow → `EncodeError('range')`; on any throw the writer is truncated back to where the snapshot started.
+**Entity ids.** Each record's entity is the varuint of its id less the previous record's id in the same list (creates, updates and destroys each start from `ENTITY_NONE`, 0) less 1; the first create of entity 5 is `04`, and entity 6 after it `00`. An `EntityId` keeps its slot in the low 20 bits and its generation above them (docs/sim.md 2.1), so a raw id of a reused slot needs 4 or 5 bytes; sorted gaps stay a byte, with one wider gap where the generation changes. Ids must therefore strictly ascend within a list, which producers already did. `writeEntity(w, entity, previous)` and `readEntity(r, previous)` (exported) are the two halves.
+
+Ordering rules (producer): creates, updates and destroys each in strictly ascending `entity` id; components within a record in ascending `compId`; region table in first-use order. Decode errors: `regionCount > MAX_REGION_TABLE` → `count`; an entity id past 2^32 − 1 → `range`; `regionIdx ≥ regionCount && regionIdx !== REGION_IDX_NONE` → `range`; `compId` (in a component record or the removed list) not a replicated component → `unknown`; a field mask with a bit at or above the component's field count → `range` (9.11.1); anything else → the component schema's errors. Encode errors: more than `MAX_REGION_TABLE` regions, 255 components or removed ids in a record, or 65535 creates/updates/destroys → `EncodeError('count')`; an entity that does not ascend from the one before it in its list (or is `ENTITY_NONE`), a `regionIdx` outside the table, a component id that is not replicated, flag bits other than FULL, MASKED and STATE_TICKS, or a `mask` that 9.11.1 does not allow → `EncodeError('range')`; on any throw the writer is truncated back to where the snapshot started.
 
 #### 9.11.1 Field masks
 
@@ -719,7 +736,7 @@ The planner compares schema-encoded fields against each client's last successful
 
 #### 9.11.2 State ticks and bounded snapshot transactions
 
-`SNAPSHOT_FLAG_STATE_TICKS = 0x04` inserts `u32 stateTick` immediately after `u32 entity` in every create and update record. Without the flag, the original record layout is unchanged. Each stamp is at most the global header tick and cannot regress below an existing entity's admitted stamp on a delta. An empty update can prove a selected dependency member's unchanged state at that tick. Deferred members retain their older stamps. Destroy records use the global transaction tick.
+`SNAPSHOT_FLAG_STATE_TICKS = 0x04` inserts `varuint stateAge` immediately after the entity in every create and update record: `serverTick − stateTick`, so a stamp at the snapshot's own tick, the common case, is one `00` byte. An age above `serverTick` is `DecodeError('range')`. Without the flag, the record layout is unchanged. Each stamp is at most the global header tick and cannot regress below an existing entity's admitted stamp on a delta. An empty update can prove a selected dependency member's unchanged state at that tick. Deferred members retain their older stamps. Destroy records use the global transaction tick.
 
 `SnapshotPart` is core kind 41. Its 21-byte prefix is `u32 id | u32 tick | u32 baselineTick | u16 index | u16 count | u32 totalBytes | u8 flags`, followed by raw snapshot bytes. Flag bit0 declares an explicit reset; other flags are invalid. Parts are ordered from zero, with consistent metadata. A new ID cannot replace a pending assembly except with explicit reset part0 and baseline0; the completed payload must then be FULL. The decoded snapshot header must match the part tick/baseline.
 
@@ -764,7 +781,7 @@ Validation (throws `RangeError` with the offending name):
 - `direction ∈ {'c2s','s2c','both'}`.
 - `fields` passes `f.struct` validation. Empty is allowed.
 - `defineEvent`: `replicate` defaults to `false`. Non-replicated events never appear on the wire but still receive ids (section 7.1) so the sim's `EventBus` (docs/sim.md) uses one id space.
-- `defineInput`: `fields.tick` must be `f.u32` (`kind === 'u32'`) and must be the **first** declared field. Any other field may follow. The returned schema is used as `RegistryInput.input` and as the element type of `inputMessageSchema`.
+- `defineInput`: `fields.tick` must be `f.u32` (`kind === 'u32'`) and must be the **first** declared field. Any other field may follow. The returned schema is used as `RegistryInput.input` and as the element type of `inputMessageSchema`, which writes a frame's other fields in declaration order and its tick not at all (9.7).
 - Definitions are immutable and registry-independent; ids/kinds are looked up through `SchemaRegistry`, so the same def can be registered in several registries (tests).
 
 ## 11. Files
@@ -784,8 +801,8 @@ Validation (throws `RangeError` with the offending name):
 | `hash.ts` | `fnv1a32` (re-export of `@conduit/math`), `descriptorOf(type)` |
 | `registry.ts` | `SchemaRegistry`, `RegistryInput`, `ComponentLike`, `MessageDef`, `EventDef`, `MessageDirection`, `InputFrameBase` |
 | `envelope.ts` | `FrameWriter`, `readFrame`, `MessageHeader`, `seqAfter`, `nextSeq(seq)` |
-| `messages.ts` | `CoreKind`, `CORE_MESSAGES`, `HelloSchema`, `WelcomeSchema`, `RejectedSchema`, `RejectReason`, `SessionStateSchema`, `PlayerEntrySchema`, `PlayerState`, `ReadySchema`, `LeaveSchema`, `SpawnedSchema`, `inputMessageSchema`, `INPUT_FRAMES_PER_MESSAGE`, `InputPayload`, `AckSchema`, `PingSchema`, `PongSchema`, `REGION_ID_MAX`, `REGION_LIST_MAX`, `RegionSetSchema`, `RegionLoadStateSchema`, `KickedSchema`, `KickReason`, and the `Infer`ed payload types (`HelloPayload`, `WelcomePayload`, `RejectedPayload`, `PlayerEntryPayload`, `SessionStatePayload`, `ReadyPayload`, `LeavePayload`, `SpawnedPayload`, `AckPayload`, `PingPayload`, `PongPayload`, `RegionSetPayload`, `RegionLoadStatePayload`, `KickedPayload`) |
-| `snapshot.ts` | `SNAPSHOT_FLAG_FULL`, `SNAPSHOT_FLAG_MASKED`, `SnapshotHeader`, `SnapshotComponent`, `SnapshotCreate`, `SnapshotUpdate`, `SnapshotData`, `encodeSnapshot`, `decodeSnapshot`, `writeSnapshotHeader`, `readSnapshotHeader` |
+| `messages.ts` | `CoreKind`, `CORE_MESSAGES`, `HelloSchema`, `WelcomeSchema`, `RejectedSchema`, `RejectReason`, `SessionStateSchema`, `PlayerEntrySchema`, `PlayerState`, `ReadySchema`, `LeaveSchema`, `SpawnedSchema`, `inputMessageSchema`, `INPUT_FRAMES_PER_MESSAGE`, `INPUT_FLAG_GAPS`, `InputPayload`, `AckSchema`, `PingSchema`, `PongSchema`, `REGION_ID_MAX`, `REGION_LIST_MAX`, `RegionSetSchema`, `RegionLoadStateSchema`, `KickedSchema`, `KickReason`, and the `Infer`ed payload types (`HelloPayload`, `WelcomePayload`, `RejectedPayload`, `PlayerEntryPayload`, `SessionStatePayload`, `ReadyPayload`, `LeavePayload`, `SpawnedPayload`, `AckPayload`, `PingPayload`, `PongPayload`, `RegionSetPayload`, `RegionLoadStatePayload`, `KickedPayload`) |
+| `snapshot.ts` | `SNAPSHOT_FLAG_FULL`, `SNAPSHOT_FLAG_MASKED`, `SNAPSHOT_FLAG_STATE_TICKS`, `SnapshotHeader`, `SnapshotComponent`, `SnapshotCreate`, `SnapshotUpdate`, `SnapshotData`, `encodeSnapshot`, `decodeSnapshot`, `writeSnapshotHeader`, `readSnapshotHeader`, `writeEntity`, `readEntity` |
 | `events.ts` | `WireEvent`, `EventsData`, `encodeEvents`, `decodeEvents` |
 | `define.ts` | `defineMessage`, `defineEvent`, `defineInput`, `assertName(name)` |
 
@@ -801,8 +818,8 @@ Validation (throws `RangeError` with the offending name):
 | `hash.test.ts` | FNV test vectors (`''`, `'a'`, `'foobar'` = `0xBF9CF968`); descriptor strings for each kind match the grammar exactly; scale `0.001` renders as `0.001`; changing any field/scale/max/order changes the schema hash |
 | `registry.test.ts` | ids identical under random permutations of `components`/`messages`/`events`; game kinds start at 128; overflow limits throw; core-name collision throws; registry hash changes when a component flips `replicate`, a message changes direction, or the input schema changes; `interpolate` changes do not change the hash |
 | `envelope.test.ts` | frame with 0, 1, 255 messages; 256th throws; unknown kind skipped and following message still delivered; truncated payload → `length`; wrong wire version → `version`; `message()` rollback on encoder throw leaves `count` unchanged; `seqAfter` at the wrap boundary |
-| `messages.test.ts` | byte-exact fixtures (hex) for Hello, Welcome, Rejected, SessionState, Spawned, Ack, Ping, Pong, RegionSet, RegionLoadState, Kicked, empty Ready/Leave; `inputMessageSchema` with a sample input schema |
-| `snapshot.test.ts` | byte-exact fixture of a snapshot with two regions, one create with two components, one update with one changed and one removed component, one destroy; round trip through a registry; unknown compId → `unknown`; bad regionIdx → `range`; empty snapshot is 19 + 1 + 2 + 2 + 2 bytes. Field masks (9.11.1): byte-exact fixture of a MASKED snapshot with a whole create, a `u8` and a `u16` mask, a zero mask, a zero-field component and a component of more than 16 fields, whose decode carries `mask` and exactly the flagged keys and re-encodes to the same bytes; a zero mask alone; the create's bytes equal the unmasked encoding and a `mask` on a create is rejected; unknown mask bits (`u8`, `u16`, zero-field) → `range` at the mask's first byte, a truncated mask → `eof`, and the same masks rejected on encode with the writer rolled back; a `mask` in an unmasked snapshot or on a wide component → `EncodeError('range')`; the same whole data encodes to a hand-derived unmasked fixture (no mask keys after decode, `mask: undefined` equals absent) and, with MASKED, to the same records behind full masks; flag bits 2–7 masked off on decode and rejected on encode |
+| `messages.test.ts` | byte-exact fixtures (hex) for Hello, Welcome, Rejected, SessionState, Spawned, Ack, Ping, Pong, RegionSet, RegionLoadState, Kicked, empty Ready/Leave; `inputMessageSchema` with a sample input schema: consecutive frames without ticks, gapped frames behind `INPUT_FLAG_GAPS` (a two-byte gap included), an empty message; `decodeInto` reuses the target's frames; a count over 4, a tick past u32 and a truncated frame rejected on decode; frames that do not start at `firstTick` and ascend rejected on encode with the writer rolled back; a schema without a leading `tick` rejected |
+| `snapshot.test.ts` | byte-exact fixture of a snapshot with two regions, one create with two components, one update with one changed and one removed component, one destroy; round trip through a registry; unknown compId → `unknown`; bad regionIdx → `range`; empty snapshot is 19 + 1 + 2 + 2 + 2 bytes. Entity ids as gaps: one-byte gaps, a three-byte gap to a reused slot's generation, the five-byte gap to `0xffffffff`, non-ascending, duplicate, `ENTITY_NONE` and non-integer ids rejected on encode, an id past u32 rejected on decode; STATE_TICKS stamps as ages (one and two bytes), an age past `serverTick` rejected. Field masks (9.11.1): byte-exact fixture of a MASKED snapshot with a whole create, a `u8` and a `u16` mask, a zero mask, a zero-field component and a component of more than 16 fields, whose decode carries `mask` and exactly the flagged keys and re-encodes to the same bytes; a zero mask alone; the create's bytes equal the unmasked encoding and a `mask` on a create is rejected; unknown mask bits (`u8`, `u16`, zero-field) → `range` at the mask's first byte, a truncated mask → `eof`, and the same masks rejected on encode with the writer rolled back; a `mask` in an unmasked snapshot or on a wide component → `EncodeError('range')`; the same whole data encodes to a hand-derived unmasked fixture (no mask keys after decode, `mask: undefined` equals absent) and, with MASKED, to the same records behind full masks; flag bits 2–7 masked off on decode and rejected on encode |
 | `events.test.ts` | round trip with two events in two regions and one global (`REGION_IDX_NONE`); non-replicated event id → `unknown` |
 | `define.test.ts` | name validation; `defineInput` without a leading `u32 tick` throws; `defineEvent` default `replicate=false`; defs are reusable across two registries with different kinds |
 | `purity.test.ts` | no source file under `src/` references `Date`, `Math.random`, `setTimeout`, `setInterval`, `performance`, `process`, `fetch`, or `require` (regex over file contents) |

@@ -81,6 +81,7 @@ export interface PreparedReplication {
 const equal = (a: Uint8Array, b: Uint8Array) =>
   a.byteLength === b.byteLength && a.every((byte, index) => byte === b[index]);
 const compare = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
+const byEntity = (a: { entity: EntityId }, b: { entity: EntityId }) => a.entity - b.entity;
 
 /** Per-client wire images; dirty discovery never uses a global last-snapshot watermark. */
 export class ReplicationPlanner {
@@ -204,6 +205,9 @@ export class ReplicationPlanner {
     const componentIds = source.registry.replicated.map((component) =>
       source.registry.componentId(component),
     );
+    // A withheld component is absent for this client (docs/net.md A.8.4): its wire image goes, so
+    // it is sent as removed, and comes back whole once it is no longer withheld.
+    const withheldOf = source.withheld;
     const candidates: Candidate[] = [];
     let cacheBytes = 0;
     for (const group of groups) {
@@ -217,10 +221,11 @@ export class ReplicationPlanner {
         const changed: SnapshotComponent[] = [];
         const removed: number[] = [];
         const slot = source.slot(entity);
+        const hidden = withheldOf?.(entity);
         for (const id of componentIds) {
           const store = source.store(id);
           const prior = previous?.components.get(id);
-          if (!store.has(entity)) {
+          if (!store.has(entity) || hidden?.has(id) === true) {
             if (prior) {
               removed.push(id);
               dirty = true;
@@ -561,7 +566,8 @@ export class ReplicationPlanner {
   ): SnapshotData {
     const regions: string[] = [];
     const indices = new Map<string, number>();
-    const entries = creates.map((create) => {
+    // Records go in ascending entity order (docs/protocol.md 9.11), whatever the groups' order.
+    const entries = [...creates].sort(byEntity).map((create) => {
       const region = source.regionOf(create.entity);
       if (region === null || region === undefined) return create;
       let index = indices.get(region);
@@ -584,7 +590,7 @@ export class ReplicationPlanner {
       },
       regions,
       creates: entries,
-      updates,
+      updates: [...updates].sort(byEntity),
       destroys,
     };
   }

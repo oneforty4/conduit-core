@@ -148,7 +148,7 @@ const C2S_SCHEMAS: Record<number, readonly [string, Schema<unknown>]> = {
   [CoreKind.Leave]: ['Leave', LeaveSchema as Schema<unknown>],
 };
 
-/** Decodes a client frame into messages (every client frame holds exactly one message today). */
+/** Decodes a client frame into messages (an Ack may ride with an Input or a Ping, docs/net.md B.6). */
 export function decodeClientFrame(buf: Uint8Array, registry: SchemaRegistry): ClientMessage[] {
   const out: ClientMessage[] = [];
   readFrame(buf, (header, r) => {
@@ -174,6 +174,8 @@ export class ScriptedServer {
   readonly link: MemoryLink;
   readonly registry: SchemaRegistry;
   readonly received: ClientMessage[] = [];
+  /** The names of each frame's messages, frame by frame. */
+  readonly frames: string[][] = [];
   closed: { code: number; reason: string } | null = null;
   private seq = 0;
   private readonly fw = new FrameWriter();
@@ -181,7 +183,11 @@ export class ScriptedServer {
   constructor(link: MemoryLink, registry: SchemaRegistry) {
     this.link = link;
     this.registry = registry;
-    link.onMessage((buf) => this.received.push(...decodeClientFrame(buf, registry)));
+    link.onMessage((buf) => {
+      const messages = decodeClientFrame(buf, registry);
+      this.received.push(...messages);
+      this.frames.push(messages.map((m) => m.name));
+    });
     link.onClose((code, reason) => {
       this.closed = { code, reason };
     });

@@ -45,6 +45,11 @@ export const SLEW_DEADBAND_MS = 1;
 export const SNAP_THRESHOLD_MS = 250;
 /** Input frames kept by `InputRing`. */
 export const INPUT_RING = 8;
+/**
+ * Client ticks an Ack waits, at most, for a frame to ride in (docs/net.md B.6): the next Input's,
+ * which is due within one; the second is slack for a late input wake.
+ */
+export const DEFERRED_SEND_TICKS = 2;
 /** Samples per interpolated component in a `SampleRing`. */
 export const SAMPLE_RING = 8;
 /** Replicated events buffered for render-time dispatch (M2, docs/net.md B.7). */

@@ -1,8 +1,11 @@
+import type { ByteReader, ByteWriter } from './bytes.ts';
 import { CompatibilityField, type CompatibilityDescriptor } from './compatibility.ts';
 import { PROTOCOL_SESSION_CAPACITY_MAX } from './constants.ts';
-import { f } from './fields.ts';
+import { DecodeError, EncodeError } from './errors.ts';
+import { f, type FieldType } from './fields.ts';
+import { fnv1a32 } from './hash.ts';
 import type { InputFrameBase, MessageDef, MessageDirection } from './registry.ts';
-import { defineSchema, type Schema } from './schema.ts';
+import { defineSchema, encodeWith, type Schema } from './schema.ts';
 import { SnapshotLimitsField, type SnapshotLimits } from './snapshot-fragment.ts';
 
 type PayloadOf<S> = S extends Schema<infer T> ? T : never;
@@ -120,18 +123,147 @@ export type SpawnedPayload = PayloadOf<typeof SpawnedSchema>;
 
 // 9.7 Input (c2s)
 export const INPUT_FRAMES_PER_MESSAGE = 4;
+/** Bit 7 of an Input's count byte: the frame ticks do not follow on, so a gap precedes each frame. */
+export const INPUT_FLAG_GAPS = 0x80;
 export interface InputPayload<I extends InputFrameBase = InputFrameBase> {
   firstTick: number;
   frames: I[];
 }
-/** `u32 firstTick | u16 count (<= 4) | InputFrame x count`. */
+
+/**
+ * The Input payload (docs/protocol.md 9.7), hand-coded: `u32 firstTick | u8 count | frame 0 |
+ * (varuint gap | frame) x (count - 1)`, where a frame is the InputFrame's fields after `tick` and
+ * the gaps are there only when bit 7 of `count` (`INPUT_FLAG_GAPS`) is set. Frame 0's tick is
+ * `firstTick`, and each later frame's the one before it plus 1 plus its gap (0 without the flag).
+ * Frames must start at `firstTick` and ascend (`EncodeError('range')` otherwise). The descriptor is
+ * the payload's logical struct, `struct{firstTick:u32,frames:array(<input>,4)}`.
+ */
 export function inputMessageSchema<I extends InputFrameBase>(
   input: Schema<I>,
 ): Schema<InputPayload<I>> {
-  return defineSchema({
+  if (input.fieldNames[0] !== 'tick' || input.fields['tick']?.kind !== 'u32') {
+    throw new RangeError('inputMessageSchema: the input schema must begin with tick: f.u32');
+  }
+  const fields = Object.freeze({
     firstTick: f.u32,
     frames: f.array(input.type, INPUT_FRAMES_PER_MESSAGE),
   });
+  const descriptor = f.struct(fields).descriptor;
+  // Every field after tick, in declaration order: what a frame carries on the wire.
+  const names = input.fieldNames.slice(1);
+  const types = names.map((name) => input.fields[name]!);
+  const n = names.length;
+
+  const encode = (w: ByteWriter, v: InputPayload<I>): void => {
+    const frames = v.frames;
+    const count = frames.length;
+    if (count > INPUT_FRAMES_PER_MESSAGE) {
+      throw new EncodeError('count', `Input: ${count} frames > ${INPUT_FRAMES_PER_MESSAGE}`);
+    }
+    let gaps = false;
+    for (let i = 0; i < count; i++) {
+      const tick = frames[i]!.tick;
+      const previous = i === 0 ? v.firstTick - 1 : frames[i - 1]!.tick;
+      if (
+        !Number.isInteger(tick) ||
+        tick <= previous ||
+        tick > 0xffffffff ||
+        (i === 0 && tick !== v.firstTick)
+      ) {
+        throw new EncodeError('range', 'Input: frame ticks must start at firstTick and ascend');
+      }
+      if (tick !== previous + 1) gaps = true;
+    }
+    w.u32(v.firstTick);
+    w.u8(count | (gaps ? INPUT_FLAG_GAPS : 0));
+    for (let i = 0; i < count; i++) {
+      const frame = frames[i] as unknown as Record<string, unknown>;
+      if (gaps && i > 0) w.varuint(frames[i]!.tick - frames[i - 1]!.tick - 1);
+      for (let j = 0; j < n; j++) types[j]!.encode(w, frame[names[j]!]);
+    }
+  };
+
+  /** Into `target`'s frame objects where it has them (`decodeInto`), else fresh ones. */
+  const read = (r: ByteReader, target: InputPayload<I> | undefined): InputPayload<I> => {
+    const firstTick = r.u32();
+    const countOffset = r.offset;
+    const head = r.u8();
+    const count = head & ~INPUT_FLAG_GAPS;
+    if (count > INPUT_FRAMES_PER_MESSAGE) {
+      throw new DecodeError(
+        'count',
+        countOffset,
+        `Input: ${count} frames > ${INPUT_FRAMES_PER_MESSAGE}`,
+      );
+    }
+    const gaps = (head & INPUT_FLAG_GAPS) !== 0;
+    const out = target ?? { firstTick, frames: [] };
+    const frames = out.frames;
+    let tick = firstTick;
+    for (let i = 0; i < count; i++) {
+      if (i > 0) {
+        const gapOffset = r.offset;
+        tick += 1 + (gaps ? r.varuint() : 0);
+        if (tick > 0xffffffff) {
+          throw new DecodeError('range', gapOffset, 'Input: frame tick beyond u32');
+        }
+      }
+      const reused = frames[i] as unknown as Record<string, unknown> | undefined;
+      if (reused === undefined) {
+        // Built as f.struct's decode builds it: own keys in declaration order, tick first.
+        const frame: Record<string, unknown> = { tick };
+        for (let j = 0; j < n; j++) frame[names[j]!] = types[j]!.decode(r);
+        frames[i] = frame as unknown as I;
+      } else {
+        reused['tick'] = tick;
+        for (let j = 0; j < n; j++) {
+          const name = names[j]!;
+          reused[name] = types[j]!.decodeInto(r, reused[name]);
+        }
+      }
+    }
+    frames.length = count;
+    out.firstTick = firstTick;
+    return out;
+  };
+
+  const type: FieldType<InputPayload<I>> = Object.freeze({
+    kind: 'struct' as const,
+    descriptor,
+    allocates: true,
+    numeric: false,
+    encode,
+    decode: (r: ByteReader) => read(r, undefined),
+    decodeInto: (r: ByteReader, target: InputPayload<I>) => read(r, target ?? undefined),
+    create: (): InputPayload<I> => ({ firstTick: 0, frames: [] }),
+    copy(v: InputPayload<I>, out: InputPayload<I>): InputPayload<I> {
+      const o = out ?? { firstTick: 0, frames: [] };
+      o.firstTick = v.firstTick;
+      const count = v.frames.length;
+      if (o.frames.length > count) o.frames.length = count;
+      for (let i = 0; i < count; i++) {
+        const cur = o.frames[i];
+        o.frames[i] = input.copy(v.frames[i]!, cur ?? input.create());
+      }
+      return o;
+    },
+  });
+  const schema: Schema<InputPayload<I>> = {
+    fields,
+    fieldNames: Object.freeze(Object.keys(fields)),
+    type,
+    descriptor,
+    hash: fnv1a32(descriptor),
+    allocates: true,
+    create: () => type.create(),
+    copy: (v, out) => type.copy(v, out),
+    encode: (w, v) => encodeWith(w, schema, v),
+    decode: (r) => type.decode(r),
+    decodeInto: (r, target) => {
+      type.decodeInto(r, target);
+    },
+  };
+  return Object.freeze(schema);
 }
 
 // 9.8 Ack (c2s)

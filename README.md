@@ -82,8 +82,11 @@ and Three.js duplication caveats.
 
 ## Current contracts and limits
 
-- **Wire version 4:** coordinate client/server upgrades. Game simulation compatibility,
+- **Wire version 5:** coordinate client/server upgrades. Game simulation compatibility,
   state-schema identity, application saves, and exact replay have separate contracts.
+- **Bandwidth options are opt-in:** permessage-deflate on game sockets (`createServer`'s and the
+  host's `compression`), components withheld per recipient (`withheldComponents`), and one client
+  frame per tick, the Ack riding with the next Input (`batchSends: true`).
 - **Eight players remain the default and public limit.** The wire codec ceiling is sixteen;
   sixteen-player admission did not pass qualification.
 - Prediction, selective replication budgets, diagnostics, and asset memory policies are

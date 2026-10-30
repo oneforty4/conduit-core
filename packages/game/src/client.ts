@@ -178,6 +178,8 @@ export interface CreateClientOpts<I extends InputFrame = InputFrame> {
   maxInputLeadTicks?: number | undefined;
   maxSessionCapacity?: number | undefined;
   extrapolation?: { horizonMs: number; onLimit?: 'hold' | 'reset' } | undefined;
+  /** NetClient's `batchSends` (docs/net.md B.6): true, an Ack rides with the next Input. Default false. */
+  batchSends?: boolean | undefined;
   onFrame?: ((frame: FrameContext<I>) => void) | undefined;
   /** s2c game message handlers keyed by message name. */
   onMessage?: Record<string, (msg: unknown, frame: FrameContext<I>) => void> | undefined;
@@ -548,6 +550,7 @@ class Client<I extends InputFrame> implements GameClient<I> {
       maxInputLeadTicks: this.opts.maxInputLeadTicks,
       maxSessionCapacity: this.opts.maxSessionCapacity,
       extrapolation: this.opts.extrapolation,
+      batchSends: this.opts.batchSends,
       sampleInput: (frame, context) => this.sample(net, frame, context),
     });
     this.netClient = net;

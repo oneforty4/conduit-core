@@ -167,6 +167,31 @@ describe('Gateway: upgrades', () => {
   });
 });
 
+describe('Gateway: compression (docs/net.md A.2)', () => {
+  it('leaves game sockets uncompressed by default', async () => {
+    const socket = await joinAndConnect(target, alice.cookie, running, 'alice');
+    await socket.next('Welcome');
+    expect(socket.ws.extensions).toBe('');
+    socket.ws.close();
+    await socket.closed;
+  });
+
+  it('compresses them with HostOptions.compression, through to the worker and back', async () => {
+    const compressed = await startHost({ compression: true });
+    try {
+      const bob = await lobbyLogin(compressed, 'bob');
+      const id = (await createSession(compressed, bob.cookie)).id;
+      const socket = await joinAndConnect(compressed, bob.cookie, id, 'bob');
+      expect(socket.ws.extensions).toBe('permessage-deflate');
+      expect((await socket.next('Welcome')).payload).toMatchObject({ simTickRate: 60 });
+      socket.ws.close();
+      await socket.closed;
+    } finally {
+      await compressed.close();
+    }
+  });
+});
+
 describe('Gateway: the Hello check', () => {
   it('carries bounded declarations to the worker and rejects a declared client against schema-only session', async () => {
     const valid = token({ accountId: alice.accountId, sessionId: running });

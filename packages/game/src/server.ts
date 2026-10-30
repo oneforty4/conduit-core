@@ -5,6 +5,7 @@ import {
   Session,
   WsLink,
   type SessionOptions,
+  type WsCompressionOptions,
 } from '@conduit/net-server';
 import { AUTOSAVE_INTERVAL_MS, Autosaver, type BlobStore, MemoryStore } from '@conduit/persist';
 import type { InputFrame } from '@conduit/sim';
@@ -69,6 +70,11 @@ export interface CreateServerOpts<I extends InputFrame = InputFrame> extends Pic
   port?: number | undefined;
   /** Default `DEFAULT_SERVER_HOST`. */
   host?: string | undefined;
+  /**
+   * permessage-deflate on the game sockets (net-server's `createWsServer`, docs/net.md A.2): `true`
+   * for `DEFAULT_WS_COMPRESSION`, or options. Default `false`.
+   */
+  compression?: boolean | WsCompressionOptions | undefined;
   /**
    * Default `new MemoryStore()`. The server owns the store it is given: `close()` closes it after
    * the final save, and so does a failed start, when it has a `close()` method (`SqliteStore` has).
@@ -201,7 +207,7 @@ export function createServer<I extends InputFrame>(
         onError: (err) => log('error', 'saving the session failed', err),
       }),
   });
-  return serve(session, store, opts.host ?? DEFAULT_SERVER_HOST, port, log);
+  return serve(session, store, opts.host ?? DEFAULT_SERVER_HOST, port, log, opts.compression);
 }
 
 /** Closes a store that has a `close()` (`SqliteStore`); other stores have nothing to release. */
@@ -233,6 +239,7 @@ async function serve(
   host: string,
   port: number,
   log: ServerLog,
+  compression: CreateServerOpts['compression'],
 ): Promise<GameServer> {
   // A failed start stops what did start and closes the store it was given, then rethrows the start
   // failure (a failure of that cleanup is only logged).
@@ -252,7 +259,7 @@ async function serve(
   }
   let wss: WebSocketServer;
   try {
-    wss = createWsServer({ host, port });
+    wss = createWsServer({ host, port, compression });
   } catch (err) {
     return abandon(err, [() => session.stop()]);
   }

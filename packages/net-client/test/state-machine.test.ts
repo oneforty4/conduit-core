@@ -136,20 +136,23 @@ function fullSnapshot(h: Harness, tick: number, entities: number[]): SnapshotDat
       flags: SNAPSHOT_FLAG_FULL,
     },
     regions: [],
-    creates: entities.map((entity) => ({
-      entity,
-      regionIdx: REGION_IDX_NONE,
-      components: [
-        {
-          id: tId,
-          value: {
-            pos: { x: 1, y: 0, z: 2 },
-            rot: { x: 0, y: 0, z: 0, w: 1 },
-            vel: { x: 0, y: 0, z: 0 },
+    // Producers send records in ascending entity order (docs/protocol.md 9.11).
+    creates: [...entities]
+      .sort((a, b) => a - b)
+      .map((entity) => ({
+        entity,
+        regionIdx: REGION_IDX_NONE,
+        components: [
+          {
+            id: tId,
+            value: {
+              pos: { x: 1, y: 0, z: 2 },
+              rot: { x: 0, y: 0, z: 0, w: 1 },
+              vel: { x: 0, y: 0, z: 0 },
+            },
           },
-        },
-      ],
-    })),
+        ],
+      })),
     updates: [],
     destroys: [],
   };

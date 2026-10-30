@@ -47,10 +47,11 @@ import { player } from './harness.ts';
  * every open tab to refresh (`Rejected: SchemaMismatch`, PLAN.md Spike 5); update it deliberately.
  * M4 added the `Joins` message (was 0xb82e70c1); the core `Transform.vel` became `f32` (was
  * 0x4bf19379). Wire 3 adds snapshot-limit negotiation and SnapshotPart; wire 4 adds capacity
- * admission. `persist` flags are not part of this wire hash (they are included in the
+ * admission; wire 5 drops the ticks of Input frames and makes snapshot record ids varuints (was
+ * 0x8a68c0f8). `persist` flags are not part of this wire hash (they are included in the
  * independent state schema hash).
  */
-const REGISTRY_HASH = 0x8a68c0f8;
+const REGISTRY_HASH = 0x432f2877;
 
 interface SharedModules {
   game: typeof GameModule;

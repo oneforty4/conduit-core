@@ -69,7 +69,7 @@ function collect(buf: Uint8Array): Seen[] {
 
 describe('constants', () => {
   it('match the envelope layout', () => {
-    expect(WIRE_VERSION).toBe(4);
+    expect(WIRE_VERSION).toBe(5);
     expect(FRAME_HEADER_BYTES).toBe(2);
     expect(MESSAGE_HEADER_BYTES).toBe(9);
     expect(MAX_MESSAGES_PER_FRAME).toBe(255);
@@ -89,7 +89,7 @@ describe('FrameWriter', () => {
     expect(fw.count).toBe(1);
     const frame = fw.finish();
     // 04 wireVersion | 01 count | 05 kind | 04 03 02 01 tick | ef be seq | 04 00 length | dd cc bb aa
-    expect(hex(frame)).toBe('04 01 05 04 03 02 01 ef be 04 00 dd cc bb aa');
+    expect(hex(frame)).toBe('05 01 05 04 03 02 01 ef be 04 00 dd cc bb aa');
     expect(fw.count).toBe(0);
   });
 
@@ -97,7 +97,7 @@ describe('FrameWriter', () => {
     const fw = new FrameWriter();
     fw.begin();
     const frame = fw.finish();
-    expect(hex(frame)).toBe('04 00');
+    expect(hex(frame)).toBe('05 00');
     expect(collect(frame)).toEqual([]);
   });
 
@@ -105,7 +105,7 @@ describe('FrameWriter', () => {
     const fw = new FrameWriter();
     fw.begin();
     fw.message(CoreKind.Ready, 0, 0, () => {});
-    expect(hex(fw.finish())).toBe('04 01 02 00 00 00 00 00 00 00 00');
+    expect(hex(fw.finish())).toBe('05 01 02 00 00 00 00 00 00 00 00');
   });
 
   it('frames 255 messages and rejects the 256th without changing count', () => {
@@ -146,7 +146,7 @@ describe('FrameWriter', () => {
     expect(fw.count).toBe(1);
     fw.message(7, 3, 3, () => {});
     expect(hex(fw.finish())).toBe(
-      '04 02 05 01 00 00 00 01 00 04 00 07 00 00 00 07 03 00 00 00 03 00 00 00',
+      '05 02 05 01 00 00 00 01 00 04 00 07 00 00 00 07 03 00 00 00 03 00 00 00',
     );
   });
 
@@ -160,7 +160,7 @@ describe('FrameWriter', () => {
     fw.message(130, 0, 0, (w) => w.bytes(new Uint8Array(MAX_PAYLOAD_BYTES)));
     const frame = fw.finish();
     expect(frame.length).toBe(2 + 9 + MAX_PAYLOAD_BYTES);
-    expect(hex(frame.subarray(0, 11))).toBe('04 01 82 00 00 00 00 00 00 ff ff');
+    expect(hex(frame.subarray(0, 11))).toBe('05 01 82 00 00 00 00 00 00 ff ff');
   });
 
   it('rejects out-of-range header fields and rolls back', () => {
@@ -171,7 +171,7 @@ describe('FrameWriter', () => {
     expect(encodeErr(() => fw.message(1, 0, 65536, () => {}))).toBe('range');
     expect(encodeErr(() => fw.message(1, -1, 0, () => {}))).toBe('range');
     expect(fw.count).toBe(0);
-    expect(hex(fw.finish())).toBe('04 00');
+    expect(hex(fw.finish())).toBe('05 00');
   });
 
   it('requires begin() and supports abort()', () => {
@@ -186,7 +186,7 @@ describe('FrameWriter', () => {
     fw.begin();
     fw.begin(); // begin resets any partial frame
     fw.message(2, 0, 0, () => {});
-    expect(hex(fw.finish())).toBe('04 01 02 00 00 00 00 00 00 00 00');
+    expect(hex(fw.finish())).toBe('05 01 02 00 00 00 00 00 00 00 00');
   });
 
   it('returns an independent copy from finish()', () => {
@@ -197,7 +197,7 @@ describe('FrameWriter', () => {
     fw.begin();
     fw.message(1, 0, 0, (w) => w.u8(0xbb));
     fw.finish();
-    expect(hex(first)).toBe('04 01 01 00 00 00 00 00 00 01 00 aa');
+    expect(hex(first)).toBe('05 01 01 00 00 00 00 00 00 01 00 aa');
     expect(first.byteOffset).toBe(0);
     expect(first.buffer.byteLength).toBe(first.length);
   });
@@ -207,7 +207,7 @@ describe('readFrame', () => {
   it('parses headers and limits each payload reader', () => {
     // 04 02 | c8 ff ff ff ff ff ff 01 00 | 7f | 05 07 00 00 00 01 00 04 00 | 2a 00 00 00
     const frame = fromHex(
-      '04 02 c8 ff ff ff ff ff ff 01 00 7f 05 07 00 00 00 01 00 04 00 2a 00 00 00',
+      '05 02 c8 ff ff ff ff ff ff 01 00 7f 05 07 00 00 00 01 00 04 00 2a 00 00 00',
     );
     const seen: { header: MessageHeader; start: number; end: number }[] = [];
     readFrame(frame, (header, payload) => {
@@ -223,7 +223,7 @@ describe('readFrame', () => {
   it('skips an unknown kind by payloadLength and still delivers the following message', () => {
     // unknown kind 200 with a 3-byte payload the callback never reads, then Ping{clientTimeMs: 42}
     const frame = fromHex(
-      '04 02 c8 00 00 00 00 00 00 03 00 01 02 03 05 07 00 00 00 01 00 04 00 2a 00 00 00',
+      '05 02 c8 00 00 00 00 00 00 03 00 01 02 03 05 07 00 00 00 01 00 04 00 2a 00 00 00',
     );
     const delivered: number[] = [];
     readFrame(frame, (h, payload) => {
@@ -248,7 +248,7 @@ describe('readFrame', () => {
   });
 
   it('gives each payload reader an eof at the payload boundary', () => {
-    const frame = fromHex('04 02 05 00 00 00 00 00 00 01 00 aa 06 00 00 00 00 00 00 01 00 bb');
+    const frame = fromHex('05 02 05 00 00 00 00 00 00 01 00 aa 06 00 00 00 00 00 00 01 00 bb');
     const errors: unknown[] = [];
     readFrame(frame, (_h, payload) => {
       payload.u8();
@@ -262,7 +262,7 @@ describe('readFrame', () => {
 
   it('throws length for a truncated payload before running any callback', () => {
     // a valid first message, then payloadLength 4 (at offset 18) with only 2 bytes left
-    const frame = fromHex('04 02 05 00 00 00 00 00 00 00 00 05 00 00 00 00 00 00 04 00 01 02');
+    const frame = fromHex('05 02 05 00 00 00 00 00 00 00 00 05 00 00 00 00 00 00 04 00 01 02');
     let calls = 0;
     expect(decodeErr(() => readFrame(frame, () => calls++))).toEqual({
       code: 'length',
@@ -270,7 +270,7 @@ describe('readFrame', () => {
     });
     expect(calls).toBe(0);
     expect(
-      decodeErr(() => readFrame(fromHex('04 01 05 00 00 00 00 00 00 04 00 01 02'), () => {})),
+      decodeErr(() => readFrame(fromHex('05 01 05 00 00 00 00 00 00 04 00 01 02'), () => {})),
     ).toEqual({
       code: 'length',
       offset: 9,
@@ -278,6 +278,10 @@ describe('readFrame', () => {
   });
 
   it('throws version for a wrong wire version', () => {
+    expect(decodeErr(() => readFrame(fromHex('04 00'), () => {}))).toEqual({
+      code: 'version',
+      offset: 0,
+    });
     expect(decodeErr(() => readFrame(fromHex('03 00'), () => {}))).toEqual({
       code: 'version',
       offset: 0,
@@ -301,15 +305,15 @@ describe('readFrame', () => {
       code: 'eof',
       offset: 0,
     });
-    expect(decodeErr(() => readFrame(fromHex('04'), () => {}))).toEqual({ code: 'eof', offset: 1 });
-    expect(decodeErr(() => readFrame(fromHex('04 01 05 00 00'), () => {}))).toEqual({
+    expect(decodeErr(() => readFrame(fromHex('05'), () => {}))).toEqual({ code: 'eof', offset: 1 });
+    expect(decodeErr(() => readFrame(fromHex('05 01 05 00 00'), () => {}))).toEqual({
       code: 'eof',
       offset: 2,
     });
   });
 
   it('throws length for trailing bytes after the last message', () => {
-    expect(decodeErr(() => readFrame(fromHex('04 00 ff'), () => {}))).toEqual({
+    expect(decodeErr(() => readFrame(fromHex('05 00 ff'), () => {}))).toEqual({
       code: 'length',
       offset: 2,
     });

@@ -21,6 +21,7 @@ import {
   RejectedSchema,
   RejectReason,
 } from '@conduit/protocol';
+import { type WsCompressionOptions, wsPerMessageDeflate } from '@conduit/net-server';
 import { type RawData, type WebSocket, WebSocketServer } from 'ws';
 import {
   GATEWAY_CLOSE,
@@ -48,6 +49,11 @@ export interface GatewayOptions {
   /** The Hello timer; default the globals. */
   setTimeout?: ((fn: () => void, ms: number) => unknown) | undefined;
   clearTimeout?: ((handle: unknown) => void) | undefined;
+  /**
+   * permessage-deflate on game sockets (net-server's `wsPerMessageDeflate`, docs/net.md A.2):
+   * `true` for `DEFAULT_WS_COMPRESSION`, or options. Default `false`. Presence sockets never are.
+   */
+  compression?: boolean | WsCompressionOptions | undefined;
 }
 
 const SESSION_PATH_RE = /^\/session\/([^/]+)$/;
@@ -105,11 +111,7 @@ export class Gateway {
   private readonly now: () => number;
   private readonly setTimer: (fn: () => void, ms: number) => unknown;
   private readonly clearTimer: (handle: unknown) => void;
-  private readonly sessionServer = new WebSocketServer({
-    noServer: true,
-    perMessageDeflate: false,
-    maxPayload: MAX_CLIENT_FRAME_BYTES,
-  });
+  private readonly sessionServer: WebSocketServer;
   private readonly presenceServer = new WebSocketServer({
     noServer: true,
     perMessageDeflate: false,
@@ -119,6 +121,11 @@ export class Gateway {
   private isAccepting = true;
 
   constructor(opts: GatewayOptions) {
+    this.sessionServer = new WebSocketServer({
+      noServer: true,
+      perMessageDeflate: wsPerMessageDeflate(opts.compression),
+      maxPayload: MAX_CLIENT_FRAME_BYTES,
+    });
     this.secret = opts.secret;
     this.service = opts.service;
     this.presence = opts.presence;

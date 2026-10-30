@@ -95,6 +95,8 @@ export interface ClientConn {
   /** Ring of the last `SENT_LOG_SIZE` snapshots sent, oldest first. */
   sentLog: SentSnapshot[];
   known: Set<EntityId>;
+  /** Component ids withheld from the client per known entity, as of the last snapshot (A.8.4). */
+  withheld: Map<EntityId, ReadonlySet<number>>;
   /** The next snapshot is FULL. */
   fullNext: boolean;
   /** `RegionLoadState.loaded`. */
@@ -186,6 +188,7 @@ export function createConn(
     lastAckAtMs: nowMs,
     sentLog: [],
     known: new Set(),
+    withheld: new Map(),
     fullNext: true,
     reportedRegions: new Set(),
     regionsReported: false,
@@ -234,6 +237,7 @@ export function transition(
  */
 export function resetReplication(conn: ClientConn, nowMs: number): void {
   conn.known = new Set();
+  conn.withheld = new Map();
   conn.baselineTick = 0;
   conn.lastAckedTick = 0;
   conn.sentLog = [];
